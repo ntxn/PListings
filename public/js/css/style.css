@@ -1,0 +1,10 @@
+h3 {
+  color: white; }
+
+h3 {
+  background-color: #f7f7f7;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+

@@ -1,0 +1,7 @@
+@import 'temp/color';
+$color-grey-light-1: #f7f7f7;
+
+h3 {
+  background-color: $color-grey-light-1;
+  user-select: none;
+}
