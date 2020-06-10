@@ -8,7 +8,7 @@ const config = {
   target: 'node',
 
   // Tell webpack the root file of server application
-  entry: path.resolve(__dirname, 'src') + '/server/index.ts',
+  entry: './src/server/index.ts',
 
   // Tell webpack where to put the output file that's generated
   output: {

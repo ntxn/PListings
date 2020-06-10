@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const baseConfig = require('./webpack.base');
 
 const config = {
-  entry: path.resolve(__dirname, 'src') + '/client/index.ts',
+  entry: './src/client/index.tsx',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'public', 'js'),
@@ -23,11 +23,11 @@ const config = {
           'postcss-loader',
         ],
       },
-    ]
+    ],
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/style.css',
+      filename: '../css/style.css',
       ignoreOrder: false,
     }),
   ],

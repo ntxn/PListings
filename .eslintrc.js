@@ -13,7 +13,7 @@ module.exports = {
     },
   },
   extends: [
-    'airbnb',
+    // 'airbnb',
     'plugin:react/recommended', // Uses the recommended rules from @eslint-plugin-react
     // 'plugin:node/recommended',
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin

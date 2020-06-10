@@ -1,22 +1,29 @@
+const babelLoader = {
+  loader: 'babel-loader',
+  options: {
+    cacheDirectory: true,
+    presets: ['@babel/preset-react', '@babel/preset-env'],
+  },
+};
+
 module.exports = {
+  cache: true,
   // Tell webpack to run ts-loader on every file it runs through
   module: {
     rules: [
       {
-        test: /\.(jsx?|tsx?)$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env', '@babel/preset-typescript'],
-            },
-          },
-        ],
+        use: [babelLoader, 'ts-loader'],
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [babelLoader],
       },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', 'jsx', '.js', 'df'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
 };
