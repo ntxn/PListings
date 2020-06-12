@@ -3,6 +3,7 @@ const babelLoader = {
   options: {
     cacheDirectory: true,
     presets: ['@babel/preset-react', '@babel/preset-env'],
+    plugins: ['@babel/plugin-transform-typescript'],
   },
 };
 
