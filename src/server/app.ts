@@ -1,5 +1,8 @@
 import express from 'express';
 
+import './controllers';
+import { AppRouter } from './utils';
+
 const app = express();
 
 /****************** GLOBAL MIDDLEWARES ******************/
@@ -10,8 +13,6 @@ app.use(express.static('public'));
 app.use(express.json());
 
 /****************** ROUTES ******************/
-app.get('/ping', (req, res) => {
-  res.send('pong');
-});
+app.use(AppRouter.instance);
 
 export { app };
