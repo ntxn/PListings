@@ -1,0 +1,7 @@
+export enum HTML_Methods {
+  get = 'get',
+  post = 'post',
+  patch = 'patch',
+  put = 'put',
+  delete = 'delete',
+}
