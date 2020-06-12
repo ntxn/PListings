@@ -1,7 +1,7 @@
 // import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
-import { UserRole, errMsg } from '../../common';
+import { UserRole, ErrMsg } from '../../common';
 
 interface UserAttrs {
   name: string;
@@ -58,13 +58,13 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, errMsg.NameRequired],
+      required: [true, ErrMsg.NameRequired],
       trim: true,
     },
     email: {
       type: String,
-      required: [true, errMsg.EmailRequired],
-      unique: [true, errMsg.EmailExisted],
+      required: [true, ErrMsg.EmailRequired],
+      unique: [true, ErrMsg.EmailExisted],
       trim: true,
       lowercase: true,
     },
@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
       trim: true,
-      maxlength: [150, errMsg.BioMaxLength],
+      maxlength: [150, ErrMsg.BioMaxLength],
     },
     role: {
       type: String,
@@ -97,8 +97,8 @@ const userSchema = new mongoose.Schema(
     updatedAt: Date,
     password: {
       type: String,
-      minlength: [8, errMsg.PasswordMinLength],
-      required: [true, errMsg.PasswordRequired],
+      minlength: [8, ErrMsg.PasswordMinLength],
+      required: [true, ErrMsg.PasswordRequired],
     },
     tokens: [
       {

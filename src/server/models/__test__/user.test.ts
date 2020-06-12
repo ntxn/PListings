@@ -1,5 +1,5 @@
 import { User, UserDoc } from '../user';
-import { errMsg } from '../../../common';
+import { ErrMsg } from '../../../common';
 
 const name = 'Will Smith';
 const email = 'wsmith@g.io';
@@ -12,21 +12,21 @@ describe('Creating User instance with invalid inputs', () => {
     await expect(user.save()).rejects.toThrow();
 
     user = User.build({ name: '', email, password });
-    await expect(user.save()).rejects.toThrowError(errMsg.NameRequired);
+    await expect(user.save()).rejects.toThrowError(ErrMsg.NameRequired);
 
     user = User.build({ name, email: '', password });
-    await expect(user.save()).rejects.toThrowError(errMsg.EmailRequired);
+    await expect(user.save()).rejects.toThrowError(ErrMsg.EmailRequired);
 
     user = User.build({ name, email, password: '' });
-    await expect(user.save()).rejects.toThrowError(errMsg.PasswordRequired);
+    await expect(user.save()).rejects.toThrowError(ErrMsg.PasswordRequired);
   });
 
   it('Throws min/max length error message when inputs exceed length constraint', async () => {
     let user = User.build({ name, email, password: 'pass' });
-    await expect(user.save()).rejects.toThrowError(errMsg.PasswordMinLength);
+    await expect(user.save()).rejects.toThrowError(ErrMsg.PasswordMinLength);
 
     user = User.build({ name, email, password, bio });
-    await expect(user.save()).rejects.toThrowError(errMsg.BioMaxLength);
+    await expect(user.save()).rejects.toThrowError(ErrMsg.BioMaxLength);
   });
 });
 
