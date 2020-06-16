@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { controller, GET, POST, PATCH } from '../decorators';
-import { Routes, ResourceRoutes } from '../../common';
-import { User } from '../models';
-import { catchAsync, AppError } from '../utils';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import validator from 'validator';
+import { controller, defineBodyProps, GET, POST, PATCH } from '../decorators';
+import { Routes, ResourceRoutes, ErrMsg } from '../../common';
+import { User, UserDoc } from '../models';
+import { catchAsync, AppError, BadRequestError } from '../utils';
 
 /**
  * Create a JWT token with userId as payload
@@ -40,6 +41,27 @@ const createCookieOptions = () => {
 };
 
 /**
+ * Get token from helper method createToken, save newly created token to user's token list.
+ * Attach token to cookie and send it back to User
+ */
+const createSendCookieWithToken = async (
+  res: Response,
+  statusCode: number,
+  user: UserDoc
+) => {
+  const token = createToken(user.id);
+  user.tokens.push({ token });
+  await user.save({ validateBeforeSave: false });
+
+  res.cookie('jwt', token, createCookieOptions());
+
+  res.status(statusCode).json({
+    status: 'success',
+    data: user,
+  });
+};
+
+/**
  * Controller which create routes and handlers for app authentication related
  */
 @controller(ResourceRoutes.Auth)
@@ -58,23 +80,35 @@ class AuthController {
       });
       await user.save();
 
-      // Create token, attach token to a cookie
-      const token = createToken(user.id);
-      user.tokens.push({ token });
-      await user.save({ validateBeforeSave: false });
-
-      res.cookie('jwt', token, createCookieOptions());
-
-      res.status(201).json({
-        status: 'success',
-        data: user,
-      });
+      await createSendCookieWithToken(res, 201, user);
     })(req, res, next);
   }
 
+  /** Route and Handler to log user in */
   @POST(Routes.LogIn)
-  login(req: Request, res: Response): void {
-    res.send('Log in');
+  @defineBodyProps(
+    {
+      prop: 'email',
+      validator: validator.isEmail,
+      message: ErrMsg.EmailInvalid,
+    },
+    {
+      prop: 'password',
+      validator: (pass: string) => pass.length >= 8,
+      message: ErrMsg.PasswordMinLength,
+    }
+  )
+  login(req: Request, res: Response, next: NextFunction): void {
+    catchAsync(async (req, res, next) => {
+      // Find existing user and compare password
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+
+      if (!user || !(await user.correctPassword!(password)))
+        return next(new BadRequestError('Invalid Credentials'));
+
+      await createSendCookieWithToken(res, 201, user);
+    })(req, res, next);
   }
 
   @POST(Routes.ForgotPassword)
