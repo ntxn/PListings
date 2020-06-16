@@ -30,6 +30,7 @@ module.exports = {
       'error',
       { argsIgnorePattern: 'req|res|next|val' },
     ],
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'spaced-comment': 'off',
     'no-console': 'warn',
     'consistent-return': 'off',
