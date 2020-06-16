@@ -3,6 +3,7 @@ export enum Routes {
   SignUp = '/signup',
   LogIn = '/login',
   LogOut = '/logout',
+  LogOutAll = '/logout-all',
   ForgotPassword = '/forgot-password',
   ResetPassword = '/reset-password/:token',
   MyAccount = '/my-account',

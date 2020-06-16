@@ -10,4 +10,8 @@ export enum ErrMsg {
   DuplicateKey = 'MongoDB Duplicate Key Error',
   JwtInvalid = 'Invalid token. Please log in again',
   JwtExpired = 'Your token has expired. Please log in again',
+  JwtNotFoundUserWithToken = 'Cannot find user with this token',
+  Unauthenticated = 'You are not logged in. Please log in to get access',
+  MissingDataForJWT = 'Missing data needed to create JWT',
+  MissingDataForCookie = 'Missing data to create cookie',
 }
