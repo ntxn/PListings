@@ -2,6 +2,7 @@
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import validator from 'validator';
+import jwt from 'jsonwebtoken';
 import { UserRole, ErrMsg } from '../../common';
 import { Model, ModelAttribute } from '../utils';
 
@@ -37,10 +38,16 @@ export interface UserDoc extends mongoose.Document {
   tokens: { token: string }[];
   passwordResetToken?: string[];
   passwordResetExpires?: Date;
-  correctPassword?(password: string): Promise<boolean>;
+  correctPassword(password: string): Promise<boolean>;
+  removeExpiredTokens(): void;
 }
 
-type UserModel = Model<UserAttrs, UserDoc>;
+interface UserModel extends Model<UserAttrs, UserDoc> {
+  findOneByIdAndToken(
+    id: mongoose.Types.ObjectId,
+    token: string
+  ): Promise<UserDoc>;
+}
 
 const displayOptions = {
   transform(doc: UserDoc, ret: UserDoc) {
@@ -130,6 +137,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.index({ _id: 1, 'tokens.token': 1 });
+
 // hash new/updated password and update `updatedAt` field
 userSchema.pre('save', async function (next) {
   const userDoc = this as UserDoc;
@@ -137,6 +146,7 @@ userSchema.pre('save', async function (next) {
     userDoc.password = await bcrypt.hash(userDoc.password, 12);
     if (!userDoc.isNew) userDoc.passwordChangedAt = new Date(Date.now() - 1000);
     userDoc.passwordConfirm = undefined;
+    userDoc.tokens = [];
   }
 
   if (!userDoc.isNew) userDoc.updatedAt = new Date(Date.now() - 1000);
@@ -150,8 +160,27 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(password, this.password);
 };
 
+userSchema.methods.removeExpiredTokens = function () {
+  const userDoc = this as UserDoc;
+  const nowTimestamp = new Date(Date.now()).getTime() / 1000;
+
+  userDoc.tokens = userDoc.tokens.filter(({ token }) => {
+    const decoded = jwt.decode(token);
+    return decoded!.exp > nowTimestamp;
+  });
+};
+
 // Class method to create an instance while ultilize Typescript type checking
 userSchema.statics.build = (attrs: UserAttrs): UserDoc => new User(attrs);
+
+userSchema.statics.findOneByIdAndToken = async (
+  id: mongoose.Types.ObjectId,
+  token: string
+) =>
+  await User.findOne({
+    _id: id,
+    'tokens.token': token,
+  });
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
