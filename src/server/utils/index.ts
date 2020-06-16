@@ -2,4 +2,5 @@ export * from './catchAsync';
 export * from './html-methods';
 export * from './metadata-keys';
 export * from './AppRouter';
-export * from './middleware-interface';
+export * from './interfaces';
+export * from './errors';
