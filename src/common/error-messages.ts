@@ -14,4 +14,5 @@ export enum ErrMsg {
   Unauthenticated = 'You are not logged in. Please log in to get access',
   MissingDataForJWT = 'Missing data needed to create JWT',
   MissingDataForCookie = 'Missing data to create cookie',
+  AccessRestriction = 'You do not have permission to perform this action',
 }
