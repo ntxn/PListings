@@ -1,7 +1,7 @@
 export enum ErrMsg {
   NameRequired = 'Please enter your name',
-  EmailRequired = 'Please enter your email address',
-  EmailInvalid = 'Please enter a valid email address',
+  EmailRequired = 'Please enter your email',
+  EmailInvalid = 'Please enter a valid email',
   PasswordRequired = 'Please enter your password',
   PasswordMinLength = 'Password requirement: minium 8 characters',
   PasswordConfirmRequired = 'Please confirm your password',
