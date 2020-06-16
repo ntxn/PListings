@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 
 import './controllers';
 import { globalErrorHandler } from './controllers';
@@ -12,6 +13,7 @@ app.use(express.static('public'));
 
 // Body parsers
 app.use(express.json());
+app.use(cookieParser());
 
 /****************** ROUTES ******************/
 app.use(AppRouter.instance);

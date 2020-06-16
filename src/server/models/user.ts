@@ -34,6 +34,7 @@ export interface UserDoc extends mongoose.Document {
   password: string;
   passwordConfirm?: string;
   passwordChangedAt?: Date;
+  tokens: { token: string }[];
   passwordResetToken?: string[];
   passwordResetExpires?: Date;
   correctPassword?(password: string): Promise<boolean>;
@@ -51,6 +52,7 @@ const displayOptions = {
     delete ret.passwordResetExpires;
     delete ret.role;
     delete ret.active;
+    delete ret.tokens;
   },
   versionKey: false,
   virtuals: true,
