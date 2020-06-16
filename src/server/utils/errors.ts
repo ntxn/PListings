@@ -20,7 +20,11 @@ abstract class CustomError extends Error {
 
 /** A general Custom Error for the app. It can be instantiated with an error message and a status code */
 export class AppError extends CustomError {
-  constructor(public message: string, public statusCode: number) {
+  constructor(
+    public message: string,
+    public statusCode: number,
+    public errors?: { field: string; message: string }[]
+  ) {
     super(message);
     Object.setPrototypeOf(this, AppError.prototype);
   }
@@ -41,6 +45,14 @@ export class NotAuthorizedError extends CustomError {
   constructor(public message = 'Not Authorized') {
     super(message);
     Object.setPrototypeOf(this, NotAuthorizedError);
+  }
+}
+
+export class BadRequestError extends CustomError {
+  statusCode = 400;
+  constructor(public message = 'Bad Request') {
+    super(message);
+    Object.setPrototypeOf(this, BadRequestError);
   }
 }
 

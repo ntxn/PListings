@@ -25,6 +25,12 @@ export interface Model<
 
 export type Validator = ([input]: any) => boolean;
 
+export type PropsAndValidators = {
+  prop: string;
+  validator?: Validator;
+  message?: string;
+}[];
+
 export interface DuplicateKeyMongoError extends MongoError {
   keyValue: { [field: string]: string };
 }
