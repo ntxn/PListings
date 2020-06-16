@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { MongoError } from 'mongodb';
+import { UserDoc } from '../models';
+
+export interface CustomRequest extends Request {
+  user?: UserDoc;
+  token?: string;
+}
 
 export type MiddlewareHandler = (
   req: Request,
