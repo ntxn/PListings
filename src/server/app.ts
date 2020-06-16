@@ -1,7 +1,8 @@
 import express from 'express';
 
 import './controllers';
-import { AppRouter } from './utils';
+import { globalErrorHandler } from './controllers';
+import { AppRouter, NotFoundError } from './utils';
 
 const app = express();
 
@@ -14,5 +15,9 @@ app.use(express.json());
 
 /****************** ROUTES ******************/
 app.use(AppRouter.instance);
+app.all('*', (req, res, next) => next(new NotFoundError('Page not found')));
+
+/****************** GLOBAL ERROR HANDLER ******************/
+app.use(globalErrorHandler);
 
 export { app };
