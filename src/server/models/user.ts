@@ -1,9 +1,11 @@
 // import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
+import validator from 'validator';
 import { UserRole, ErrMsg } from '../../common';
+import { Model, ModelAttribute } from '../utils';
 
-interface UserAttrs {
+export interface UserAttrs extends ModelAttribute {
   name: string;
   email: string;
   photo?: string;
@@ -13,6 +15,7 @@ interface UserAttrs {
   };
   bio?: string;
   password: string;
+  passwordConfirm: string;
 }
 
 export interface UserDoc extends mongoose.Document {
@@ -29,15 +32,14 @@ export interface UserDoc extends mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
   password: string;
+  passwordConfirm?: string;
   passwordChangedAt?: Date;
   passwordResetToken?: string[];
   passwordResetExpires?: Date;
   correctPassword?(password: string): Promise<boolean>;
 }
 
-interface UserModel extends mongoose.Model<UserDoc> {
-  build(attrs: UserAttrs): UserDoc;
-}
+type UserModel = Model<UserAttrs, UserDoc>;
 
 const displayOptions = {
   transform(doc: UserDoc, ret: UserDoc) {
@@ -64,9 +66,10 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, ErrMsg.EmailRequired],
-      unique: [true, ErrMsg.EmailExisted],
+      unique: true,
       trim: true,
       lowercase: true,
+      validate: [validator.isEmail, ErrMsg.EmailInvalid],
     },
     photo: {
       type: String,
@@ -100,6 +103,16 @@ const userSchema = new mongoose.Schema(
       minlength: [8, ErrMsg.PasswordMinLength],
       required: [true, ErrMsg.PasswordRequired],
     },
+    passwordConfirm: {
+      type: String,
+      required: [true, ErrMsg.PasswordConfirmRequired],
+      validate: [
+        function (val) {
+          return val === this.password;
+        },
+        ErrMsg.PasswordConfirmNotMatch,
+      ],
+    },
     tokens: [
       {
         token: String,
@@ -121,6 +134,7 @@ userSchema.pre('save', async function (next) {
   if (userDoc.isModified('password')) {
     userDoc.password = await bcrypt.hash(userDoc.password, 12);
     if (!userDoc.isNew) userDoc.passwordChangedAt = new Date(Date.now() - 1000);
+    userDoc.passwordConfirm = undefined;
   }
 
   if (!userDoc.isNew) userDoc.updatedAt = new Date(Date.now() - 1000);
