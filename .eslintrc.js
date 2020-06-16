@@ -26,6 +26,10 @@ module.exports = {
     'prettier/prettier': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-var-requires': 0,
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: 'req|res|next|val' },
+    ],
     'spaced-comment': 'off',
     'no-console': 'warn',
     'consistent-return': 'off',
