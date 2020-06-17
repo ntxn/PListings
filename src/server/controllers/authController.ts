@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import validator from 'validator';
 
 import {
@@ -13,9 +14,13 @@ import { Routes, ResourceRoutes, ErrMsg } from '../../common';
 import {
   catchAsync,
   CustomRequest,
+  AppError,
   BadRequestError,
+  NotFoundError,
   createSendCookieWithToken,
   removeSendExpiredCookieToken,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
 } from '../utils';
 import { User } from '../models';
 import { authenticationChecker } from '../middlewares';
@@ -41,6 +46,7 @@ class AuthController {
       });
       await user.save();
 
+      await sendWelcomeEmail(user.name, user.email);
       await createSendCookieWithToken(res, 201, user);
     })(req, res, next);
   }
@@ -78,13 +84,75 @@ class AuthController {
   }
 
   @POST(Routes.ForgotPassword)
-  sendResetPasswordToken(req: Request, res: Response): void {
-    res.send('Forgot password, Send reset password token');
+  @defineBodyProps({
+    prop: 'email',
+    validator: validator.isEmail,
+    message: ErrMsg.EmailInvalid,
+  })
+  sendResetPasswordToken(req: Request, res: Response, next: NextFunction) {
+    catchAsync(async (req, res, next) => {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+      if (!user) return next(new NotFoundError(ErrMsg.NoUserWithEmail));
+
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      user.passwordResetToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+      user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+      await user.save({ validateBeforeSave: false });
+
+      const resetURL = `${req.protocol}://${req.get('host')}${
+        ResourceRoutes.Auth
+      }/reset-password/${resetToken}`;
+
+      // Send reset url to user's email
+      try {
+        await sendPasswordResetEmail(user.name, user.email, resetURL);
+        res.status(200).json({
+          status: 'success',
+          message: 'Password Reset Link is sent to your email',
+        });
+      } catch (err) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        return next(new AppError(ErrMsg.SendEmailIssue, 500));
+      }
+    })(req, res, next);
   }
 
   @PATCH(Routes.ResetPassword)
-  resetPassword(req: Request, res: Response): void {
-    res.send('resetPassword');
+  resetPassword(req: Request, res: Response, next: NextFunction): void {
+    catchAsync(async (req, res, next) => {
+      // find user with the token in the params
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(req.params.token)
+        .digest('hex');
+
+      const user = await User.findOne({
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { $gt: Date.now() },
+      });
+
+      if (!user)
+        return next(new BadRequestError(ErrMsg.ResetTokenInvalidOrExpired));
+
+      // Update user's new password
+      user.password = req.body.password;
+      user.passwordConfirm = req.body.passwordConfirm;
+      user.passwordResetExpires = undefined;
+      user.passwordResetToken = undefined;
+      await user.save();
+
+      // Log user in
+      await createSendCookieWithToken(res, 200, user);
+    })(req, res, next);
   }
 
   /**

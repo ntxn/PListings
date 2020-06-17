@@ -1,4 +1,3 @@
-// import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import validator from 'validator';
@@ -36,8 +35,8 @@ export interface UserDoc extends mongoose.Document {
   passwordConfirm?: string;
   passwordChangedAt?: Date;
   tokens: { token: string }[];
-  passwordResetToken?: string[];
-  passwordResetExpires?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: number;
   correctPassword(password: string): Promise<boolean>;
   removeExpiredTokens(): void;
 }
