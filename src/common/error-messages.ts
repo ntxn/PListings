@@ -15,4 +15,7 @@ export enum ErrMsg {
   MissingDataForJWT = 'Missing data needed to create JWT',
   MissingDataForCookie = 'Missing data to create cookie',
   AccessRestriction = 'You do not have permission to perform this action',
+  NoUserWithEmail = 'No user with the provided email',
+  ResetTokenInvalidOrExpired = 'Reset Token is invalid or has expired',
+  SendEmailIssue = 'There was an error sending the email. Try again later.',
 }
