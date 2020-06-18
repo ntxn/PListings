@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { DuplicateKeyMongoError } from '../utils';
-import { ErrMsg } from '../../common';
+import { ErrMsg, RequestStatus } from '../../common';
 
 abstract class CustomError extends Error {
   isOperational = true;
@@ -14,7 +14,9 @@ abstract class CustomError extends Error {
   }
 
   get status(): string {
-    return `${this.statusCode}`.startsWith('4') ? 'fail' : 'error';
+    return `${this.statusCode}`.startsWith('4')
+      ? RequestStatus.Fail
+      : RequestStatus.Error;
   }
 }
 

@@ -10,7 +10,13 @@ import {
   POST,
   PATCH,
 } from '../decorators';
-import { Routes, ResourceRoutes, ErrMsg } from '../../common';
+import {
+  Routes,
+  ResourceRoutes,
+  ErrMsg,
+  AccountStatus,
+  RequestStatus,
+} from '../../common';
 import {
   catchAsync,
   CustomRequest,
@@ -21,6 +27,8 @@ import {
   removeSendExpiredCookieToken,
   sendWelcomeEmail,
   sendPasswordResetEmail,
+  propLengthValidator,
+  NotAuthorizedError,
 } from '../utils';
 import { User } from '../models';
 import { authenticationChecker } from '../middlewares';
@@ -36,8 +44,21 @@ class AuthController {
   @POST(Routes.SignUp)
   signup(req: Request, res: Response, next: NextFunction): void {
     catchAsync(async (req, res, next) => {
-      // Create new User
       const { name, email, password, passwordConfirm } = req.body;
+
+      // Check if there's a user with the provided email
+      const existingUser = await User.findOne({ email });
+      if (existingUser)
+        switch (existingUser.status) {
+          case AccountStatus.Active:
+            return next(new BadRequestError(ErrMsg.EmailInUse));
+          case AccountStatus.Inactive:
+            return next(new BadRequestError(ErrMsg.InactiveAccount));
+          case AccountStatus.Suspended:
+            return next(new BadRequestError(ErrMsg.SuspendedAccount));
+        }
+
+      // Create new User
       const user = User.build({
         name,
         email,
@@ -54,19 +75,15 @@ class AuthController {
   /**
    * Route and Handler to log user in
    */
-  @POST(Routes.LogIn)
   @defineBodyProps(
     {
       prop: 'email',
       validator: validator.isEmail,
       message: ErrMsg.EmailInvalid,
     },
-    {
-      prop: 'password',
-      validator: (pass: string) => pass.length >= 8,
-      message: ErrMsg.PasswordMinLength,
-    }
+    propLengthValidator('password', 8, ErrMsg.PasswordMinLength)
   )
+  @POST(Routes.LogIn)
   login(req: Request, res: Response, next: NextFunction): void {
     catchAsync(async (req, res, next) => {
       // Find existing user and compare password
@@ -74,21 +91,29 @@ class AuthController {
       const user = await User.findOne({ email });
 
       if (!user || !(await user.correctPassword!(password)))
-        return next(new BadRequestError('Invalid Credentials'));
+        return next(new NotAuthorizedError(ErrMsg.InvalidCredentials));
 
-      user.removeExpiredTokens();
-      await user.save({ validateBeforeSave: false });
+      switch (user.status) {
+        case AccountStatus.Suspended:
+          return next(new BadRequestError(ErrMsg.SuspendedAccount));
+        case AccountStatus.Inactive:
+          user.status = AccountStatus.Active;
+          break;
+      }
 
       await createSendCookieWithToken(res, 200, user);
     })(req, res, next);
   }
 
-  @POST(Routes.ForgotPassword)
+  /**
+   * Send user an email with a reset URL if user forgot their password
+   */
   @defineBodyProps({
     prop: 'email',
     validator: validator.isEmail,
     message: ErrMsg.EmailInvalid,
   })
+  @POST(Routes.ForgotPassword)
   sendResetPasswordToken(req: Request, res: Response, next: NextFunction) {
     catchAsync(async (req, res, next) => {
       const { email } = req.body;
@@ -113,7 +138,7 @@ class AuthController {
       try {
         await sendPasswordResetEmail(user.name, user.email, resetURL);
         res.status(200).json({
-          status: 'success',
+          status: RequestStatus.Success,
           message: 'Password Reset Link is sent to your email',
         });
       } catch (err) {
@@ -126,6 +151,11 @@ class AuthController {
     })(req, res, next);
   }
 
+  /**
+   * Reset password by using reset token
+   * After password being reset, clear all existing tokens
+   * and generate a new one for current device
+   */
   @PATCH(Routes.ResetPassword)
   resetPassword(req: Request, res: Response, next: NextFunction): void {
     catchAsync(async (req, res, next) => {
@@ -158,12 +188,13 @@ class AuthController {
   /**
    * Log out from the current logged in device
    */
-  @GET(Routes.LogOut)
   @use(authenticationChecker)
+  @GET(Routes.LogOut)
   logout(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
       await removeSendExpiredCookieToken(
         res,
+        200,
         req.user!,
         req.user!.tokens.filter(({ token }) => token !== req.token)
       );
@@ -173,11 +204,11 @@ class AuthController {
   /**
    * Log out from all devices
    */
-  @GET(Routes.LogOutAll)
   @use(authenticationChecker)
+  @GET(Routes.LogOutAll)
   logoutAll(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
-      await removeSendExpiredCookieToken(res, req.user!, []);
+      await removeSendExpiredCookieToken(res, 200, req.user!, []);
     })(req, res, next);
   }
 }

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { UserDoc } from '../models';
 import { AppError } from '../utils';
-import { ErrMsg } from '../../common';
+import { ErrMsg, RequestStatus } from '../../common';
 
 /**
  * Create a JWT token with userId as payload
@@ -48,23 +48,23 @@ export const createSendCookieWithToken = async (
   user: UserDoc
 ): Promise<void> => {
   const token = createToken(user.id);
+  if (user.tokens.length > 1) user.removeExpiredTokens();
   user.tokens.push({ token });
   await user.save({ validateBeforeSave: false });
 
   res.cookie('jwt', token, createCookieOptions());
 
-  res.status(statusCode).json({
-    status: 'success',
-    data: user,
-  });
+  res.status(statusCode).json({ status: RequestStatus.Success, data: user });
 };
 
 export const removeSendExpiredCookieToken = async (
   res: Response,
+  statusCode: number,
   user: UserDoc,
   newTokens: { token: string }[]
 ): Promise<void> => {
   user.tokens = newTokens;
+  if (user.tokens.length > 1) user.removeExpiredTokens();
   await user.save({ validateBeforeSave: false });
 
   res.cookie('jwt', 'loggedOut', {
@@ -72,5 +72,5 @@ export const removeSendExpiredCookieToken = async (
     httpOnly: true,
   });
 
-  res.status(200).json({ status: 'sucsess' });
+  res.status(statusCode).json({ status: RequestStatus.Success, data: null });
 };

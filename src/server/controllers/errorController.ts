@@ -1,4 +1,5 @@
 import { ErrorRequestHandler } from 'express';
+import { RequestStatus } from '../../common';
 import {
   MongooseValidationError,
   MongoDuplicateKeyError,
@@ -23,7 +24,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error('ERROR', error);
 
   res.status(error.statusCode || 500).json({
-    status: error.status || 'error',
+    status: error.status || RequestStatus.Fail,
     message:
       devEnv || err.isOperational ? error.message : 'Something went wrong',
     errors: error.errors,
