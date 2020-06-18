@@ -1,6 +1,12 @@
 import mongoose, { ModelPopulateOptions } from 'mongoose';
-// import { Request, Response, NextFunction } from 'express';
-import { catchAsync, MiddlewareHandler, Model, ModelAttribute } from '../utils';
+import { ErrMsg, RequestStatus } from '../../common';
+import {
+  catchAsync,
+  MiddlewareHandler,
+  Model,
+  ModelAttribute,
+  NotFoundError,
+} from '../utils';
 
 type CRUD_handler = (
   Model: Model<ModelAttribute, mongoose.Document>,
@@ -16,10 +22,7 @@ export const createOne: CRUD_handler = Model =>
     const doc = Model.build(req.body);
     await doc.save();
 
-    res.status(201).json({
-      status: 'success',
-      data: doc,
-    });
+    res.status(201).json({ status: RequestStatus.Success, data: doc });
   });
 
 /**
@@ -29,15 +32,42 @@ export const createOne: CRUD_handler = Model =>
  */
 export const getOne: CRUD_handler = (Model, populateOptions) =>
   catchAsync(async (req, res, next) => {
-    // let query = Model.findById(req.params.id);
-    // if (populateOptions) query = query.populate(populateOptions);
-    // const doc = await query;
+    let query = Model.findById(req.params.id);
+    if (populateOptions) query = query.populate(populateOptions);
+    const doc = await query;
 
-    // if (!doc) return next(new AppError('No document found with that ID', 404));
+    if (!doc) return next(new NotFoundError(ErrMsg.NoDocWithId));
 
-    const doc = await Model.findById(req.params.id); // will delete
+    res.status(200).json({ status: RequestStatus.Success, data: doc });
+  });
+
+export const deleteOne: CRUD_handler = Model =>
+  catchAsync(async (req, res, next) => {
+    const doc = await Model.findByIdAndDelete(req.params.id);
+    if (!doc) return next(new NotFoundError(ErrMsg.NoDocWithId));
+
+    res.status(204).json({ status: RequestStatus.Success, data: null });
+  });
+
+export const updateOne: CRUD_handler = Model =>
+  catchAsync(async (req, res, next) => {
+    const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!doc) return next(new NotFoundError(ErrMsg.NoDocWithId));
+
+    res.status(200).json({ status: RequestStatus.Success, data: doc });
+  });
+
+export const getAll: CRUD_handler = Model =>
+  catchAsync(async (req, res, next) => {
+    const filter = {};
+    const docs = await Model.find(filter);
+
     res.status(200).json({
-      status: 'success',
-      data: doc,
+      status: RequestStatus.Success,
+      length: docs.length,
+      data: docs,
     });
   });

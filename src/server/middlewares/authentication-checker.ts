@@ -10,7 +10,9 @@ import {
 import { User } from '../models';
 
 /**
- * Check if the user is authenticated to access protected route
+ * Check if the user is authenticated to access protected route.
+ * If the user is authenticated successfully, the request object will
+ * have user data and jwt token (req.user, req.token)
  */
 export const authenticationChecker: MiddlewareHandler = catchAsync(
   async (req: CustomRequest, res, next) => {

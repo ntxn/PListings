@@ -31,6 +31,7 @@ module.exports = {
       { argsIgnorePattern: 'req|res|next|val' },
     ],
     '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'spaced-comment': 'off',
     'no-console': 'warn',
     'consistent-return': 'off',
