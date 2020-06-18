@@ -8,6 +8,7 @@ export enum Routes {
   ResetPassword = '/reset-password/:token',
   MyAccount = '/my-account',
   UpdateMyAccount = '/update-my-account',
+  UpdateMyPassword = '/update-my-password',
   DeleteMyAccount = '/delete-my-account',
 
   // Admins only
