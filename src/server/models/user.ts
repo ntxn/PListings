@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
-import { UserRole, ErrMsg } from '../../common';
+import { UserRole, AccountStatus, ErrMsg } from '../../common';
 import { Model, ModelAttribute } from '../utils';
 
 export interface UserAttrs extends ModelAttribute {
@@ -28,7 +28,7 @@ export interface UserDoc extends mongoose.Document {
   };
   bio?: string;
   role: UserRole;
-  active: boolean;
+  status: AccountStatus;
   createdAt: Date;
   updatedAt: Date;
   password: string;
@@ -57,7 +57,7 @@ const displayOptions = {
     delete ret.passwordResetToken;
     delete ret.passwordResetExpires;
     delete ret.role;
-    delete ret.active;
+    delete ret.status;
     delete ret.tokens;
   },
   versionKey: false,
@@ -97,15 +97,11 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(UserRole),
       default: UserRole.User,
     },
-    active: {
-      type: Boolean,
-      default: true,
+    status: {
+      type: String,
+      enum: Object.values(AccountStatus),
+      default: AccountStatus.Active,
     },
-    createdAt: {
-      type: Date,
-      default: new Date(),
-    },
-    updatedAt: Date,
     password: {
       type: String,
       minlength: [8, ErrMsg.PasswordMinLength],
@@ -116,6 +112,7 @@ const userSchema = new mongoose.Schema(
       required: [true, ErrMsg.PasswordConfirmRequired],
       validate: [
         function (val) {
+          // @ts-ignore
           return val === this.password;
         },
         ErrMsg.PasswordConfirmNotMatch,
@@ -133,12 +130,13 @@ const userSchema = new mongoose.Schema(
   {
     toJSON: displayOptions,
     toObject: displayOptions,
+    timestamps: true,
   }
 );
 
 userSchema.index({ _id: 1, 'tokens.token': 1 });
 
-// hash new/updated password and update `updatedAt` field
+// hash new/updated password
 userSchema.pre('save', async function (next) {
   const userDoc = this as UserDoc;
   if (userDoc.isModified('password')) {
@@ -148,7 +146,6 @@ userSchema.pre('save', async function (next) {
     userDoc.tokens = [];
   }
 
-  if (!userDoc.isNew) userDoc.updatedAt = new Date(Date.now() - 1000);
   next();
 });
 
@@ -165,6 +162,7 @@ userSchema.methods.removeExpiredTokens = function () {
 
   userDoc.tokens = userDoc.tokens.filter(({ token }) => {
     const decoded = jwt.decode(token);
+    // @ts-ignore
     return decoded!.exp > nowTimestamp;
   });
 };
