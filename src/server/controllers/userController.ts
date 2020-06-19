@@ -9,7 +9,7 @@ import {
 } from '../decorators';
 import {
   Routes,
-  ResourceRoutes,
+  Base,
   AccountStatus,
   RequestStatus,
   ErrMsg,
@@ -61,7 +61,7 @@ const updatePasswordRestrictor: MiddlewareHandler = (
 /**
  * Controller for User resource routes
  */
-@controller(ResourceRoutes.Users)
+@controller(Base.Users)
 class UserController {
   /**
    * Get the current logged in user's account

@@ -12,7 +12,7 @@ import {
 } from '../decorators';
 import {
   Routes,
-  ResourceRoutes,
+  Base,
   ErrMsg,
   AccountStatus,
   RequestStatus,
@@ -35,7 +35,7 @@ import { authenticationChecker } from '../middlewares';
 /**
  * Controller which create routes and handlers for app authentication related
  */
-@controller(ResourceRoutes.Auth)
+@controller(Base.Auth)
 class AuthController {
   /**
    * Route and Handler for signing user up.
@@ -134,7 +134,7 @@ class AuthController {
       await user.save({ validateBeforeSave: false });
 
       const resetURL = `${req.protocol}://${req.get('host')}${
-        ResourceRoutes.Auth
+        Base.Auth
       }/reset-password/${resetToken}`;
 
       // Send reset url to user's email

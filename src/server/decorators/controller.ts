@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ResourceRoutes } from '../../common';
+import { Base } from '../../common';
 import {
   AppError,
   AppRouter,
@@ -65,7 +65,7 @@ const getBodyValidators = (
  * on the controller classes' methods.
  * @param resourceRoute base route of a resource. Ex: /api/v1/users
  */
-export function controller(resourceRoute: ResourceRoutes) {
+export function controller(resourceRoute: Base) {
   return function (target: any): void {
     const router = AppRouter.instance;
 

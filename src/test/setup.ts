@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { app } from '../server/app';
-import { mongoDbOptions, ResourceRoutes, Routes } from '../common';
+import { mongoDbOptions, ApiRoutes } from '../common';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -40,7 +40,7 @@ afterAll(async () => {
 
 global.login = async (email: string) => {
   const response = await request(app)
-    .post(`${ResourceRoutes.Auth}${Routes.LogIn}`)
+    .post(ApiRoutes.LogIn)
     .send({ email, password: 'password' })
     .expect(200);
 
