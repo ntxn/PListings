@@ -62,7 +62,7 @@ export class BadRequestError extends CustomError {
 export class MongooseValidationError extends CustomError {
   statusCode = 400;
   constructor(err: mongoose.Error.ValidationError) {
-    super('Validation Error');
+    super(ErrMsg.ValidationError);
     Object.setPrototypeOf(this, MongooseValidationError);
 
     this.errors = Object.keys(err.errors).map(field => {

@@ -8,6 +8,7 @@ export enum ErrMsg {
   PasswordConfirmNotMatch = 'Password confirmation does not match',
   BioMaxLength = 'Your biography should be less than 150 characters',
   DuplicateKey = 'MongoDB Duplicate Key Error',
+  ValidationError = 'Validation Error',
   JwtInvalid = 'Invalid token. Please log in again',
   JwtExpired = 'Your token has expired. Please log in again',
   JwtNotFoundUserWithToken = 'Cannot find user with this token',

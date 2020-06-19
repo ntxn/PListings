@@ -26,7 +26,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   res.status(error.statusCode || 500).json({
     status: error.status || RequestStatus.Fail,
     message:
-      devEnv || err.isOperational ? error.message : 'Something went wrong',
+      devEnv || error.isOperational ? error.message : 'Something went wrong',
     errors: error.errors,
     // stack: devEnv ? err.stack : undefined,
     originalError: devEnv ? err : undefined,

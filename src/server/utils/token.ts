@@ -48,7 +48,7 @@ export const createSendCookieWithToken = async (
   user: UserDoc
 ): Promise<void> => {
   const token = createToken(user.id);
-  if (user.tokens.length > 1) user.removeExpiredTokens();
+  if (user.tokens.length > 0) user.removeExpiredTokens();
   user.tokens.push({ token });
   await user.save({ validateBeforeSave: false });
 
@@ -64,7 +64,7 @@ export const removeSendExpiredCookieToken = async (
   newTokens: { token: string }[]
 ): Promise<void> => {
   user.tokens = newTokens;
-  if (user.tokens.length > 1) user.removeExpiredTokens();
+  if (user.tokens.length > 0) user.removeExpiredTokens();
   await user.save({ validateBeforeSave: false });
 
   res.cookie('jwt', 'loggedOut', {

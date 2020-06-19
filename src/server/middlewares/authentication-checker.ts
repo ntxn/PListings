@@ -30,6 +30,7 @@ export const authenticationChecker: MiddlewareHandler = catchAsync(
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Check if user still exists
+    // @ts-ignore
     const user = await User.findOneByIdAndToken(decoded.id, token);
     if (!user)
       return next(new NotAuthorizedError(ErrMsg.JwtNotFoundUserWithToken));

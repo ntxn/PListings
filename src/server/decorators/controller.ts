@@ -22,7 +22,7 @@ const getBodyValidators = (
     if (propsAndValidators.length === 0) return next();
 
     // Check if req.body contains the required props
-    if (!req.body) return next(new AppError('Invalid Request', 422));
+    if (!req.body) return next(new AppError('Invalid Request', 400));
 
     const missingProps = propsAndValidators.filter(
       ({ prop }) => !req.body[prop]
@@ -35,7 +35,7 @@ const getBodyValidators = (
           message: `Please enter your ${prop}`,
         };
       });
-      return next(new AppError('Missing Properties', 422, errors));
+      return next(new AppError('Missing Properties', 400, errors));
     }
 
     // Run additional validator for each prop if provided
@@ -50,6 +50,7 @@ const getBodyValidators = (
       const errors = propsFailedValidation.map(({ prop, message }) => {
         return { field: prop, message };
       });
+      // @ts-ignore
       return next(new AppError('Validation Error', 400, errors));
     }
 

@@ -25,11 +25,10 @@ import {
   NotFoundError,
   createSendCookieWithToken,
   removeSendExpiredCookieToken,
-  sendWelcomeEmail,
-  sendPasswordResetEmail,
   propLengthValidator,
   NotAuthorizedError,
 } from '../utils';
+import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email';
 import { User } from '../models';
 import { authenticationChecker } from '../middlewares';
 
@@ -39,7 +38,11 @@ import { authenticationChecker } from '../middlewares';
 @controller(ResourceRoutes.Auth)
 class AuthController {
   /**
-   * Route and Handler for signing user up
+   * Route and Handler for signing user up.
+   * When succeed, it returns new user data and a cookie with token.
+   * Required request body fields are: name, email, password, passwordConfirm.
+   * They are being validated at mongoose and database level and if there's
+   * and errors, the errors will be caught by the global error handler
    */
   @POST(Routes.SignUp)
   signup(req: Request, res: Response, next: NextFunction): void {
