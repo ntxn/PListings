@@ -4,8 +4,8 @@ import { app } from '../../app';
 import { User, UserDoc } from '../../models';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../../utils/email';
 import {
-  ResourceRoutes,
-  Routes,
+  Base,
+  ApiRoutes,
   RequestStatus,
   AccountStatus,
   ErrMsg,
@@ -16,10 +16,6 @@ const email = 'jdoe@g.io';
 const password = 'password';
 const passwordConfirm = 'password';
 
-const signupRoute = `${ResourceRoutes.Auth}${Routes.SignUp}`;
-const loginRoute = `${ResourceRoutes.Auth}${Routes.LogIn}`;
-const forgotPasswordRoute = `${ResourceRoutes.Auth}${Routes.ForgotPassword}`;
-
 describe('SIGN UP', () => {
   type ReqBody = { [key: string]: string };
   const validReqBody = { name, email, password, passwordConfirm };
@@ -29,7 +25,7 @@ describe('SIGN UP', () => {
     errMsg: string,
     reqBody: ReqBody
   ) => {
-    const response = await request(app).post(signupRoute).send(reqBody);
+    const response = await request(app).post(ApiRoutes.SignUp).send(reqBody);
     expect(response.body.status).toEqual(RequestStatus.Fail);
 
     const { field, message } = response.body.errors[0];
@@ -39,7 +35,7 @@ describe('SIGN UP', () => {
 
   it('Returns a 201 when valid input are provided', async () => {
     const { body } = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send(validReqBody)
       .expect(201);
 
@@ -64,7 +60,10 @@ describe('SIGN UP', () => {
   });
 
   it('Returns a 400 when any of the required body fields are missing', async () => {
-    const response = await request(app).post(signupRoute).send().expect(400);
+    const response = await request(app)
+      .post(ApiRoutes.SignUp)
+      .send()
+      .expect(400);
     expect(response.body.status).toEqual(RequestStatus.Fail);
     expect(response.body.message).toEqual(ErrMsg.ValidationError);
     expect(response.body.errors.length).toBe(4);
@@ -114,7 +113,7 @@ describe('SIGN UP', () => {
     // Error message of email in use if account status is Active
     expect(user.status).toEqual(AccountStatus.Active);
     let response = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send(validReqBody)
       .expect(400);
     expect(response.body.message).toEqual(ErrMsg.EmailInUse);
@@ -123,7 +122,7 @@ describe('SIGN UP', () => {
     user.status = AccountStatus.Inactive;
     await user.save({ validateBeforeSave: false });
     response = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send(validReqBody)
       .expect(400);
     expect(response.body.message).toEqual(ErrMsg.InactiveAccount);
@@ -132,7 +131,7 @@ describe('SIGN UP', () => {
     user.status = AccountStatus.Suspended;
     await user.save({ validateBeforeSave: false });
     response = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send(validReqBody)
       .expect(400);
     expect(response.body.message).toEqual(ErrMsg.SuspendedAccount);
@@ -146,14 +145,14 @@ describe('LOG IN', () => {
 
   beforeEach(async () => {
     const { body } = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send({ name, email, password, passwordConfirm });
     user = await User.findById(body.data.id);
   });
 
   it('Returns a 200 when valid input are provided', async () => {
     const response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email, password })
       .expect(200);
     expect(response.body.status).toEqual(RequestStatus.Success);
@@ -164,7 +163,7 @@ describe('LOG IN', () => {
 
   it('Returns a 400 when email and password are invalid', async () => {
     let response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email: 'w', password: '2' })
       .expect(400);
     expect(response.body.status).toEqual(RequestStatus.Fail);
@@ -172,13 +171,13 @@ describe('LOG IN', () => {
     expect(response.body.errors.length).toBe(2);
 
     response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email: 'w', password })
       .expect(400);
     expect(response.body.errors[0].message).toEqual(ErrMsg.EmailInvalid);
 
     response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email, password: '1' })
       .expect(400);
     expect(response.body.errors[0].message).toEqual(ErrMsg.PasswordMinLength);
@@ -186,13 +185,13 @@ describe('LOG IN', () => {
 
   it('Returns a 401 when there is no match of the provided email and password', async () => {
     let response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email: 'email@email.com', password })
       .expect(401);
     expect(response.body.message).toEqual(ErrMsg.InvalidCredentials);
 
     response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email, password: 'SomeOtherPassword' })
       .expect(401);
     expect(response.body.message).toEqual(ErrMsg.InvalidCredentials);
@@ -203,7 +202,7 @@ describe('LOG IN', () => {
     await user!.save({ validateBeforeSave: false });
 
     const response = await request(app)
-      .post(loginRoute)
+      .post(ApiRoutes.LogIn)
       .send({ email, password })
       .expect(400);
     expect(response.body.message).toEqual(ErrMsg.SuspendedAccount);
@@ -213,7 +212,10 @@ describe('LOG IN', () => {
     user!.status = AccountStatus.Inactive;
     await user!.save({ validateBeforeSave: false });
 
-    await request(app).post(loginRoute).send({ email, password }).expect(200);
+    await request(app)
+      .post(ApiRoutes.LogIn)
+      .send({ email, password })
+      .expect(200);
 
     const loggedInUser = await User.findById(user!.id);
     expect(loggedInUser!.status).toEqual(AccountStatus.Active);
@@ -228,7 +230,10 @@ describe('LOG IN', () => {
     expect(user!.tokens.length).toBe(4);
 
     // Log in which adds 1 new token and remove expired tokens
-    await request(app).post(loginRoute).send({ email, password }).expect(200);
+    await request(app)
+      .post(ApiRoutes.LogIn)
+      .send({ email, password })
+      .expect(200);
 
     // The user data in database should remove the 2 expired tokens
     const loggedInUser = await User.findById(user!.id);
@@ -242,7 +247,7 @@ describe('LOG OUT', () => {
 
   beforeEach(async () => {
     const { body } = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send({ name, email, password, passwordConfirm });
 
     userCookie = await global.login(email);
@@ -253,7 +258,7 @@ describe('LOG OUT', () => {
 
   it('Removes token of the current login session and clears cookie session (for single log out)', async () => {
     const response = await request(app)
-      .get(`${ResourceRoutes.Auth}${Routes.LogOut}`)
+      .get(ApiRoutes.LogOut)
       .set('Cookie', userCookie)
       .send()
       .expect(200);
@@ -268,7 +273,7 @@ describe('LOG OUT', () => {
 
   it('Removes all tokens and clears cookie session (for log out all)', async () => {
     const response = await request(app)
-      .get(`${ResourceRoutes.Auth}${Routes.LogOutAll}`)
+      .get(ApiRoutes.LogOutAll)
       .set('Cookie', userCookie)
       .send()
       .expect(200);
@@ -276,9 +281,6 @@ describe('LOG OUT', () => {
     expect(response.get('Set-Cookie')[0].split('; ')[0]).toEqual(
       'jwt=loggedOut'
     );
-
-    const loggedOutUser = await User.findById(user!.id);
-    expect(loggedOutUser!.tokens.length).toBe(0);
   });
 });
 
@@ -287,7 +289,7 @@ describe('FORGOT PASSWORD', () => {
 
   beforeEach(async () => {
     const { body } = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send({ name, email, password, passwordConfirm });
     user = await User.findById(body.data.id);
   });
@@ -296,7 +298,10 @@ describe('FORGOT PASSWORD', () => {
     expect(user!.passwordResetToken).toBeUndefined();
     expect(user!.passwordResetExpires).toBeUndefined();
 
-    await request(app).post(forgotPasswordRoute).send({ email }).expect(200);
+    await request(app)
+      .post(ApiRoutes.ForgotPassword)
+      .send({ email })
+      .expect(200);
     expect(sendPasswordResetEmail).toHaveBeenCalled();
 
     const updatedUser = await User.findById(user!.id);
@@ -304,18 +309,9 @@ describe('FORGOT PASSWORD', () => {
     expect(updatedUser!.passwordResetExpires).toBeDefined();
   });
 
-  it('Returns a 500 when the reset email is failed to be sent out', async () => {
-    await request(app).post(forgotPasswordRoute).send({ email }).expect(500);
-    expect(sendPasswordResetEmail).toHaveBeenCalled();
-
-    const updatedUser = await User.findById(user!.id);
-    expect(updatedUser!.passwordResetToken).toBeUndefined();
-    expect(updatedUser!.passwordResetExpires).toBeUndefined();
-  });
-
   it('Returns a 400 when providing an invalid email', async () => {
     await request(app)
-      .post(forgotPasswordRoute)
+      .post(ApiRoutes.ForgotPassword)
       .send({ email: 'e' })
       .expect(400);
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
@@ -323,24 +319,40 @@ describe('FORGOT PASSWORD', () => {
 
   it('Returns a 404 when theres no user with that email', async () => {
     await request(app)
-      .post(forgotPasswordRoute)
+      .post(ApiRoutes.ForgotPassword)
       .send({ email: 'e@e.io' })
       .expect(404);
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  it('Returns a 500 when the reset email is failed to be sent out', async () => {
+    (sendPasswordResetEmail as jest.Mock).mockRejectedValueOnce({});
+    await request(app)
+      .post(ApiRoutes.ForgotPassword)
+      .send({ email })
+      .expect(500);
+    expect(sendPasswordResetEmail).toHaveBeenCalled();
+
+    const updatedUser = await User.findById(user!.id);
+    expect(updatedUser!.passwordResetToken).toBeUndefined();
+    expect(updatedUser!.passwordResetExpires).toBeUndefined();
   });
 });
 
 describe('RESET PASSWORD', () => {
   let user: UserDoc | null;
   let resetToken: string;
-  const resetPasswordRoute = `${ResourceRoutes.Auth}/reset-password`;
+  const resetPasswordRoute = `${Base.Auth}/reset-password`;
 
   beforeEach(async () => {
     const response = await request(app)
-      .post(signupRoute)
+      .post(ApiRoutes.SignUp)
       .send({ name, email, password, passwordConfirm });
     const userId = response.body.data.id;
-    await request(app).post(forgotPasswordRoute).send({ email }).expect(200);
+    await request(app)
+      .post(ApiRoutes.ForgotPassword)
+      .send({ email })
+      .expect(200);
 
     user = await User.findById(userId);
     const resetUrl = (sendPasswordResetEmail as jest.Mock).mock.calls[0][2];
@@ -365,22 +377,22 @@ describe('RESET PASSWORD', () => {
     expect(response.get('Set-Cookie')).toBeDefined();
   });
 
-  // it('Returns a 400 when reset token is expired', async () => {
-  //   user!.passwordResetExpires = Date.now();
-  //   await user!.save({ validateBeforeSave: false });
-  //   console.log(user!.passwordResetExpires);
+  it('Returns a 400 when reset token is expired', async () => {
+    user!.passwordResetExpires = Date.now();
+    await user!.save({ validateBeforeSave: false });
 
-  //   const { body } = await request(app)
-  //     .patch(`${resetPasswordRoute}/${resetToken}`)
-  //     .send({ password, passwordConfirm })
-  //     .expect(400);
-  //   expect(body.message).toBe(ErrMsg.ResetTokenInvalidOrExpired);
-  // });
+    const { body } = await request(app)
+      .patch(`${resetPasswordRoute}/${resetToken}`)
+      .send({ password, passwordConfirm })
+      .expect(400);
+    expect(body.message).toBe(ErrMsg.ResetTokenInvalidOrExpired);
+  });
 
-  // it('Returns a 500 when reset token format is invalid', async () => {
-  //   await request(app)
-  //     .patch(`${resetPasswordRoute}/someRandomToken`)
-  //     .send({ password, passwordConfirm })
-  //     .expect(500);
-  // });
+  it('Returns a 400 when reset token format is invalid', async () => {
+    const { body } = await request(app)
+      .patch(`${resetPasswordRoute}/someRandomToken`)
+      .send({ password, passwordConfirm })
+      .expect(400);
+    expect(body.message).toBe(ErrMsg.ResetTokenInvalidOrExpired);
+  });
 });
