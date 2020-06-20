@@ -1,18 +1,12 @@
-import request from 'supertest';
-import mongoose from 'mongoose';
 import httpMocks from 'node-mocks-http';
 import { Request, Response } from 'express';
 
-import { app } from '../../app';
 import { authenticationChecker } from '../authentication-checker';
-import { ErrMsg, RequestStatus, ApiRoutes } from '../../../common';
+import { ErrMsg } from '../../../common';
 import { User, UserDoc } from '../../models';
-import { NotFoundError, NotAuthorizedError, createToken } from '../../utils';
+import { createToken } from '../../utils';
 
-const name = 'Jane Doe';
 const email = 'jdoe@g.io';
-const password = 'password';
-const passwordConfirm = 'password';
 
 const next = jest.fn();
 let res: httpMocks.MockResponse<Response>;
