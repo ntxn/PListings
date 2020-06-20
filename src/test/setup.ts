@@ -39,10 +39,14 @@ afterAll(async () => {
 });
 
 global.login = async (email: string) => {
+  const name = 'Jane Doe';
+  const password = 'password';
+  const passwordConfirm = 'password';
+
   const response = await request(app)
-    .post(ApiRoutes.LogIn)
-    .send({ email, password: 'password' })
-    .expect(200);
+    .post(ApiRoutes.SignUp)
+    .send({ name, email, password, passwordConfirm })
+    .expect(201);
 
   return response.get('Set-Cookie');
 };
