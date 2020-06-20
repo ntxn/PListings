@@ -8,14 +8,16 @@ import { ErrMsg, RequestStatus } from '../../common';
 /**
  * Create a JWT token with userId as payload
  * @param id userId from user document
+ * @param expiresIn Optional to override the default value in environment valirable
  */
-const createToken = (id: mongoose.Types.ObjectId): string => {
+export const createToken = (
+  id: mongoose.Types.ObjectId,
+  expiresIn = process.env.JWT_EXPIRES_IN
+): string => {
   if (!process.env.JWT_SECRET || !process.env.JWT_EXPIRES_IN)
     throw new AppError(ErrMsg.MissingDataForJWT, 500);
 
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
 };
 
 /**
@@ -59,14 +61,8 @@ export const createSendCookieWithToken = async (
 
 export const removeSendExpiredCookieToken = async (
   res: Response,
-  statusCode: number,
-  user: UserDoc,
-  newTokens: { token: string }[]
+  statusCode: number
 ): Promise<void> => {
-  user.tokens = newTokens;
-  if (user.tokens.length > 0) user.removeExpiredTokens();
-  await user.save({ validateBeforeSave: false });
-
   res.cookie('jwt', 'loggedOut', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
