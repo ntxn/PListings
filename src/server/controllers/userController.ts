@@ -122,7 +122,9 @@ class UserController {
   deleteMyAccount(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
       req.user!.status = AccountStatus.Inactive;
-      await removeSendExpiredCookieToken(res, 204, req.user!, []);
+      req.user!.tokens = [];
+      req.user!.save({ validateBeforeSave: false });
+      await removeSendExpiredCookieToken(res, 204);
     })(req, res, next);
   }
 

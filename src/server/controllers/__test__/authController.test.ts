@@ -1,8 +1,8 @@
 import request from 'supertest';
-import jwt from 'jsonwebtoken';
 import { app } from '../../app';
 import { User, UserDoc } from '../../models';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../../utils/email';
+import { createToken } from '../../utils';
 import {
   Base,
   ApiRoutes,
@@ -140,8 +140,6 @@ describe('SIGN UP', () => {
 
 describe('LOG IN', () => {
   let user: UserDoc | null;
-  const createToken = (id: string, expiresIn: string) =>
-    jwt.sign({ id }, process.env.JWT_SECRET!, { expiresIn });
 
   beforeEach(async () => {
     const { body } = await request(app)
@@ -246,14 +244,15 @@ describe('LOG OUT', () => {
   let userCookie: string[];
 
   beforeEach(async () => {
-    const { body } = await request(app)
-      .post(ApiRoutes.SignUp)
-      .send({ name, email, password, passwordConfirm });
-
     userCookie = await global.login(email);
-    user = await User.findById(body.data.id);
+    user = await User.findOne({ email });
 
-    expect(user!.tokens.length).toBe(2); // 1 from signing up, one from signing in
+    user!.tokens.push({ token: createToken(user!.id, '0') });
+    user!.tokens.push({ token: createToken(user!.id, '1') });
+    user!.tokens.push({ token: createToken(user!.id, '2d') });
+    await user!.save({ validateBeforeSave: false });
+
+    expect(user!.tokens.length).toBe(4);
   });
 
   it('Removes token of the current login session and clears cookie session (for single log out)', async () => {
@@ -281,6 +280,9 @@ describe('LOG OUT', () => {
     expect(response.get('Set-Cookie')[0].split('; ')[0]).toEqual(
       'jwt=loggedOut'
     );
+
+    const loggedOutUser = await User.findById(user!.id);
+    expect(loggedOutUser!.tokens.length).toBe(0);
   });
 });
 

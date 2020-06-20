@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
 import { User, UserDoc } from '../user';
+import { createToken } from '../../utils';
 import { ErrMsg, AccountStatus, UserRole } from '../../../common';
 
 const name = 'Will Smith';
@@ -7,10 +7,6 @@ const email = 'wsmith@g.io';
 const password = 'password';
 const passwordConfirm = 'password';
 const bio = 'biobiobiob'.repeat(16);
-const createToken = (id: string, expiresIn: string) =>
-  jwt.sign({ id }, 'secret', {
-    expiresIn,
-  });
 
 let user: UserDoc;
 

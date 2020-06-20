@@ -195,12 +195,13 @@ class AuthController {
   @GET(Routes.LogOut)
   logout(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
-      await removeSendExpiredCookieToken(
-        res,
-        200,
-        req.user!,
-        req.user!.tokens.filter(({ token }) => token !== req.token)
+      req.user!.tokens = req.user!.tokens.filter(
+        ({ token }) => token !== req.token
       );
+      if (req.user!.tokens.length > 0) req.user!.removeExpiredTokens();
+      await req.user!.save({ validateBeforeSave: false });
+
+      await removeSendExpiredCookieToken(res, 200);
     })(req, res, next);
   }
 
@@ -211,7 +212,10 @@ class AuthController {
   @GET(Routes.LogOutAll)
   logoutAll(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
-      await removeSendExpiredCookieToken(res, 200, req.user!, []);
+      req.user!.tokens = [];
+      await req.user!.save({ validateBeforeSave: false });
+
+      await removeSendExpiredCookieToken(res, 200);
     })(req, res, next);
   }
 }
