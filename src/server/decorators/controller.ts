@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Base } from '../../common';
+import { Base, ErrMsg } from '../../common';
 import {
   AppError,
   AppRouter,
@@ -22,7 +22,7 @@ const getBodyValidators = (
     if (propsAndValidators.length === 0) return next();
 
     // Check if req.body contains the required props
-    if (!req.body) return next(new AppError('Invalid Request', 400));
+    if (!req.body) return next(new AppError(ErrMsg.InvalidRequest, 400));
 
     const missingProps = propsAndValidators.filter(
       ({ prop }) => !req.body[prop]
@@ -35,7 +35,7 @@ const getBodyValidators = (
           message: `Please enter your ${prop}`,
         };
       });
-      return next(new AppError('Missing Properties', 400, errors));
+      return next(new AppError(ErrMsg.MissingProperties, 400, errors));
     }
 
     // Run additional validator for each prop if provided
@@ -51,7 +51,7 @@ const getBodyValidators = (
         return { field: prop, message };
       });
       // @ts-ignore
-      return next(new AppError('Validation Error', 400, errors));
+      return next(new AppError(ErrMsg.ValidationError, 400, errors));
     }
 
     // Pass all validation step
