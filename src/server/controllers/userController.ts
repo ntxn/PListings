@@ -84,7 +84,7 @@ class UserController {
     propLengthValidator('passwordConfirm', 8, ErrMsg.PasswordMinLength)
   )
   @use(authenticationChecker)
-  @PATCH(Routes.MyAccount)
+  @PATCH(Routes.UpdateMyPassword)
   updateMyPassword(
     req: CustomRequest,
     res: Response,
@@ -110,7 +110,7 @@ class UserController {
   @use(updatePasswordRestrictor)
   @use(addIdToReqParams)
   @use(authenticationChecker)
-  @PATCH(Routes.MyAccount)
+  @PATCH(Routes.UpdateMyAccount)
   updateMyAccount(req: Request, res: Response): void {}
 
   /**
@@ -118,13 +118,13 @@ class UserController {
    * by switching their account status to inactive
    */
   @use(authenticationChecker)
-  @DELETE(Routes.MyAccount)
+  @DELETE(Routes.DeleteMyAccount)
   deleteMyAccount(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
       req.user!.status = AccountStatus.Inactive;
       req.user!.tokens = [];
       req.user!.save({ validateBeforeSave: false });
-      await removeSendExpiredCookieToken(res, 204);
+      await removeSendExpiredCookieToken(res, 200);
     })(req, res, next);
   }
 
@@ -177,7 +177,7 @@ class UserController {
       user.tokens = [];
       await user.save({ validateBeforeSave: false });
 
-      res.status(204).json({ status: RequestStatus.Success, data: null });
+      res.status(200).json({ status: RequestStatus.Success, data: null });
     })(req, res, next);
   }
 }
