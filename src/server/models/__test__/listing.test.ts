@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import { Listing, ListingAttrs, ListingDoc } from '../listing';
 import { User, UserDoc } from '../user';
 import { Categories, Subcategories, ErrMsg } from '../../../common';
@@ -14,7 +14,7 @@ const title = 'Portable bench';
 const price = 40;
 const photos = ['itemPhoto.png'];
 const category = Categories.SportsAndOutdoors;
-const subcategory = Subcategories[category].CampingGear;
+const subcategory = Subcategories[category]['Camping Gear'];
 const location = { coordinates: [-118.404188, 37.737706] };
 let attrs: ListingAttrs;
 let listing: ListingDoc;
@@ -61,6 +61,29 @@ describe('LISTING MODEL', () => {
       listing = Listing.build({ ...attrs, location: { coordinates: [] } });
       await expect(listing.save()).rejects.toThrowError(
         ErrMsg.LocationCoorsLength
+      );
+    });
+
+    it('Throws an error when provide over the maximum number of elements in an array for required fields', async () => {
+      listing = Listing.build({
+        ...attrs,
+        photos: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'],
+      });
+      await expect(listing.save()).rejects.toThrowError(ErrMsg.PhotosLength);
+
+      listing = Listing.build({
+        ...attrs,
+        location: { coordinates: [1, 2, 3] },
+      });
+      await expect(listing.save()).rejects.toThrowError(
+        ErrMsg.LocationCoorsLength
+      );
+    });
+
+    it('Throws an error when subcategory value is not a subcategory of the main category', async () => {
+      listing = Listing.build({ ...attrs, subcategory: 'does not exist' });
+      await expect(listing.save()).rejects.toThrowError(
+        ErrMsg.SubcategoryInvalid
       );
     });
 
