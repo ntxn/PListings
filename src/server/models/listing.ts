@@ -84,7 +84,7 @@ const listingSchema = new mongoose.Schema(
       validate: [
         function (val) {
           // @ts-ignore
-          return !(val in Subcategories[this.category]);
+          return val in Subcategories[this.category];
         },
         ErrMsg.SubcategoryInvalid,
       ],
