@@ -1,7 +1,7 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { app } from '../../app';
-import { User, UserDoc } from '../../models';
+import { User, UserDoc, Listing, ListingDoc, ListingAttrs } from '../../models';
 import { HTML_Methods } from '../../utils';
 import {
   ApiRoutes,
@@ -9,11 +9,52 @@ import {
   RequestStatus,
   AccountStatus,
   ErrMsg,
+  Categories,
+  Subcategories,
 } from '../../../common';
 
+const name = 'Jane Doe';
 const email = 'jdoe@g.io';
 const adminEmail = 'admin@g.io';
 const password = 'password';
+const passwordConfirm = 'password';
+
+// Listing data
+const title = 'Portable bench';
+const price = 40;
+const photos = ['itemPhoto.png'];
+const category = Categories.SportsAndOutdoors;
+const subcategory = Subcategories[category]['Camping Gear'];
+const location = { coordinates: [-118.404188, 37.737706] };
+
+const createAListing = async (attrs: ListingAttrs) => {
+  const listing = Listing.build(attrs);
+  await listing.save();
+  return listing;
+};
+
+let attrs: ListingAttrs;
+let listing0: ListingDoc;
+let listing1: ListingDoc;
+
+const createListings = async (owner: mongoose.Types.ObjectId) => {
+  attrs = { title, price, photos, category, subcategory, location, owner };
+
+  // Create 4 listings for this owner, 2 is active, 1 created then deleted, 1 is expired
+  listing0 = await createAListing(attrs);
+  listing1 = await createAListing(attrs);
+
+  const deletedListing = await createAListing(attrs);
+  await Listing.findByIdAndDelete(deletedListing!.id);
+
+  const expiredListing = await createAListing(attrs);
+  expiredListing.active = false;
+  await expiredListing.save({ validateBeforeSave: false });
+
+  // create 2 listings for random users
+  await createAListing({ ...attrs, owner: mongoose.Types.ObjectId() });
+  await createAListing({ ...attrs, owner: mongoose.Types.ObjectId() });
+};
 
 const makeRequestToProtectedRouteWithoutAuthentication = async (
   method: HTML_Methods,
@@ -98,19 +139,33 @@ describe('DELETE MY ACCOUNT', () => {
     userCookie = await global.login(email);
   });
 
-  it('Returns a 200 (account deleted successfully) when I am logged in', async () => {
+  it('Returns a 200 (account deleted successfully) when I am logged in. All my listings will be removed', async () => {
+    // Create listings for this user
+    let user = await User.findOne({ email });
+    await createListings(user!.id);
+
+    // Expectations before delete user
+    expect(user!.status).toBe(AccountStatus.Active);
+    let listings = await Listing.find({ owner: user!.id });
+    expect(listings.length).toBe(3); // get active and inactive listings
+
+    // Make request to delete user
     const response = await request(app)
       .delete(ApiRoutes.DeleteMyAccount)
       .set('Cookie', userCookie)
       .send()
       .expect(200);
 
+    // Final expectations
     expect(response.body.status).toBe(RequestStatus.Success);
     expect(response.get('Set-Cookie')[0].split(';')[0]).toBe('jwt=loggedOut');
 
-    const user = await User.findOne({ email });
+    user = await User.findOne({ email });
     expect(user!.status).toBe(AccountStatus.Inactive);
     expect(user!.tokens.length).toBe(0);
+
+    listings = await Listing.find({ owner: user!.id });
+    expect(listings.length).toBe(0);
   });
 
   it('Returns a 401 when I am not logged in', async () => {
@@ -208,7 +263,7 @@ describe('ADMIN: GET ALL USERS', () => {
 
   it('Returns a 200 when an admin user is logged in', async () => {
     const { body } = await request(app)
-      .get(ApiRoutes.Users)
+      .get(ApiRoutes.UsersProtected)
       .set('Cookie', adminCookie)
       .send()
       .expect(200);
@@ -220,13 +275,13 @@ describe('ADMIN: GET ALL USERS', () => {
   it('Returns a 401 when no user is logged in', async () => {
     makeRequestToProtectedRouteWithoutAuthentication(
       HTML_Methods.get,
-      ApiRoutes.Users
+      ApiRoutes.UsersProtected
     );
   });
 
   it('Returns a 403 when a non-admin user requests for a user list', async () => {
     const { body } = await request(app)
-      .get(ApiRoutes.Users)
+      .get(ApiRoutes.UsersProtected)
       .set('Cookie', userCookie)
       .send()
       .expect(403);
@@ -251,7 +306,7 @@ describe('ADMIN: GET A USER', () => {
     admin!.role = UserRole.Admin;
     await admin!.save({ validateBeforeSave: false });
 
-    singleUserRoute = `${ApiRoutes.Users}/${user!.id}`;
+    singleUserRoute = `${ApiRoutes.UsersProtected}/${user!.id}`;
   });
 
   it('Returns a 200 when an admin user make the request with a valid user ID', async () => {
@@ -285,7 +340,7 @@ describe('ADMIN: GET A USER', () => {
 
   it('Returns a 400 when request is made with an invalid mongoose ID format', async () => {
     await request(app)
-      .get(`${ApiRoutes.Users}/someInvalidUserId`)
+      .get(`${ApiRoutes.UsersProtected}/someInvalidUserId`)
       .set('Cookie', adminCookie)
       .send()
       .expect(400);
@@ -293,7 +348,9 @@ describe('ADMIN: GET A USER', () => {
 
   it('Returns a 404 when request is made with a non-existing user ID', async () => {
     const { body } = await request(app)
-      .get(`${ApiRoutes.Users}/${mongoose.Types.ObjectId().toHexString()}`)
+      .get(
+        `${ApiRoutes.UsersProtected}/${mongoose.Types.ObjectId().toHexString()}`
+      )
       .set('Cookie', adminCookie)
       .send()
       .expect(404);
@@ -316,7 +373,7 @@ describe('ADMIN: UPDATE A USER', () => {
     admin!.role = UserRole.Admin;
     await admin!.save({ validateBeforeSave: false });
 
-    singleUserRoute = `${ApiRoutes.Users}/${user!.id}`;
+    singleUserRoute = `${ApiRoutes.UsersProtected}/${user!.id}`;
   });
 
   it('Returns a 200 when an admin user make the request with a valid user ID and input', async () => {
@@ -356,7 +413,7 @@ describe('ADMIN: UPDATE A USER', () => {
 
   it('Returns a 400 when user ID is invalid mongoose ObjectId format', async () => {
     await request(app)
-      .patch(`${ApiRoutes.Users}/someInvalidUserId`)
+      .patch(`${ApiRoutes.UsersProtected}/someInvalidUserId`)
       .set('Cookie', adminCookie)
       .send({ name: 'Test Name' })
       .expect(400);
@@ -364,7 +421,9 @@ describe('ADMIN: UPDATE A USER', () => {
 
   it('Returns a 404 when user ID does not exist', async () => {
     const { body } = await request(app)
-      .patch(`${ApiRoutes.Users}/${mongoose.Types.ObjectId().toHexString()}`)
+      .patch(
+        `${ApiRoutes.UsersProtected}/${mongoose.Types.ObjectId().toHexString()}`
+      )
       .set('Cookie', adminCookie)
       .send({ name: 'Test Name' })
       .expect(404);
@@ -404,18 +463,26 @@ describe('ADMIN: DELETE A USER', () => {
     admin!.role = UserRole.Admin;
     await admin!.save({ validateBeforeSave: false });
 
-    singleUserRoute = `${ApiRoutes.Users}/${user!.id}`;
+    singleUserRoute = `${ApiRoutes.UsersProtected}/${user!.id}`;
   });
 
-  it('Returns a 200 when an admin user make the request with a valid user ID', async () => {
-    expect(user!.status).toBe(AccountStatus.Active);
+  it('Returns a 200 when an admin user make the request with a valid user ID. User lisings are deleted', async () => {
+    // Create listings for this user
+    await createListings(user!.id);
 
+    // Expectations before request to delete user
+    expect(user!.status).toBe(AccountStatus.Active);
+    let listings = await Listing.find({ owner: user!.id });
+    expect(listings.length).toBe(3); // get active and inactive listings
+
+    // Make request to delete user
     const { body } = await request(app)
       .delete(singleUserRoute)
       .set('Cookie', adminCookie)
       .send()
       .expect(200);
 
+    // Expectations
     expect(body.status).toBe(RequestStatus.Success);
 
     const updatedUser = await User.findOne({ email });
@@ -424,6 +491,9 @@ describe('ADMIN: DELETE A USER', () => {
     expect(updatedUser!.updatedAt.getTime()).toBeGreaterThan(
       user!.updatedAt.getTime()
     );
+
+    listings = await Listing.find({ owner: user!.id });
+    expect(listings.length).toBe(0);
   });
 
   it('Returns a 401 when no user is logged in', async () => {
@@ -446,7 +516,7 @@ describe('ADMIN: DELETE A USER', () => {
 
   it('Returns a 400 when request is made with an invalid mongoose ID format', async () => {
     await request(app)
-      .delete(`${ApiRoutes.Users}/someInvalidUserId`)
+      .delete(`${ApiRoutes.UsersProtected}/someInvalidUserId`)
       .set('Cookie', adminCookie)
       .send()
       .expect(400);
@@ -454,8 +524,53 @@ describe('ADMIN: DELETE A USER', () => {
 
   it('Returns a 404 when request is made with a non-existing user ID', async () => {
     const { body } = await request(app)
-      .delete(`${ApiRoutes.Users}/${mongoose.Types.ObjectId().toHexString()}`)
+      .delete(
+        `${ApiRoutes.UsersProtected}/${mongoose.Types.ObjectId().toHexString()}`
+      )
       .set('Cookie', adminCookie)
+      .send()
+      .expect(404);
+    expect(body.message).toBe(ErrMsg.NoUserWithId);
+  });
+});
+
+describe('PUBLIC: GET USER PROFILE', () => {
+  it('Returns a 200 with user data only consists of name, location, photo, selling/sold items', async () => {
+    const user = User.build({ name, email, password, passwordConfirm });
+    await user.save();
+
+    await createListings(user.id);
+
+    const { body } = await request(app)
+      .get(`${ApiRoutes.Users}/${user.id}`)
+      .send()
+      .expect(200);
+
+    // User data should only consist of name, location
+    expect(body.data.email).toBeUndefined();
+    expect(body.data.role).toBeUndefined();
+    expect(body.data.status).toBeUndefined();
+    expect(body.data.name).toBe(name);
+    expect(body.data.photo).toBeDefined();
+    expect(body.data.location).toBeDefined();
+
+    // Public user's listings should only show the active, and sold items
+    expect(body.data.listings.length).toBe(2);
+    expect(body.data.listings[0].id).toBe(listing0.id);
+    expect(body.data.listings[1].id).toBe(listing1.id);
+  });
+
+  it('Returns a 400 when user ID is invalid mongoose ObjectId format', async () => {
+    const { body } = await request(app)
+      .get(`${ApiRoutes.Users}/someId`)
+      .send()
+      .expect(400);
+    expect(body.message).toBe('Invalid _id: someId');
+  });
+
+  it('Returns a 404 when user ID does not exist', async () => {
+    const { body } = await request(app)
+      .get(`${ApiRoutes.Users}/${mongoose.Types.ObjectId().toHexString()}`)
       .send()
       .expect(404);
     expect(body.message).toBe(ErrMsg.NoUserWithId);
