@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
+import { ListingDoc } from './listing';
 import { UserRole, AccountStatus, ErrMsg } from '../../common';
 import { Model, ModelAttribute } from '../utils';
 
@@ -10,8 +11,7 @@ export interface UserAttrs extends ModelAttribute {
   email: string;
   photo?: string;
   location?: {
-    lat: number;
-    lng: number;
+    coordinates: number[];
   };
   bio?: string;
   password: string;
@@ -23,8 +23,7 @@ export interface UserDoc extends mongoose.Document {
   email: string;
   photo?: string;
   location?: {
-    lat: number;
-    lng: number;
+    coordinates: number[];
   };
   bio?: string;
   role: UserRole;
@@ -37,6 +36,7 @@ export interface UserDoc extends mongoose.Document {
   tokens: { token: string }[];
   passwordResetToken?: string;
   passwordResetExpires?: number;
+  listings?: ListingDoc[];
   correctPassword(password: string): Promise<boolean>;
   removeExpiredTokens(): void;
 }
@@ -84,8 +84,12 @@ const userSchema = new mongoose.Schema(
       default: 'default.jpg',
     },
     location: {
-      lat: Number,
-      lng: Number,
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
     },
     bio: {
       type: String,
@@ -135,6 +139,13 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.index({ _id: 1, 'tokens.token': 1 });
+
+// Virtual populate
+userSchema.virtual('listings', {
+  ref: 'Listing',
+  foreignField: 'owner',
+  localField: '_id',
+});
 
 // hash new/updated password
 userSchema.pre('save', async function (next) {
