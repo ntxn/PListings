@@ -34,7 +34,7 @@ import {
   accessRestrictor,
   authenticationChecker,
 } from '../middlewares';
-import { User } from '../models';
+import { User, Listing } from '../models';
 
 const addIdToReqParams: MiddlewareHandler = (req: CustomRequest, res, next) => {
   req.params.id = req.user!.id;
@@ -115,7 +115,8 @@ class UserController {
 
   /**
    * Delete the current logged in user's account
-   * by switching their account status to inactive
+   * by switching their account status to inactive.
+   * All user's listing will be deleted.
    */
   @use(authenticationChecker)
   @DELETE(Routes.DeleteMyAccount)
@@ -124,6 +125,8 @@ class UserController {
       req.user!.status = AccountStatus.Inactive;
       req.user!.tokens = [];
       req.user!.save({ validateBeforeSave: false });
+      await Listing.deleteMany({ owner: req.user!.id });
+
       await removeSendExpiredCookieToken(res, 200);
     })(req, res, next);
   }
@@ -135,7 +138,7 @@ class UserController {
   @use(getAll(User))
   @use(accessRestrictor(UserRole.Admin))
   @use(authenticationChecker)
-  @GET(Routes.AllUsers)
+  @GET(Routes.AllUsersProtected)
   getAllUsers(req: Request, res: Response): void {}
 
   /**
@@ -145,7 +148,7 @@ class UserController {
   @use(getOne(User))
   @use(accessRestrictor(UserRole.Admin))
   @use(authenticationChecker)
-  @GET(Routes.User)
+  @GET(Routes.UserProtected)
   getUser(req: Request, res: Response): void {}
 
   /**
@@ -158,16 +161,17 @@ class UserController {
   @use(updatePasswordRestrictor)
   @use(accessRestrictor(UserRole.Admin))
   @use(authenticationChecker)
-  @PATCH(Routes.User)
+  @PATCH(Routes.UserProtected)
   updateUser(req: Request, res: Response): void {}
 
   /**
    * Delete a User account by switching their account status to Inactive.
+   * All user's listing will be deleted.
    * Only Admin-users can deactivate other users's accounts
    */
   @use(accessRestrictor(UserRole.Admin))
   @use(authenticationChecker)
-  @DELETE(Routes.User)
+  @DELETE(Routes.UserProtected)
   deleteUser(req: Request, res: Response, next: NextFunction): void {
     catchAsync(async (req, res, next) => {
       const user = await User.findById(req.params.id);
@@ -177,7 +181,29 @@ class UserController {
       user.tokens = [];
       await user.save({ validateBeforeSave: false });
 
+      await Listing.deleteMany({ owner: user.id });
+
       res.status(200).json({ status: RequestStatus.Success, data: null });
+    })(req, res, next);
+  }
+
+  /***
+   * Get user's public data: name, location, photo, items selling/sold
+   */
+  @GET(Routes.User)
+  getUserPublicProfile(req: Request, res: Response, next: NextFunction): void {
+    catchAsync(async (req, res, next) => {
+      const user = await User.findById(req.params.id)
+        .populate({
+          path: 'listings',
+          select: 'title photos sold -owner',
+          match: { active: true },
+        })
+        .select('name location photo listings');
+
+      if (!user) return next(new NotFoundError(ErrMsg.NoUserWithId));
+
+      res.status(200).json({ status: RequestStatus.Success, data: user });
     })(req, res, next);
   }
 }
