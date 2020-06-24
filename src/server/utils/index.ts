@@ -7,3 +7,4 @@ export * from './errors';
 export * from './token';
 export * from './email';
 export * from './misc';
+export * from './query-features';
