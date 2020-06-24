@@ -1,13 +1,37 @@
+import mongoose from 'mongoose';
+import { Listing, ListingAttrs, ListingDoc } from '../listing';
 import { User, UserDoc } from '../user';
 import { createToken } from '../../utils';
-import { ErrMsg, AccountStatus, UserRole } from '../../../common';
+import {
+  ErrMsg,
+  AccountStatus,
+  UserRole,
+  Categories,
+  Subcategories,
+} from '../../../common';
 
+// User Data
 const name = 'Will Smith';
 const email = 'wsmith@g.io';
 const password = 'password';
 const passwordConfirm = 'password';
 const bio = 'biobiobiob'.repeat(16);
 
+// Listing data
+const title = 'Portable bench';
+const price = 40;
+const photos = ['itemPhoto.png'];
+const category = Categories.SportsAndOutdoors;
+const subcategory = Subcategories[category]['Camping Gear'];
+const location = { coordinates: [-118.404188, 37.737706] };
+
+const createListing = async (attrs: ListingAttrs) => {
+  const listing = Listing.build(attrs);
+  await listing.save();
+  return listing;
+};
+
+let attrs: ListingAttrs;
 let user: UserDoc;
 
 describe('Creating User instance with invalid inputs', () => {
@@ -171,5 +195,45 @@ describe('User class static methods', () => {
     expect(foundUser.id).toEqual(user.id);
     expect(foundUser.tokens.length).toEqual(user.tokens.length);
     expect(foundUser.tokens[0].token).toEqual(user.tokens[0].token);
+  });
+});
+
+describe('Listings belonged to user', () => {
+  let listing1: ListingDoc, listing2: ListingDoc, listing3: ListingDoc;
+  beforeEach(async () => {
+    user = User.build({ name, email, password, passwordConfirm });
+    await user!.save();
+
+    const owner = user!.id;
+    attrs = { title, price, photos, category, subcategory, location, owner };
+
+    // Create 3 listings for this user
+    listing1 = await createListing(attrs);
+    listing2 = await createListing(attrs);
+    listing3 = await createListing(attrs);
+
+    // create 2 listings for random users
+    await createListing({ ...attrs, owner: mongoose.Types.ObjectId() });
+    await createListing({ ...attrs, owner: mongoose.Types.ObjectId() });
+  });
+
+  it('Retrieves listings when populate virtual listings and only includes listings that belong to this user', async () => {
+    const updatedUser = await User.findById(user.id).populate(
+      'listings',
+      'title photos -owner'
+    );
+
+    expect(updatedUser!.listings!.length).toBe(3);
+  });
+
+  it('Returns an empty array of listings when there is no listings belonged to this user', async () => {
+    // Delete all listing belonged to this user
+    await Listing.findByIdAndDelete(listing1.id);
+    await Listing.findByIdAndDelete(listing2.id);
+    await Listing.findByIdAndDelete(listing3.id);
+
+    const updatedUser = await User.findById(user.id).populate('listings');
+
+    expect(updatedUser!.listings!.length).toBe(0);
   });
 });
