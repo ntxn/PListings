@@ -11,9 +11,12 @@ export enum Routes {
   DeleteMyAccount = '/delete-my-account',
   UpdateMyPassword = '/update-my-password',
 
-  // Admins only
-  AllUsers = '/',
+  // Public users data
   User = '/:id',
+
+  // Admins only
+  AllUsersProtected = '/admin',
+  UserProtected = '/admin/:id',
 }
 
 // base route for each resource
@@ -33,6 +36,7 @@ export enum ApiRoutes {
 
   // Users
   Users = '/api/v1/users',
+  UsersProtected = '/api/v1/users/admin',
   MyAccount = '/api/v1/users/my-account',
   UpdateMyAccount = '/api/v1/users/update-my-account',
   DeleteMyAccount = '/api/v1/users/delete-my-account',
