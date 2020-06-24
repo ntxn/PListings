@@ -6,6 +6,7 @@ import {
   Model,
   ModelAttribute,
   NotFoundError,
+  QueryFeatures,
 } from '../utils';
 
 type CRUD_handler = (
@@ -62,8 +63,16 @@ export const updateOne: CRUD_handler = Model =>
 
 export const getAll: CRUD_handler = Model =>
   catchAsync(async (req, res, next) => {
+    // Add features to the query if there's any
     const filter = {};
-    const docs = await Model.find(filter);
+    const queryWithFeatures = new QueryFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .selectFields()
+      .paginate();
+
+    // Execute the query to get documents
+    const docs = await queryWithFeatures.query;
 
     res.status(200).json({
       status: RequestStatus.Success,
