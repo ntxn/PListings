@@ -44,10 +44,11 @@ export enum ErrMsg {
   PriceNegative = 'Please enter a non-negative number',
   CategoryRequired = 'Please choose a category',
   SubcategoryRequired = 'Please choose a subcategory',
-  SubcategoryInvalid = 'Invalid value for a subcategory. Please choose an appropriate subcategory for each category.',
+  SubcategoryNotInCategory = 'Subcategory is not a member of the current Category. Please choose an appropriate subcategory for each category.',
   DescriptionMaxLength = 'Description length cannot be over 1450 characters',
   BrandMaxLength = 'Brand length cannot be over 100 characters',
   LocationCoorsRequired = 'Location Coordinates are required',
-  LocationCoorsLength = 'Location Coordinates have exactly two values: [long, lat]',
+  LocationCoorsLength = 'Location Coordinates must have exactly two values: [long, lat]',
   OwnerRequired = 'A listing must belong to a user',
+  UnauthorizedToMadeChangesToOtherUsersListings = 'You cannot make changes to listings that you do not own',
 }

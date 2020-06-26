@@ -1,4 +1,5 @@
 export enum Routes {
+  // ------------------- USERS ---------------------
   // Sub-routes for USERS resource
   SignUp = '/signup',
   LogIn = '/login',
@@ -17,12 +18,22 @@ export enum Routes {
   // Admins only
   AllUsersProtected = '/admin',
   UserProtected = '/admin/:id',
+
+  // ------------------- LISTING ---------------------
+  // Listings routes
+  Listings = '/',
+  Listing = '/:id',
+
+  // Admin only
+  ListingProtected = '/admin/:id',
 }
 
 // base route for each resource
 export enum Base {
   Users = '/api/v1/users',
   Auth = '/api/v1/auth',
+
+  Listings = '/api/v1/listings',
 }
 
 /** These routes are used for making API calls */
@@ -41,4 +52,8 @@ export enum ApiRoutes {
   UpdateMyAccount = '/api/v1/users/update-my-account',
   DeleteMyAccount = '/api/v1/users/delete-my-account',
   UpdateMyPassword = '/api/v1/users/update-my-password',
+
+  // Listings
+  Listings = '/api/v1/listings',
+  ListingProtected = '/api/v1/listings/admin',
 }
