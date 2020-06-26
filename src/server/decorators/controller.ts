@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { Base, ErrMsg } from '../../common';
+import { getCurrentUser } from '../middlewares';
 import {
   AppError,
   AppRouter,
@@ -83,12 +84,14 @@ export function controller(resourceRoute: Base) {
         functionName
       );
 
-      const middlewares: MiddlewareHandler[] =
-        Reflect.getMetadata(
+      const middlewares = [
+        getCurrentUser,
+        ...(Reflect.getMetadata(
           MetadataKeys.middleware,
           target.prototype,
           functionName
-        ) || [];
+        ) || []),
+      ];
 
       const requiredPropsAndValidators: PropsAndValidators =
         Reflect.getMetadata(
