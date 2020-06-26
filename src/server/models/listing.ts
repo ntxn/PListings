@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Conditions, Categories, Subcategories, ErrMsg } from '../../common';
-import { Model, ModelAttribute } from '../utils';
+import { Model, ModelAttribute, AppError } from '../utils';
 import { UserDoc } from '../models';
 
 export interface ListingAttrs extends ModelAttribute {
@@ -84,9 +84,9 @@ const listingSchema = new mongoose.Schema(
       validate: [
         function (val) {
           // @ts-ignore
-          return val in Subcategories[this.category];
+          return this && val in Subcategories[this.category];
         },
-        ErrMsg.SubcategoryInvalid,
+        ErrMsg.SubcategoryNotInCategory,
       ],
     },
     location: {

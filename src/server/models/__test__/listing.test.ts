@@ -80,10 +80,15 @@ describe('LISTING MODEL', () => {
       );
     });
 
-    it('Throws an error when subcategory value is not a subcategory of the main category', async () => {
+    it('Throws an error when subcategory value is not a member of the main category', async () => {
       listing = Listing.build({ ...attrs, subcategory: 'does not exist' });
       await expect(listing.save()).rejects.toThrowError(
-        ErrMsg.SubcategoryInvalid
+        ErrMsg.SubcategoryNotInCategory
+      );
+
+      listing = Listing.build({ ...attrs, category: Categories.Garden });
+      await expect(listing.save()).rejects.toThrowError(
+        ErrMsg.SubcategoryNotInCategory
       );
     });
 
