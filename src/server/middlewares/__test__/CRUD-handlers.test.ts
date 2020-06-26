@@ -195,8 +195,9 @@ describe('CRUD HANDLER MIDDLEWARES ON MODEL', () => {
       req = httpMocks.createRequest({ params: { id: userId } });
 
       await deleteUserMiddleware(req, res, next);
-      expect(res.statusCode).toBe(204);
+      expect(res.statusCode).toBe(200);
       expect(res._getJSONData().data).toBeNull();
+      expect(res._getJSONData().status).toBe(RequestStatus.Success);
 
       const deletedUser = await User.findById(userId);
       expect(deletedUser).toBeNull();

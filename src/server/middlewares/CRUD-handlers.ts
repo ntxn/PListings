@@ -47,7 +47,7 @@ export const deleteOne: CRUD_handler = Model =>
     const doc = await Model.findByIdAndDelete(req.params.id);
     if (!doc) return next(new NotFoundError(ErrMsg.NoDocWithId));
 
-    res.status(204).json({ status: RequestStatus.Success, data: null });
+    res.status(200).json({ status: RequestStatus.Success, data: null });
   });
 
 export const updateOne: CRUD_handler = Model =>
@@ -56,6 +56,7 @@ export const updateOne: CRUD_handler = Model =>
       new: true,
       runValidators: true,
     });
+
     if (!doc) return next(new NotFoundError(ErrMsg.NoDocWithId));
 
     res.status(200).json({ status: RequestStatus.Success, data: doc });
