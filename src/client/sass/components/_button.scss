@@ -1,0 +1,11 @@
+.btn {
+  &,
+  &:link,
+  &:visited {
+    font-size: $default-font-size;
+    display: inline-block;
+    text-transform: capitalize;
+    text-decoration: none;
+    color: $color-grey-dark-3;
+  }
+}
