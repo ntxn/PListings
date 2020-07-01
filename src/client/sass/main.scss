@@ -1,7 +1,10 @@
-@import 'temp/color';
-$color-grey-light-1: #f7f7f7;
+@import "abstracts/variables";
 
-h3 {
-  background-color: $color-grey-light-1;
-  user-select: none;
-}
+@import "base/base";
+
+@import "components/button";
+
+@import "layout/body-wrapper";
+@import "layout/footer";
+@import "layout/header";
+@import "layout/main";

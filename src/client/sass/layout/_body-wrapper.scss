@@ -1,0 +1,11 @@
+/*  
+  When the main content is empty, with this wrapper,
+  it'll put the footer at the bottom of the viewport.
+  When the content is longer than the viewport, the
+  footer will be at the end of the content.
+*/
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
