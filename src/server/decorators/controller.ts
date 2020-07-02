@@ -3,6 +3,7 @@ import { Base, ErrMsg } from '../../common';
 import { getCurrentUser } from '../middlewares';
 import {
   AppError,
+  ValidationError,
   AppRouter,
   HTML_Methods,
   MetadataKeys,
@@ -30,11 +31,10 @@ const getBodyValidators = (
     );
 
     if (missingProps.length > 0) {
-      const errors = missingProps.map(({ prop }) => {
-        return {
-          field: prop,
-          message: `Please enter your ${prop}`,
-        };
+      const errors = {};
+      missingProps.forEach(({ prop }) => {
+        // @ts-ignore
+        errors[prop] = `Please enter your ${prop}`;
       });
       return next(new AppError(ErrMsg.MissingProperties, 400, errors));
     }
@@ -48,11 +48,12 @@ const getBodyValidators = (
     );
 
     if (propsFailedValidation.length > 0) {
-      const errors = propsFailedValidation.map(({ prop, message }) => {
-        return { field: prop, message };
+      const errors = {};
+      propsFailedValidation.forEach(({ prop, message }) => {
+        // @ts-ignore
+        errors[prop] = message;
       });
-      // @ts-ignore
-      return next(new AppError(ErrMsg.ValidationError, 400, errors));
+      return next(new ValidationError(errors));
     }
 
     // Pass all validation step

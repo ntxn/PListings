@@ -12,7 +12,7 @@ import { User } from '../models';
 /**
  * Helper method: process user's token to check if they're logged in
  */
-const getloggingStatus = (...errors: NotAuthorizedError[]): MiddlewareHandler =>
+const getloginStatus = (...errors: NotAuthorizedError[]): MiddlewareHandler =>
   catchAsync(async (req: CustomRequest, res, next) => {
     // If user is already authenticated, then move to the next middlewares
     if (req.user && req.token) return next();
@@ -46,14 +46,14 @@ const getloggingStatus = (...errors: NotAuthorizedError[]): MiddlewareHandler =>
  * If they are logged in, attach their user data to req object.
  * If not, move to the next middleware, req.user will be null, no errors
  */
-export const getCurrentUser: MiddlewareHandler = getloggingStatus();
+export const getCurrentUser: MiddlewareHandler = getloginStatus();
 
 /**
  * Check if the user is authenticated to access protected route.
  * If the user is authenticated successfully, the request object will
  * have user data and jwt token (req.user, req.token)
  */
-export const authenticationChecker: MiddlewareHandler = getloggingStatus(
+export const authenticationChecker: MiddlewareHandler = getloginStatus(
   new NotAuthorizedError(ErrMsg.Unauthenticated),
   new NotAuthorizedError(ErrMsg.JwtNotFoundUserWithToken)
 );
