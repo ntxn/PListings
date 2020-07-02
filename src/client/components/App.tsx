@@ -20,7 +20,7 @@ const _App = (props: AppProps): JSX.Element => {
 
   return (
     <Router history={history}>
-      <div className="wrapper">
+      <div className="body-wrapper">
         <Header />
         <main>
           <div className="main">

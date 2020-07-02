@@ -1,20 +1,13 @@
 footer {
-  width: 100%;
-  background-color: $color-primary;
-  color: $color-grey-light-1;
-  padding: 2.5rem 0;
-  font-size: 1.4rem;
+  @include center-content;
 
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+  padding: var(--padding-body);
+  background-color: var(--color-primary);
+  color: var(--color-grey-light-1);
+  font-size: var(--footer-font-size);
 
   .footer {
-    width: $content-max-width;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    @include expand-content-to-max-width;
 
     &__logo {
       height: 5.5rem;

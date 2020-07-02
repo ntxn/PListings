@@ -1,17 +1,24 @@
-// COLORS
-$color-primary: #ff7851;
-$color-primary-light: #ffb7a1;
+:root {
+  // COLORS
+  --color-primary: #ff7851;
+  --color-primary-light: #ffb7a1;
 
-$color-white: #fff;
-$color-black: #000;
+  --color-white: #fff;
+  --color-black: #000;
 
-$color-grey-light-1: #f5f4f2;
-$color-grey-light-2: #ede7e7;
+  --color-grey-light-1: #f5f4f2;
+  --color-grey-light-2: #ede7e7;
 
-$color-grey-dark-1: #76768e;
-$color-grey-dark-3: #333;
+  --color-grey-dark-1: #76768e;
+  --color-grey-dark-3: #333;
 
-// FONT SIZE
-$default-font-size: 1.6rem;
+  // CONTENT WIDTH
+  --content-max-width: 120rem;
 
-$content-max-width: 100rem;
+  // FONT SIZE
+  --default-font-size: 1.6rem;
+  --footer-font-size: 1.4rem;
+
+  // PADDING, MARGIN
+  --padding-body: 2rem;
+}

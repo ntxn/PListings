@@ -1,10 +1,11 @@
+@import "abstracts/mixins";
 @import "abstracts/variables";
 
 @import "base/base";
 
 @import "components/button";
 
-@import "layout/body-wrapper";
+@import "layout/containers";
 @import "layout/footer";
 @import "layout/header";
 @import "layout/main";

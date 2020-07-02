@@ -4,7 +4,7 @@
   When the content is longer than the viewport, the
   footer will be at the end of the content.
 */
-.wrapper {
+.body-wrapper {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
