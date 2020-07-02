@@ -1,7 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-export const Header = (): JSX.Element => {
+import { UserDoc } from '../../server/models';
+import { StoreState } from '../reducers';
+import { logOut } from '../actions';
+
+interface HeaderProps {
+  user: UserDoc | null;
+  logOut(): void;
+}
+
+const _Header = (props: HeaderProps): JSX.Element => {
+  const renderNav = props.user ? (
+    <div className="header__nav">
+      <Link to="/users/login" className="btn">
+        Sell
+      </Link>
+      <button className="btn" onClick={props.logOut}>
+        Log Out
+      </button>
+    </div>
+  ) : (
+    <div className="header__nav">
+      <Link to="/users/login" className="btn">
+        Log In
+      </Link>
+      <Link to="/users/signup" className="btn">
+        Sign Up
+      </Link>
+    </div>
+  );
+
   return (
     <header>
       <div className="header">
@@ -14,15 +44,14 @@ export const Header = (): JSX.Element => {
           </Link>
         </div>
         <div className="header__search-bar">Search bar</div>
-        <div className="header__nav">
-          <Link to="/users/login" className="btn">
-            Log In
-          </Link>
-          <Link to="/users/signup" className="btn">
-            Sign Up
-          </Link>
-        </div>
+        {renderNav}
       </div>
     </header>
   );
 };
+
+const mapStateToProps = (state: StoreState): { user: UserDoc | null } => {
+  return { user: state.user };
+};
+
+export const Header = connect(mapStateToProps, { logOut })(_Header);
