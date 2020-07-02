@@ -4,7 +4,7 @@ import { ErrMsg, RequestStatus } from '../../common';
 
 abstract class CustomError extends Error {
   isOperational = true;
-  errors?: { field: string; message: string }[];
+  errors?: { [field: string]: string };
   abstract statusCode: number;
 
   constructor(message: string) {
@@ -25,7 +25,7 @@ export class AppError extends CustomError {
   constructor(
     public message: string,
     public statusCode: number,
-    public errors?: { field: string; message: string }[]
+    public errors?: { [field: string]: string }
   ) {
     super(message);
     Object.setPrototypeOf(this, AppError.prototype);
@@ -58,21 +58,30 @@ export class BadRequestError extends CustomError {
   }
 }
 
-/** A Custom Error that handles Field Validation Errors from Mongoose for Mongoose Model */
-export class MongooseValidationError extends CustomError {
+/** A Custom Error that handles Field Validation Errors */
+export class ValidationError extends CustomError {
   statusCode = 400;
-  constructor(err: mongoose.Error.ValidationError) {
-    super(ErrMsg.ValidationError);
-    Object.setPrototypeOf(this, MongooseValidationError);
 
-    this.errors = Object.keys(err.errors).map(field => {
-      const error = err.errors[field];
-      const message =
-        error instanceof mongoose.Error.ValidatorError
-          ? error.properties.message
-          : `Invalid ${error.path}: ${error.value}`;
-      return { field, message };
-    });
+  constructor(
+    err: { [field: string]: string } | mongoose.Error.ValidationError
+  ) {
+    super(ErrMsg.ValidationError);
+    Object.setPrototypeOf(this, ValidationError);
+
+    if (err instanceof mongoose.Error.ValidationError) {
+      this.errors = {};
+      Object.keys(err.errors).forEach(field => {
+        const error = err.errors[field];
+        const message =
+          error instanceof mongoose.Error.ValidatorError
+            ? error.properties.message
+            : `Invalid ${error.path}: ${error.value}`;
+        this.errors![field] = message;
+      });
+    } else {
+      // @ts-ignore
+      this.errors = err.errors ? err.errors : err;
+    }
   }
 }
 
@@ -95,7 +104,7 @@ export class MongoDuplicateKeyError extends CustomError {
     const field = Object.keys(err.keyValue)[0];
     const message = `${field} ${err.keyValue[field]} already exists`;
 
-    this.errors = [{ field, message }];
+    this.errors = { [field]: message };
   }
 }
 

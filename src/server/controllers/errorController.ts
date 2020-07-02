@@ -1,7 +1,7 @@
 import { ErrorRequestHandler } from 'express';
 import { RequestStatus } from '../../common';
 import {
-  MongooseValidationError,
+  ValidationError,
   MongoDuplicateKeyError,
   MongooseCastError,
   JwtInvalidError,
@@ -13,7 +13,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   const devEnv = process.env.NODE_ENV === 'development';
   let error: AppError;
 
-  if (err.name === 'ValidationError') error = new MongooseValidationError(err);
+  if (err.name === 'ValidationError') error = new ValidationError(err);
   else if (err.name === 'CastError') error = new MongooseCastError(err);
   else if (err.name === 'JsonWebTokenError') error = new JwtInvalidError();
   else if (err.name === 'TokenExpiredError') error = new JwtExpiredError();
@@ -21,7 +21,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     error = new MongoDuplicateKeyError(err);
   else error = err;
 
-  console.error('ERROR', error);
+  // console.error('ERROR', error);
 
   res.status(error.statusCode || 500).json({
     status: error.status || RequestStatus.Fail,
