@@ -81,7 +81,7 @@ describe('LISTING CONTROLLER', () => {
 
       let body = await createListingRequest(userCookie, props, 400);
       expect(body.message).toBe(ErrMsg.ValidationError);
-      expect(body.errors[0].message).toBe(ErrMsg.PriceRequired);
+      expect(body.errors.price).toBe(ErrMsg.PriceRequired);
 
       props = { ...listingProps };
       delete props.photos;
@@ -97,14 +97,14 @@ describe('LISTING CONTROLLER', () => {
         400
       );
 
-      expect(body.errors[0].message).toBe(ErrMsg.SubcategoryNotInCategory);
+      expect(body.errors.subcategory).toBe(ErrMsg.SubcategoryNotInCategory);
 
       body = await createListingRequest(
         userCookie,
         { ...listingProps, subcategory: 'non-existing subcategory' },
         400
       );
-      expect(body.errors[0].message).toBe(ErrMsg.SubcategoryNotInCategory);
+      expect(body.errors.subcategory).toBe(ErrMsg.SubcategoryNotInCategory);
     });
   });
 
@@ -264,7 +264,7 @@ describe('LISTING CONTROLLER', () => {
         .send({ category: Categories.Garden })
         .expect(400);
       expect(response.body.message).toBe(ErrMsg.ValidationError);
-      expect(response.body.errors[0].message).toBe(
+      expect(response.body.errors.subcategory).toBe(
         ErrMsg.SubcategoryNotInCategory
       );
 
@@ -276,7 +276,8 @@ describe('LISTING CONTROLLER', () => {
         .set('Cookie', userCookie)
         .send({ subcategory: Subcategories.Tools['Hand Tools'] })
         .expect(400);
-      expect(response.body.errors[0].message).toBe(
+
+      expect(response.body.errors.subcategory).toBe(
         ErrMsg.SubcategoryNotInCategory
       );
 

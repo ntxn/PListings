@@ -27,10 +27,7 @@ describe('SIGN UP', () => {
   ) => {
     const response = await request(app).post(ApiRoutes.SignUp).send(reqBody);
     expect(response.body.status).toEqual(RequestStatus.Fail);
-
-    const { field, message } = response.body.errors[0];
-    expect(field).toBe(fieldName);
-    expect(message).toBe(errMsg);
+    expect(response.body.errors[fieldName]).toBe(errMsg);
   };
 
   it('Returns a 201 when valid input are provided', async () => {
@@ -66,7 +63,12 @@ describe('SIGN UP', () => {
       .expect(400);
     expect(response.body.status).toEqual(RequestStatus.Fail);
     expect(response.body.message).toEqual(ErrMsg.ValidationError);
-    expect(response.body.errors.length).toBe(4);
+    expect(response.body.errors.email).toBe(ErrMsg.EmailRequired);
+    expect(response.body.errors.password).toBe(ErrMsg.PasswordRequired);
+    expect(response.body.errors.passwordConfirm).toBe(
+      ErrMsg.PasswordConfirmRequired
+    );
+    expect(response.body.errors.name).toBe(ErrMsg.NameRequired);
 
     let missedFieldBody: ReqBody = { email, password, passwordConfirm };
     await testField('name', ErrMsg.NameRequired, missedFieldBody);
@@ -116,7 +118,9 @@ describe('SIGN UP', () => {
       .post(ApiRoutes.SignUp)
       .send(validReqBody)
       .expect(400);
-    expect(response.body.message).toEqual(ErrMsg.EmailInUse);
+
+    expect(response.body.message).toEqual(ErrMsg.ValidationError);
+    expect(response.body.errors.email).toBe(ErrMsg.EmailInUse);
 
     // Error message of inactive account if account status is Inactive
     user.status = AccountStatus.Inactive;
@@ -166,19 +170,20 @@ describe('LOG IN', () => {
       .expect(400);
     expect(response.body.status).toEqual(RequestStatus.Fail);
     expect(response.body.message).toEqual(ErrMsg.ValidationError);
-    expect(response.body.errors.length).toBe(2);
+    expect(response.body.errors.email).toBe(ErrMsg.EmailInvalid);
+    expect(response.body.errors.password).toBe(ErrMsg.PasswordMinLength);
 
     response = await request(app)
       .post(ApiRoutes.LogIn)
       .send({ email: 'w', password })
       .expect(400);
-    expect(response.body.errors[0].message).toEqual(ErrMsg.EmailInvalid);
+    expect(response.body.errors.email).toEqual(ErrMsg.EmailInvalid);
 
     response = await request(app)
       .post(ApiRoutes.LogIn)
       .send({ email, password: '1' })
       .expect(400);
-    expect(response.body.errors[0].message).toEqual(ErrMsg.PasswordMinLength);
+    expect(response.body.errors.password).toEqual(ErrMsg.PasswordMinLength);
   });
 
   it('Returns a 401 when there is no match of the provided email and password', async () => {
