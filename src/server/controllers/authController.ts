@@ -23,6 +23,7 @@ import {
   AppError,
   BadRequestError,
   NotFoundError,
+  ValidationError,
   createSendCookieWithToken,
   removeSendExpiredCookieToken,
   propLengthValidator,
@@ -30,13 +31,23 @@ import {
 } from '../utils';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email';
 import { User } from '../models';
-import { authenticationChecker } from '../middlewares';
+import { authenticationChecker, getCurrentUser } from '../middlewares';
 
 /**
  * Controller which create routes and handlers for app authentication related
  */
 @controller(Base.Auth)
 class AuthController {
+  @use(getCurrentUser)
+  @GET(Routes.CurrentUser)
+  currentUser(req: CustomRequest, res: Response, next: NextFunction): void {
+    catchAsync(async (req: CustomRequest, res, next) => {
+      res
+        .status(200)
+        .json({ status: RequestStatus.Success, data: req.user || null });
+    })(req, res, next);
+  }
+
   /**
    * Route and Handler for signing user up.
    * When succeed, it returns new user data and a cookie with token.
@@ -54,7 +65,7 @@ class AuthController {
       if (existingUser)
         switch (existingUser.status) {
           case AccountStatus.Active:
-            return next(new BadRequestError(ErrMsg.EmailInUse));
+            return next(new ValidationError({ email: ErrMsg.EmailInUse }));
           case AccountStatus.Inactive:
             return next(new BadRequestError(ErrMsg.InactiveAccount));
           case AccountStatus.Suspended:

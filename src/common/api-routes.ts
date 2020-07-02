@@ -1,12 +1,16 @@
 export enum Routes {
   // ------------------- USERS ---------------------
   // Sub-routes for USERS resource
+  CurrentUser = '/current-user',
+
   SignUp = '/signup',
   LogIn = '/login',
   LogOut = '/logout',
   LogOutAll = '/logout-all',
+
   ForgotPassword = '/forgot-password',
   ResetPassword = '/reset-password/:token',
+
   MyAccount = '/my-account',
   UpdateMyAccount = '/update-my-account',
   DeleteMyAccount = '/delete-my-account',
@@ -44,6 +48,7 @@ export enum ApiRoutes {
   LogOut = '/api/v1/auth/logout',
   LogOutAll = '/api/v1/auth/logout-all',
   ForgotPassword = '/api/v1/auth/forgot-password',
+  CurrentUser = '/api/v1/auth/current-user',
 
   // Users
   Users = '/api/v1/users',
