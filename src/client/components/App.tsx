@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Router, Route, Switch } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import { history } from '../history';
+import { fetchCurrentUser } from '../actions';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { Listings } from './Listings';
-import { UserCreate } from './UserCreate';
+import { SignUp, LogIn } from './auth';
 
-export const App = (): JSX.Element => {
+interface AppProps {
+  fetchCurrentUser(): Promise<void>;
+}
+
+const _App = (props: AppProps): JSX.Element => {
+  useEffect(() => {
+    props.fetchCurrentUser();
+  }, []);
+
   return (
     <Router history={history}>
       <div className="wrapper">
@@ -16,7 +26,8 @@ export const App = (): JSX.Element => {
           <div className="main">
             <Switch>
               <Route path="/" exact component={Listings} />
-              <Route path="/users/signup" exact component={UserCreate} />
+              <Route path="/users/SignUp" exact component={SignUp} />
+              <Route path="/users/LogIn" exact component={LogIn} />
             </Switch>
           </div>
         </main>
@@ -25,3 +36,5 @@ export const App = (): JSX.Element => {
     </Router>
   );
 };
+
+export const App = connect(null, { fetchCurrentUser })(_App);
