@@ -23,10 +23,10 @@ const _Header = (props: HeaderProps): JSX.Element => {
     </div>
   ) : (
     <div className="header__nav">
-      <Link to="/users/login" className="btn">
+      <Link to="/users/login" className="btn btn--border">
         Log In
       </Link>
-      <Link to="/users/signup" className="btn">
+      <Link to="/users/signup" className="btn btn--filled">
         Sign Up
       </Link>
     </div>
