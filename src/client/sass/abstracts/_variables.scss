@@ -3,13 +3,23 @@
   --color-primary: #ff7851;
   --color-primary-light: #ffb7a1;
 
+  --color-secondary-light: #7ed56f;
+  --color-secondary-dark: #28b485;
+
+  --color-pink-grey: #ede7e7;
+  --color-blue-grey: #76768e;
+
   --color-white: #fff;
   --color-black: #000;
+  --color-red: #f30000;
 
-  --color-grey-light-1: #f5f4f2;
-  --color-grey-light-2: #ede7e7;
+  --color-grey-light-1: #f3f3f3;
+  --color-grey-light-2: #e0e0e0;
+  --color-grey-light-3: #cecece;
+  --color-grey-light-4: #b4b3b3;
 
-  --color-grey-dark-1: #76768e;
+  --color-grey-dark-1: rgb(109, 109, 109);
+  --color-grey-dark-2: rgb(82, 82, 82);
   --color-grey-dark-3: #333;
 
   // CONTENT WIDTH
@@ -19,6 +29,17 @@
   --default-font-size: 1.6rem;
   --footer-font-size: 1.4rem;
 
+  // BORDER-RADIUS
+  --border-radius-xsmall: 0.5rem;
+  --border-radius-small: 1rem;
+  --border-radius-medium: 2rem;
+  --border-raidus-large: 3rem;
+
   // PADDING, MARGIN
   --padding-body: 2rem;
 }
+
+$shadow-grey: 0 0 0 1px var(--color-grey-light-2),
+  0 2px 4px 0 rgba(0, 0, 0, 0.07), 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
+
+$shadow-green: 0 0 1px 4px rgba(126, 213, 111, 0.7);
