@@ -1,5 +1,6 @@
 const path = require('path');
 const merge = require('webpack-merge');
+const Dotenv = require('dotenv-webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const baseConfig = require('./webpack.base');
 
@@ -30,6 +31,7 @@ const config = {
       filename: '../css/style.css',
       ignoreOrder: false,
     }),
+    new Dotenv({ path: './config.env' }),
   ],
 };
 
