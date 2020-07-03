@@ -8,6 +8,7 @@ import {
   UserRole,
   Categories,
   Subcategories,
+  DEFAULT_LOCATION,
 } from '../../../common';
 
 // User Data
@@ -23,7 +24,7 @@ const price = 40;
 const photos = ['itemPhoto.png'];
 const category = Categories.SportsAndOutdoors;
 const subcategory = Subcategories[category]['Camping Gear'];
-const location = { coordinates: [-118.404188, 37.737706] };
+const location = DEFAULT_LOCATION;
 
 const createListing = async (attrs: ListingAttrs) => {
   const listing = Listing.build(attrs);
@@ -41,54 +42,92 @@ describe('Creating User instance with invalid inputs', () => {
       email: '',
       password: '',
       passwordConfirm: '',
+      location: DEFAULT_LOCATION,
     });
     await expect(user.save()).rejects.toThrow();
 
-    user = User.build({ name: '', email, password, passwordConfirm });
+    user = User.build({ name: '', email, password, passwordConfirm, location });
     await expect(user.save()).rejects.toThrowError(ErrMsg.NameRequired);
 
-    user = User.build({ name, email: '', password, passwordConfirm });
+    user = User.build({ name, email: '', password, passwordConfirm, location });
     await expect(user.save()).rejects.toThrowError(ErrMsg.EmailRequired);
 
-    user = User.build({ name, email, password: '', passwordConfirm });
+    user = User.build({ name, email, password: '', passwordConfirm, location });
     await expect(user.save()).rejects.toThrowError(ErrMsg.PasswordRequired);
 
-    user = User.build({ name, email, password, passwordConfirm: '' });
+    user = User.build({ name, email, password, passwordConfirm: '', location });
     await expect(user.save()).rejects.toThrowError(
       ErrMsg.PasswordConfirmRequired
     );
   });
 
   it('Throws min/max length error message when inputs does not meet length constraint', async () => {
-    let user = User.build({ name, email, password: 'pass', passwordConfirm });
+    let user = User.build({
+      name,
+      email,
+      password: 'pass',
+      passwordConfirm,
+      location,
+    });
     await expect(user.save()).rejects.toThrowError(ErrMsg.PasswordMinLength);
 
-    user = User.build({ name, email, password, passwordConfirm, bio });
+    user = User.build({
+      name,
+      email,
+      password,
+      passwordConfirm,
+      location,
+      bio,
+    });
     await expect(user.save()).rejects.toThrowError(ErrMsg.BioMaxLength);
   });
 
   it('Return an invalid email error if the email format is invalid', async () => {
-    user = User.build({ name, email: 'just text', password, passwordConfirm });
+    user = User.build({
+      name,
+      email: 'just text',
+      password,
+      passwordConfirm,
+      location,
+    });
     await expect(user.save()).rejects.toThrowError(ErrMsg.EmailInvalid);
 
-    user = User.build({ name, email: 'g@i', password, passwordConfirm });
+    user = User.build({
+      name,
+      email: 'g@i',
+      password,
+      passwordConfirm,
+      location,
+    });
     await expect(user.save()).rejects.toThrowError(ErrMsg.EmailInvalid);
   });
 
   it('Returns a duplicate key MongoError if the provided email is already in use', async () => {
     // Create a user with email
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user.save();
 
     // Creating another user with the same email
-    const newUser = User.build({ name, email, password, passwordConfirm });
+    const newUser = User.build({
+      name,
+      email,
+      password,
+      passwordConfirm,
+      location,
+    });
     await expect(newUser.save()).rejects.toThrowError(
       `E11000 duplicate key error dup key: { : \"${email}\" }`
     );
   });
 
   it('Returns passwordConfirmNotMatch error message when providing different password and passwordConfirm', async () => {
-    user = User.build({ name, email, password, passwordConfirm: 'pass1234' });
+    user = User.build({
+      name,
+      email,
+      password,
+      passwordConfirm: 'pass1234',
+      location,
+    });
     await expect(user.save()).rejects.toThrowError(
       ErrMsg.PasswordConfirmNotMatch
     );
@@ -97,7 +136,7 @@ describe('Creating User instance with invalid inputs', () => {
 
 describe('New User instance created with valid inputs', () => {
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user.save();
   });
 
@@ -130,7 +169,7 @@ describe('User updates password', () => {
   let oldUpdatedAt: Date;
 
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user.save();
 
     oldHashedPassword = user.password;
@@ -156,7 +195,7 @@ describe('User updates password', () => {
 
 describe('User instance methods', () => {
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user.save();
   });
 
@@ -182,7 +221,7 @@ describe('User class static methods', () => {
   let token: string;
 
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user.save();
 
     token = createToken(user.id, '1d');
@@ -201,7 +240,7 @@ describe('User class static methods', () => {
 describe('Listings belonged to user', () => {
   let listing1: ListingDoc, listing2: ListingDoc, listing3: ListingDoc;
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user!.save();
 
     const owner = user!.id;

@@ -3,28 +3,24 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import { ListingDoc } from './listing';
-import { UserRole, AccountStatus, ErrMsg } from '../../common';
+import { UserRole, AccountStatus, ErrMsg, GeoLocation } from '../../common';
 import { Model, ModelAttribute } from '../utils';
 
 export interface UserAttrs extends ModelAttribute {
   name: string;
   email: string;
-  photo?: string;
-  location?: {
-    coordinates: number[];
-  };
-  bio?: string;
+  location: GeoLocation;
   password: string;
   passwordConfirm: string;
+  photo?: string;
+  bio?: string;
 }
 
 export interface UserDoc extends mongoose.Document {
   name: string;
   email: string;
+  location: GeoLocation;
   photo?: string;
-  location?: {
-    coordinates: number[];
-  };
   bio?: string;
   role: UserRole;
   status: AccountStatus;
@@ -89,7 +85,30 @@ const userSchema = new mongoose.Schema(
         default: 'Point',
         enum: ['Point'],
       },
-      coordinates: [Number],
+      coordinates: {
+        type: [Number], // [Long, Lat]
+        required: [true, ErrMsg.LocationCoorsRequired],
+        validate: [
+          (coors: number[]) => coors.length > 0 && coors.length < 3,
+          ErrMsg.LocationCoorsLength,
+        ],
+      },
+      postal: {
+        type: Number,
+        required: [true, ErrMsg.LocationPostalRequired],
+      },
+      city: {
+        type: String,
+        required: [true, ErrMsg.LocationCityRequired],
+      },
+      state: {
+        type: String,
+        required: [true, ErrMsg.LocationStateRequired],
+      },
+      country: {
+        type: String,
+        required: [true, ErrMsg.LocationCountryRequired],
+      },
     },
     bio: {
       type: String,
