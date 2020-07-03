@@ -17,6 +17,14 @@ export enum ErrMsg {
   AccessRestriction = 'You do not have permission to perform this action',
   ResetTokenInvalidOrExpired = 'Reset Token is invalid or has expired',
 
+  // Location
+  LocationCoorsRequired = 'Location Coordinates are required',
+  LocationCoorsLength = 'Location Coordinates must have exactly two values: [long, lat]',
+  LocationPostalRequired = 'Location Postal Code is required',
+  LocationCityRequired = 'Location City is required',
+  LocationStateRequired = 'Location State is required',
+  LocationCountryRequired = 'Location Country is required',
+
   // Users
   NameRequired = 'Please enter your name',
   EmailRequired = 'Please enter your email',
@@ -47,8 +55,6 @@ export enum ErrMsg {
   SubcategoryNotInCategory = 'Subcategory is not a member of the current Category. Please choose an appropriate subcategory for each category.',
   DescriptionMaxLength = 'Description length cannot be over 1450 characters',
   BrandMaxLength = 'Brand length cannot be over 100 characters',
-  LocationCoorsRequired = 'Location Coordinates are required',
-  LocationCoorsLength = 'Location Coordinates must have exactly two values: [long, lat]',
   OwnerRequired = 'A listing must belong to a user',
   UnauthorizedToMadeChangesToOtherUsersListings = 'You cannot make changes to listings that you do not own',
 }
