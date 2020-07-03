@@ -11,6 +11,7 @@ import {
   ErrMsg,
   Categories,
   Subcategories,
+  DEFAULT_LOCATION,
 } from '../../../common';
 
 const name = 'Jane Doe';
@@ -25,7 +26,7 @@ const price = 40;
 const photos = ['itemPhoto.png'];
 const category = Categories.SportsAndOutdoors;
 const subcategory = Subcategories[category]['Camping Gear'];
-const location = { coordinates: [-118.404188, 37.737706] };
+const location = DEFAULT_LOCATION;
 
 const createAListing = async (attrs: ListingAttrs) => {
   const listing = Listing.build(attrs);
@@ -536,7 +537,13 @@ describe('ADMIN: DELETE A USER', () => {
 
 describe('PUBLIC: GET USER PROFILE', () => {
   it('Returns a 200 with user data only consists of name, location, photo, selling/sold items', async () => {
-    const user = User.build({ name, email, password, passwordConfirm });
+    const user = User.build({
+      name,
+      email,
+      password,
+      passwordConfirm,
+      location,
+    });
     await user.save();
 
     await createListings(user.id);

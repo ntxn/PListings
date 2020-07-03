@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { QueryFeatures } from '../query-features';
 import { Listing, ListingDoc } from '../../models';
-import { Categories } from '../../../common';
+import { Categories, GeoLocation, DEFAULT_LOCATION } from '../../../common';
 
 // Create 10 listings to Listing collection
 
@@ -9,7 +9,7 @@ const createListing = async (
   price: number,
   category: Categories,
   subcategory: string,
-  coordinates: number[]
+  location: GeoLocation
 ) => {
   const listing = Listing.build({
     title: 'Portable bench',
@@ -18,7 +18,7 @@ const createListing = async (
     price,
     category,
     subcategory,
-    location: { coordinates },
+    location,
   });
   await listing.save();
 };
@@ -29,38 +29,14 @@ const create8Listings = async () => {
   // Price: 4 < $20, 2 > $200,
   // Phone and price: 1 < $200
 
-  await createListing(35, Categories.Tools, 'Power Tools', [
-    -73.946846,
-    40.65089,
-  ]);
-  await createListing(14, Categories.Tools, 'Hand Tools', [
-    -73.760136,
-    40.743806,
-  ]);
-  await createListing(4, Categories.BabyAndKids, 'Toys', [
-    -73.940126,
-    40.663008,
-  ]);
-  await createListing(120, Categories.Electronics, 'Phones', [
-    -73.965645,
-    40.58912,
-  ]);
-  await createListing(15, Categories.Entertainment, 'Movies', [
-    -73.622082,
-    40.719668,
-  ]);
-  await createListing(3, Categories.Entertainment, 'Books', [
-    -73.931594,
-    40.665233,
-  ]);
-  await createListing(354, Categories.Electronics, 'Cameras', [
-    -73.755334,
-    40.730415,
-  ]);
-  await createListing(279, Categories.Electronics, 'Phones', [
-    -73.790863,
-    40.730754,
-  ]);
+  await createListing(35, Categories.Tools, 'Power Tools', DEFAULT_LOCATION);
+  await createListing(14, Categories.Tools, 'Hand Tools', DEFAULT_LOCATION);
+  await createListing(4, Categories.BabyAndKids, 'Toys', DEFAULT_LOCATION);
+  await createListing(120, Categories.Electronics, 'Phones', DEFAULT_LOCATION);
+  await createListing(15, Categories.Entertainment, 'Movies', DEFAULT_LOCATION);
+  await createListing(3, Categories.Entertainment, 'Books', DEFAULT_LOCATION);
+  await createListing(354, Categories.Electronics, 'Cameras', DEFAULT_LOCATION);
+  await createListing(279, Categories.Electronics, 'Phones', DEFAULT_LOCATION);
 };
 
 describe('TEST QUERY FEATURES ON LISTING COLLECTION', () => {

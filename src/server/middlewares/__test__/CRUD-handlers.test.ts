@@ -5,7 +5,12 @@ import { Request, Response } from 'express';
 
 import { app } from '../../app';
 import { createOne, getOne, updateOne, deleteOne } from '../CRUD-handlers';
-import { ErrMsg, RequestStatus, ApiRoutes } from '../../../common';
+import {
+  ErrMsg,
+  RequestStatus,
+  ApiRoutes,
+  DEFAULT_LOCATION,
+} from '../../../common';
 import { User } from '../../models';
 import { NotFoundError } from '../../utils';
 
@@ -13,6 +18,7 @@ const name = 'Jane Doe';
 const email = 'jdoe@g.io';
 const password = 'password';
 const passwordConfirm = 'password';
+const location = DEFAULT_LOCATION;
 
 const next = jest.fn();
 let res: httpMocks.MockResponse<Response>;
@@ -28,7 +34,7 @@ describe('CRUD HANDLER MIDDLEWARES ON MODEL', () => {
 
     it('Returns a 201 when providing valid document attributes to create new documents', async () => {
       req = httpMocks.createRequest({
-        body: { name, email, password, passwordConfirm },
+        body: { name, email, password, passwordConfirm, location },
       });
 
       await createUserMiddleware(req, res, next);
@@ -42,7 +48,7 @@ describe('CRUD HANDLER MIDDLEWARES ON MODEL', () => {
 
     it('Calls the next function to pass on the error when providing invalid input', async () => {
       req = httpMocks.createRequest({
-        body: { email, password: '1234', passwordConfirm },
+        body: { email, password: '1234', passwordConfirm, location },
       });
 
       await createUserMiddleware(req, res, next);
@@ -61,7 +67,7 @@ describe('CRUD HANDLER MIDDLEWARES ON MODEL', () => {
     beforeEach(async () => {
       const { body } = await request(app)
         .post(ApiRoutes.SignUp)
-        .send({ name, email, password, passwordConfirm })
+        .send({ name, email, password, passwordConfirm, location })
         .expect(201);
       userId = body.data.id;
     });
@@ -112,7 +118,7 @@ describe('CRUD HANDLER MIDDLEWARES ON MODEL', () => {
     beforeEach(async () => {
       const { body } = await request(app)
         .post(ApiRoutes.SignUp)
-        .send({ name, email, password, passwordConfirm })
+        .send({ name, email, password, passwordConfirm, location })
         .expect(201);
       userId = body.data.id;
     });
@@ -186,7 +192,7 @@ describe('CRUD HANDLER MIDDLEWARES ON MODEL', () => {
     beforeEach(async () => {
       const { body } = await request(app)
         .post(ApiRoutes.SignUp)
-        .send({ name, email, password, passwordConfirm })
+        .send({ name, email, password, passwordConfirm, location })
         .expect(201);
       userId = body.data.id;
     });

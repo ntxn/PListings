@@ -3,7 +3,7 @@ import { Response } from 'express';
 
 import { AppError } from '../../utils';
 import { accessRestrictor } from '../access-restrictor';
-import { UserRole, ErrMsg } from '../../../common';
+import { UserRole, ErrMsg, DEFAULT_LOCATION } from '../../../common';
 import { User, UserDoc } from '../../models';
 
 const restrictedToAdminMiddleware = accessRestrictor(UserRole.Admin);
@@ -12,12 +12,13 @@ const name = 'Jane Doe';
 const email = 'jdoe@g.io';
 const password = 'password';
 const passwordConfirm = 'password';
+const location = DEFAULT_LOCATION;
 
 let user: UserDoc | undefined;
 
 describe('ACCESS RESTRICTOR', () => {
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user.save();
   });
 

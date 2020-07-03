@@ -9,16 +9,18 @@ import {
   RequestStatus,
   AccountStatus,
   ErrMsg,
+  DEFAULT_LOCATION,
 } from '../../../common';
 
 const name = 'Jane Doe';
 const email = 'jdoe@g.io';
 const password = 'password';
 const passwordConfirm = 'password';
+const location = DEFAULT_LOCATION;
 
 describe('SIGN UP', () => {
-  type ReqBody = { [key: string]: string };
-  const validReqBody = { name, email, password, passwordConfirm };
+  type ReqBody = { [key: string]: any };
+  const validReqBody = { name, email, password, passwordConfirm, location };
 
   const testField = async (
     fieldName: string,
@@ -93,13 +95,26 @@ describe('SIGN UP', () => {
       email: 'k',
       password,
       passwordConfirm,
+      location,
     };
     await testField('email', ErrMsg.EmailInvalid, invalidFieldBody);
 
-    invalidFieldBody = { name, email, password: '1', passwordConfirm };
+    invalidFieldBody = {
+      name,
+      email,
+      password: '1',
+      passwordConfirm,
+      location,
+    };
     await testField('password', ErrMsg.PasswordMinLength, invalidFieldBody);
 
-    invalidFieldBody = { name, email, password, passwordConfirm: 'difPass123' };
+    invalidFieldBody = {
+      name,
+      email,
+      password,
+      passwordConfirm: 'difPass123',
+      location,
+    };
     await testField(
       'passwordConfirm',
       ErrMsg.PasswordConfirmNotMatch,
@@ -148,7 +163,7 @@ describe('LOG IN', () => {
   beforeEach(async () => {
     const { body } = await request(app)
       .post(ApiRoutes.SignUp)
-      .send({ name, email, password, passwordConfirm });
+      .send({ name, email, password, passwordConfirm, location });
     user = await User.findById(body.data.id);
   });
 
@@ -298,7 +313,7 @@ describe('FORGOT PASSWORD', () => {
   beforeEach(async () => {
     const { body } = await request(app)
       .post(ApiRoutes.SignUp)
-      .send({ name, email, password, passwordConfirm });
+      .send({ name, email, password, passwordConfirm, location });
     user = await User.findById(body.data.id);
   });
 
@@ -355,7 +370,7 @@ describe('RESET PASSWORD', () => {
   beforeEach(async () => {
     const response = await request(app)
       .post(ApiRoutes.SignUp)
-      .send({ name, email, password, passwordConfirm });
+      .send({ name, email, password, passwordConfirm, location });
     const userId = response.body.data.id;
     await request(app)
       .post(ApiRoutes.ForgotPassword)

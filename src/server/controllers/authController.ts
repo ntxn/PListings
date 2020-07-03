@@ -16,6 +16,7 @@ import {
   ErrMsg,
   AccountStatus,
   RequestStatus,
+  DEFAULT_LOCATION,
 } from '../../common';
 import {
   catchAsync,
@@ -26,7 +27,6 @@ import {
   ValidationError,
   createSendCookieWithToken,
   removeSendExpiredCookieToken,
-  propLengthValidator,
   NotAuthorizedError,
 } from '../utils';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email';
@@ -58,7 +58,7 @@ class AuthController {
   @POST(Routes.SignUp)
   signup(req: Request, res: Response, next: NextFunction): void {
     catchAsync(async (req, res, next) => {
-      const { name, email, password, passwordConfirm } = req.body;
+      const { name, email, password, passwordConfirm, location } = req.body;
 
       // Check if there's a user with the provided email
       const existingUser = await User.findOne({ email });
@@ -78,6 +78,7 @@ class AuthController {
         email,
         password,
         passwordConfirm,
+        location: location ? location : DEFAULT_LOCATION,
       });
       await user.save();
 

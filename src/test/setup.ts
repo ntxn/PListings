@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { app } from '../server/app';
-import { mongoDbOptions, ApiRoutes } from '../common';
+import { mongoDbOptions, ApiRoutes, DEFAULT_LOCATION } from '../common';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -42,10 +42,11 @@ global.login = async (email: string) => {
   const name = 'Jane Doe';
   const password = 'password';
   const passwordConfirm = 'password';
+  const location = DEFAULT_LOCATION;
 
   const response = await request(app)
     .post(ApiRoutes.SignUp)
-    .send({ name, email, password, passwordConfirm })
+    .send({ name, email, password, passwordConfirm, location })
     .expect(201);
 
   return response.get('Set-Cookie');
