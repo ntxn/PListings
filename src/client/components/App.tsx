@@ -3,7 +3,7 @@ import { Router, Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { history } from '../history';
-import { fetchCurrentUser } from '../actions';
+import { fetchCurrentUser, getLocationByIP } from '../actions';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { Listings } from './Listings';
@@ -11,11 +11,13 @@ import { SignUp, LogIn } from './auth';
 
 interface AppProps {
   fetchCurrentUser(): Promise<void>;
+  getLocationByIP(): Promise<void>;
 }
 
 const _App = (props: AppProps): JSX.Element => {
   useEffect(() => {
     props.fetchCurrentUser();
+    props.getLocationByIP();
   }, []);
 
   return (
@@ -37,4 +39,7 @@ const _App = (props: AppProps): JSX.Element => {
   );
 };
 
-export const App = connect(null, { fetchCurrentUser })(_App);
+export const App = connect(null, {
+  fetchCurrentUser,
+  getLocationByIP,
+})(_App);

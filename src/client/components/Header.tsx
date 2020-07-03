@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { UserDoc } from '../../server/models';
-import { StoreState } from '../reducers';
+import { StoreState } from '../utilities';
 import { logOut } from '../actions';
 
 interface HeaderProps {
