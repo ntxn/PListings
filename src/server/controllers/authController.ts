@@ -95,7 +95,7 @@ class AuthController {
       validator: validator.isEmail,
       message: ErrMsg.EmailInvalid,
     },
-    propLengthValidator('password', 8, ErrMsg.PasswordMinLength)
+    { prop: 'password' }
   )
   @POST(Routes.LogIn)
   login(req: Request, res: Response, next: NextFunction): void {
