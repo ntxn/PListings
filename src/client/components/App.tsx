@@ -20,14 +20,14 @@ const _App = (props: AppProps): JSX.Element => {
 
   return (
     <Router history={history}>
-      <div className="body-wrapper">
+      <div className="container__fit-min-content-to-viewport-height">
         <Header />
-        <main>
+        <main className="container__center-content-horizontally">
           <div className="main">
             <Switch>
               <Route path="/" exact component={Listings} />
-              <Route path="/users/SignUp" exact component={SignUp} />
-              <Route path="/users/LogIn" exact component={LogIn} />
+              <Route path="/auth/SignUp" exact component={SignUp} />
+              <Route path="/auth/LogIn" exact component={LogIn} />
             </Switch>
           </div>
         </main>

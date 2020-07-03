@@ -14,26 +14,26 @@ interface HeaderProps {
 const _Header = (props: HeaderProps): JSX.Element => {
   const renderNav = props.user ? (
     <div className="header__nav">
-      <Link to="/users/login" className="btn">
+      <Link to="/auth/login" className="btn btn--filled">
         Sell
       </Link>
-      <button className="btn" onClick={props.logOut}>
+      <a className="btn btn--border" onClick={props.logOut}>
         Log Out
-      </button>
+      </a>
     </div>
   ) : (
     <div className="header__nav">
-      <Link to="/users/login" className="btn btn--border">
+      <Link to="/auth/login" className="btn btn--border">
         Log In
       </Link>
-      <Link to="/users/signup" className="btn btn--filled">
+      <Link to="/auth/signup" className="btn btn--filled">
         Sign Up
       </Link>
     </div>
   );
 
   return (
-    <header>
+    <header className="container__center-content-horizontally">
       <div className="header">
         <div className="header__logo">
           <Link to="/">

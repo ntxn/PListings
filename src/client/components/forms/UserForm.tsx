@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Field,
   WrappedFieldProps,
-  WrappedFieldMetaProps,
   reduxForm,
   InjectedFormProps,
 } from 'redux-form';
@@ -11,29 +10,44 @@ import { ErrMsg } from '../../../common';
 
 interface UserFormProps {
   onSubmit(formValues: UserAttrs): void;
-  formFields: { name: string; label: string; type: string }[];
+  formFields: {
+    name: string;
+    type: string;
+    required: boolean;
+    placeholder?: string;
+    label: string;
+  }[];
 }
 
 interface FieldCustomProps {
   label: string;
   type: string;
+  placeholder?: string;
+  required: boolean;
 }
 
 class _UserForm extends React.Component<
   InjectedFormProps<UserAttrs, UserFormProps> & UserFormProps
 > {
-  renderError = ({ error, touched }: WrappedFieldMetaProps) => {
-    if (error && touched) return <div style={{ color: 'red' }}>{error}</div>;
-  };
-
   renderInput: React.StatelessComponent<
     WrappedFieldProps & FieldCustomProps
-  > = ({ input, meta, label, type }): JSX.Element => {
+  > = ({ input, type, meta, label, placeholder, required }): JSX.Element => {
+    const err = meta.error && meta.touched;
+    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
     return (
-      <div>
-        <label>{label}</label>
-        <input autoComplete="off" type={type} {...input} />
-        {this.renderError(meta)}
+      <div className="form__group">
+        <label className="form__label" htmlFor={input.name}>
+          {label}
+        </label>
+        <input
+          className={inputClassName}
+          type={type}
+          id={input.name}
+          placeholder={placeholder}
+          required={required}
+          {...input}
+        />
+        <div className="form__error">{err ? meta.error : null}</div>
       </div>
     );
   };
@@ -41,23 +55,25 @@ class _UserForm extends React.Component<
   onSubmit = (formValues: UserAttrs) => this.props.onSubmit(formValues);
 
   render() {
-    const {
-      handleSubmit,
-      formFields,
-      pristine,
-      submitting,
-      error,
-    } = this.props;
+    const { handleSubmit, formFields, invalid, submitting, error } = this.props;
 
     return (
-      <form onSubmit={handleSubmit(this.onSubmit)}>
+      <form onSubmit={handleSubmit(this.onSubmit)} className="form">
         {formFields.map(field => (
           <Field key={field.name} component={this.renderInput} {...field} />
         ))}
-        <div>{error ? error : null}</div>
-        <button type="submit" disabled={pristine || submitting}>
-          Submit
-        </button>
+        <div className="form__error form__error-general">
+          {error ? error : null}
+        </div>
+        <div className="form__btn">
+          <button
+            type="submit"
+            disabled={invalid || submitting}
+            className="btn btn--filled"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     );
   }

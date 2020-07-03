@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export const Footer = (): JSX.Element => {
   return (
-    <footer>
+    <footer className="container__center-content-horizontally">
       <div className="footer">
         <div className="footer__logo">
           <Link to="/">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logIn } from '../../actions';
 import { UserForm } from '../forms';
@@ -11,15 +12,34 @@ const _LogIn = (props: LogInProps): JSX.Element => {
   const onSubmit = (formValue: { email: string; password: string }) =>
     props.logIn(formValue);
   const formFields = [
-    { name: 'email', type: 'email', label: 'Email' },
-    { name: 'password', type: 'password', label: 'Password' },
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+      placeholder: 'steve@plistings.io',
+      label: 'Email',
+    },
+    {
+      name: 'password',
+      type: 'password',
+      required: true,
+      placeholder: 'Password',
+      label: 'Password',
+    },
   ];
 
   return (
-    <>
-      <h1>Log In</h1>
+    <div className="container__form">
+      <div className="u-center-text u-margin-bottom-medium">
+        <h2 className="heading-secondary">Log In</h2>
+      </div>
       <UserForm onSubmit={onSubmit} formFields={formFields} />
-    </>
+      <div className="u-center-text u-margin-top-small u-margin-bottom-medium">
+        <Link to="/auth/signup" className="btn-text btn-text--orange">
+          Already have an account?
+        </Link>
+      </div>
+    </div>
   );
 };
 
