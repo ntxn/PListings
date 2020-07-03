@@ -163,27 +163,28 @@ describe('LOG IN', () => {
     expect(response.get('Set-Cookie')).toBeDefined();
   });
 
-  it('Returns a 400 when email and password are invalid', async () => {
+  it('Returns a 400 when email is invalid or password is not provided', async () => {
     let response = await request(app)
       .post(ApiRoutes.LogIn)
-      .send({ email: 'w', password: '2' })
+      .send({ email: 'w' })
       .expect(400);
     expect(response.body.status).toEqual(RequestStatus.Fail);
-    expect(response.body.message).toEqual(ErrMsg.ValidationError);
-    expect(response.body.errors.email).toBe(ErrMsg.EmailInvalid);
-    expect(response.body.errors.password).toBe(ErrMsg.PasswordMinLength);
+    expect(response.body.message).toEqual(ErrMsg.MissingProperties);
+    expect(response.body.errors.password).toBe(ErrMsg.PasswordRequired);
 
     response = await request(app)
       .post(ApiRoutes.LogIn)
       .send({ email: 'w', password })
       .expect(400);
     expect(response.body.errors.email).toEqual(ErrMsg.EmailInvalid);
+  });
 
-    response = await request(app)
+  it('Returns a 401 when email is valid but password is invalid', async () => {
+    const response = await request(app)
       .post(ApiRoutes.LogIn)
       .send({ email, password: '1' })
-      .expect(400);
-    expect(response.body.errors.password).toEqual(ErrMsg.PasswordMinLength);
+      .expect(401);
+    expect(response.body.message).toEqual(ErrMsg.InvalidCredentials);
   });
 
   it('Returns a 401 when there is no match of the provided email and password', async () => {
