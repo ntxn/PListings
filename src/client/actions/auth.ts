@@ -2,29 +2,16 @@ import axios from 'axios';
 import { Dispatch } from 'redux';
 import { SubmissionError } from 'redux-form';
 import { history } from '../history';
-import { ActionTypes } from './types';
-import { UserDoc, UserAttrs } from '../../server/models';
+import {
+  ActionTypes,
+  FetchCurrentUserAction,
+  SignUpAction,
+  LogInAction,
+  LogOutAction,
+  StoreState,
+} from '../utilities';
+import { UserAttrs } from '../../server/models';
 import { ApiRoutes } from '../../common';
-
-export interface FetchCurrentUserAction {
-  type: ActionTypes.fetchCurrentUser;
-  payload: UserDoc | null;
-}
-
-export interface SignUpAction {
-  type: ActionTypes.signUp;
-  payload: UserDoc;
-}
-
-export interface LogInAction {
-  type: ActionTypes.logIn;
-  payload: UserDoc;
-}
-
-export interface LogOutAction {
-  type: ActionTypes.logOut;
-  payload: null;
-}
 
 export const fetchCurrentUser = () => {
   return async (dispatch: Dispatch): Promise<void> => {
@@ -38,9 +25,15 @@ export const fetchCurrentUser = () => {
 };
 
 export const signUp = (formValues: UserAttrs) => {
-  return async (dispatch: Dispatch): Promise<void> => {
+  return async (
+    dispatch: Dispatch,
+    getState: () => StoreState
+  ): Promise<void> => {
     try {
-      const { data } = await axios.post(ApiRoutes.SignUp, formValues);
+      const { data } = await axios.post(ApiRoutes.SignUp, {
+        ...formValues,
+        location: getState().location,
+      });
 
       dispatch<SignUpAction>({
         type: ActionTypes.signUp,
