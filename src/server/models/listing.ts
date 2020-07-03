@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
-import { Conditions, Categories, Subcategories, ErrMsg } from '../../common';
-import { Model, ModelAttribute, AppError } from '../utils';
+import {
+  Conditions,
+  Categories,
+  Subcategories,
+  ErrMsg,
+  GeoLocation,
+} from '../../common';
+import { Model, ModelAttribute } from '../utils';
 import { UserDoc } from '../models';
 
 export interface ListingAttrs extends ModelAttribute {
@@ -9,9 +15,7 @@ export interface ListingAttrs extends ModelAttribute {
   price: number;
   category: Categories;
   subcategory: string;
-  location: {
-    coordinates: number[];
-  };
+  location: GeoLocation;
   owner: mongoose.Types.ObjectId;
   condition?: Conditions;
   description?: string;
@@ -24,9 +28,7 @@ export interface ListingDoc extends mongoose.Document {
   price: number;
   category: Categories;
   subcategory: string;
-  location: {
-    coordinates: number[];
-  };
+  location: GeoLocation;
   owner: UserDoc;
   condition?: Conditions;
   description?: string;
@@ -103,6 +105,26 @@ const listingSchema = new mongoose.Schema(
           ErrMsg.LocationCoorsLength,
         ],
       },
+      postal: Number,
+      city: String,
+      state: String,
+      country: String,
+      // postal: {
+      //   type: Number,
+      //   required: [true, ErrMsg.LocationPostalRequired],
+      // },
+      // city: {
+      //   type: String,
+      //   required: [true, ErrMsg.LocationCityRequired],
+      // },
+      // state: {
+      //   type: String,
+      //   required: [true, ErrMsg.LocationStateRequired],
+      // },
+      // country: {
+      //   type: String,
+      //   required: [true, ErrMsg.LocationCountryRequired],
+      // },
     },
     owner: {
       type: mongoose.Types.ObjectId,

@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
 import { Listing, ListingAttrs, ListingDoc } from '../listing';
 import { User, UserDoc } from '../user';
-import { Categories, Subcategories, ErrMsg } from '../../../common';
+import {
+  Categories,
+  Subcategories,
+  ErrMsg,
+  DEFAULT_LOCATION,
+} from '../../../common';
 
 // Create a user
 const name = 'Will Smith';
@@ -15,13 +20,13 @@ const price = 40;
 const photos = ['itemPhoto.png'];
 const category = Categories.SportsAndOutdoors;
 const subcategory = Subcategories[category]['Camping Gear'];
-const location = { coordinates: [-118.404188, 37.737706] };
+const location = DEFAULT_LOCATION;
 let attrs: ListingAttrs;
 let listing: ListingDoc;
 
 describe('LISTING MODEL', () => {
   beforeEach(async () => {
-    user = User.build({ name, email, password, passwordConfirm });
+    user = User.build({ name, email, password, passwordConfirm, location });
     await user!.save();
 
     const owner = user!.id;
@@ -58,7 +63,10 @@ describe('LISTING MODEL', () => {
       listing = Listing.build({ ...attrs, photos: [] });
       await expect(listing.save()).rejects.toThrowError(ErrMsg.PhotosLength);
 
-      listing = Listing.build({ ...attrs, location: { coordinates: [] } });
+      listing = Listing.build({
+        ...attrs,
+        location: { ...location, coordinates: [] },
+      });
       await expect(listing.save()).rejects.toThrowError(
         ErrMsg.LocationCoorsLength
       );
@@ -73,7 +81,7 @@ describe('LISTING MODEL', () => {
 
       listing = Listing.build({
         ...attrs,
-        location: { coordinates: [1, 2, 3] },
+        location: { ...location, coordinates: [1, 2, 3] },
       });
       await expect(listing.save()).rejects.toThrowError(
         ErrMsg.LocationCoorsLength
