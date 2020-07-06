@@ -1,3 +1,5 @@
+import path from 'path';
+
 import express from 'express';
 import cookieParser from 'cookie-parser';
 
@@ -17,7 +19,10 @@ app.use(cookieParser());
 
 /****************** ROUTES ******************/
 app.use(AppRouter.instance);
-app.all('*', (req, res, next) => next(new NotFoundError('Page not found')));
+app.all('/api/*', (req, res, next) =>
+  next(new NotFoundError('Route not found'))
+);
+app.get('*', (req, res) => res.redirect(`/#${req.url}`));
 
 /****************** GLOBAL ERROR HANDLER ******************/
 app.use(globalErrorHandler);
