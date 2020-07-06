@@ -6,6 +6,7 @@ import { history } from '../history';
 import { fetchCurrentUser, getLocationByIP } from '../actions';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { NotFound } from './NotFound';
 import { Listings } from './Listings';
 import { SignUp, LogIn } from './auth';
 
@@ -30,6 +31,7 @@ const _App = (props: AppProps): JSX.Element => {
               <Route path="/" exact component={Listings} />
               <Route path="/auth/SignUp" exact component={SignUp} />
               <Route path="/auth/LogIn" exact component={LogIn} />
+              <Route component={NotFound} />
             </Switch>
           </div>
         </main>
