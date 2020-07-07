@@ -45,7 +45,7 @@ const _SignUp = (props: SignUpProps): JSX.Element => {
   return (
     <div className="container__form">
       <div className="u-center-text u-margin-bottom-medium">
-        <h2 className="heading-secondary">Create Your Account</h2>
+        <h2 className="heading-primary">Create Your Account</h2>
       </div>
       <UserForm onSubmit={onSubmit} formFields={formFields} />
       <div className="u-center-text u-margin-top-small">

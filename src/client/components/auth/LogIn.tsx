@@ -31,7 +31,7 @@ const _LogIn = (props: LogInProps): JSX.Element => {
   return (
     <div className="container__form">
       <div className="u-center-text u-margin-bottom-medium">
-        <h2 className="heading-secondary">Log In</h2>
+        <h2 className="heading-primary">Log In</h2>
       </div>
       <UserForm onSubmit={onSubmit} formFields={formFields} />
       <div className="u-center-text u-margin-top-small u-margin-bottom-medium">
