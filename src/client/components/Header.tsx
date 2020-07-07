@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { UserDoc } from '../../server/models';
 import { StoreState } from '../utilities';
 import { logOut } from '../actions';
+import { ConfirmationModal } from './Modal';
 
 interface HeaderProps {
   user: UserDoc | null;
@@ -12,18 +13,32 @@ interface HeaderProps {
 }
 
 const _Header = (props: HeaderProps): JSX.Element => {
+  const [logoutModalSwitch, setLogoutModalSwitch] = useState(false);
+
   const renderNav = props.user ? (
     <div className="header__nav">
       <Link to="/auth/login" className="btn btn--filled">
         Sell
       </Link>
-      <a className="btn btn--border" onClick={props.logOut}>
+      <button
+        className="btn btn--outline"
+        onClick={() => setLogoutModalSwitch(true)}
+      >
         Log Out
-      </a>
+      </button>
+      {logoutModalSwitch && (
+        <ConfirmationModal
+          title="Log Out"
+          content="Are you sure you want to log out?"
+          confirmBtnText="Log Out"
+          action={props.logOut}
+          setModalSwitch={setLogoutModalSwitch}
+        />
+      )}
     </div>
   ) : (
     <div className="header__nav">
-      <Link to="/auth/login" className="btn btn--border">
+      <Link to="/auth/login" className="btn btn--outline">
         Log In
       </Link>
       <Link to="/auth/signup" className="btn btn--filled">
