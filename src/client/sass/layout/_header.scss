@@ -1,8 +1,8 @@
 header {
   padding: var(--padding-body);
   background-color: var(--color-grey-light-1);
-  height: 6.5rem;
-  border-bottom: solid 1px var(--color-grey-light-2);
+  height: var(--header-height);
+  // border-bottom: solid 1px var(--color-grey-light-2);
 
   // Make it sticky
   position: sticky;
@@ -21,9 +21,9 @@ header {
     }
 
     &__nav {
-      a {
-        margin-left: 2rem;
-      }
+      display: flex;
+      flex-direction: row;
+      align-items: center;
     }
   }
 }
