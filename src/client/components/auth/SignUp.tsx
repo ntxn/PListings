@@ -55,7 +55,7 @@ const _SignUp = (props: SignUpProps): JSX.Element => {
       </div>
       <div className="u-center-text u-margin-bottom-medium">
         <Link to="/auth/signup" className="btn-text btn-text--orange">
-          Don&apos;t have an account?
+          Already have an account?
         </Link>
       </div>
     </div>
