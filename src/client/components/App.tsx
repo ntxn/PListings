@@ -9,6 +9,7 @@ import { Footer } from './Footer';
 import { NotFound } from './NotFound';
 import { Listings } from './Listings';
 import { SignUp, LogIn } from './auth';
+import { UserSettings } from './user';
 
 interface AppProps {
   fetchCurrentUser(): Promise<void>;
@@ -31,6 +32,7 @@ const _App = (props: AppProps): JSX.Element => {
               <Route path="/" exact component={Listings} />
               <Route path="/auth/SignUp" exact component={SignUp} />
               <Route path="/auth/LogIn" exact component={LogIn} />
+              <Route path="/user/settings" exact component={UserSettings} />
               <Route component={NotFound} />
             </Switch>
           </div>
