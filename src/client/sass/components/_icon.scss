@@ -1,0 +1,32 @@
+.icon {
+  width: 4rem;
+  height: 4rem;
+
+  background-color: var(--color-grey-light-3);
+  border-radius: var(--border-radius-medium);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &:hover {
+    background-color: var(--color-grey-light-4);
+    transition: background-color 0.2s;
+  }
+
+  &:active,
+  &:focus {
+    background-color: var(--color-primary-light);
+    svg {
+      color: var(--color-primary);
+    }
+  }
+}
