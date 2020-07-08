@@ -1,51 +1,66 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-
+import { FaBell } from 'react-icons/fa';
+import { BsPersonFill } from 'react-icons/bs';
 import { UserDoc } from '../../server/models';
 import { StoreState } from '../utilities';
 import { logOut } from '../actions';
-import { ConfirmationModal } from './Modal';
+import { UserMenuModal } from './Modal';
 
 interface HeaderProps {
   user: UserDoc | null;
   logOut(): void;
 }
 
-const _Header = (props: HeaderProps): JSX.Element => {
-  const [logoutModalSwitch, setLogoutModalSwitch] = useState(false);
+const renderNavigationAuthenticated = (
+  props: HeaderProps,
+  userMenuModal: boolean,
+  setUserMenuModal: (status: boolean) => void
+) => {
+  return (
+    <>
+      <Link to="/listings/create" className="btn btn--filled">
+        Sell
+      </Link>
+      <div className="icon">
+        <FaBell title="Notifications" />
+      </div>
+      <div className="avatar" onClick={() => setUserMenuModal(true)}>
+        {props.user!.photo ? (
+          <img alt="User photo" />
+        ) : (
+          <div className="icon">
+            <BsPersonFill title="Default Avatar" />
+          </div>
+        )}
+      </div>
+      {userMenuModal && (
+        <UserMenuModal
+          user={props.user!}
+          closeUserMenu={() => setUserMenuModal(false)}
+          logout={props.logOut}
+        />
+      )}
+    </>
+  );
+};
 
-  const renderNav = props.user ? (
-    <div className="header__nav">
+const renderNavigationUnauthenticated = () => {
+  return (
+    <>
       <Link to="/auth/login" className="btn btn--filled">
         Sell
       </Link>
-      <button
-        className="btn btn--outline"
-        onClick={() => setLogoutModalSwitch(true)}
-      >
-        Log Out
-      </button>
-      {logoutModalSwitch && (
-        <ConfirmationModal
-          title="Log Out"
-          content="Are you sure you want to log out?"
-          confirmBtnText="Log Out"
-          action={props.logOut}
-          setModalSwitch={setLogoutModalSwitch}
-        />
-      )}
-    </div>
-  ) : (
-    <div className="header__nav">
       <Link to="/auth/login" className="btn btn--outline">
         Log In
       </Link>
-      <Link to="/auth/signup" className="btn btn--filled">
-        Sign Up
-      </Link>
-    </div>
+    </>
   );
+};
+
+const _Header = (props: HeaderProps): JSX.Element => {
+  const [userMenuModal, setUserMenuModal] = useState(false);
 
   return (
     <header className="container__center-content-horizontally">
@@ -59,7 +74,15 @@ const _Header = (props: HeaderProps): JSX.Element => {
           </Link>
         </div>
         <div className="header__search-bar">Search bar</div>
-        {renderNav}
+        <div className="header__nav">
+          {props.user
+            ? renderNavigationAuthenticated(
+                props,
+                userMenuModal,
+                setUserMenuModal
+              )
+            : renderNavigationUnauthenticated()}
+        </div>
       </div>
     </header>
   );
