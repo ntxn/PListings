@@ -1,5 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Link } from 'react-router-dom';
+import { BsPersonFill, BsListNested } from 'react-icons/bs';
+import { AiFillSetting } from 'react-icons/ai';
+import { RiLogoutBoxRLine } from 'react-icons/ri';
+import { IoIosArrowForward } from 'react-icons/io';
+import { UserDoc } from '../../server/models';
 
 interface ModalProps {
   onDismiss(): void;
@@ -12,8 +18,14 @@ interface ConfirmationModalProps {
   title: string;
   content: string;
   confirmBtnText: string;
-  action: () => void;
-  setModalSwitch: (status: boolean) => void;
+  action(): void;
+  closeModal(): void;
+}
+
+interface UserMenuModalProps {
+  user: UserDoc;
+  closeUserMenu(): void;
+  logout(): void;
 }
 
 /***
@@ -49,20 +61,19 @@ export const Modal = (props: ModalProps): React.ReactPortal => {
 export const ConfirmationModal = (
   props: ConfirmationModalProps
 ): JSX.Element => {
-  const closeModal = () => props.setModalSwitch(false);
-
-  const logout = () => {
-    props.setModalSwitch(false);
-    props.action();
-  };
-
   const renderActions = (): JSX.Element => {
     return (
       <>
-        <button className="btn btn--filled" onClick={closeModal}>
+        <button className="btn btn--filled" onClick={props.closeModal}>
           Cancel
         </button>
-        <button className="btn btn--outline u-white-bg" onClick={logout}>
+        <button
+          className="btn btn--outline u-white-bg"
+          onClick={() => {
+            props.closeModal();
+            props.action();
+          }}
+        >
           {props.confirmBtnText}
         </button>
       </>
@@ -74,7 +85,90 @@ export const ConfirmationModal = (
       title={props.title}
       content={props.content}
       actions={renderActions()}
-      onDismiss={closeModal}
+      onDismiss={props.closeModal}
     />
+  );
+};
+
+/**
+ * A modal to display menu options for authenticated user: settings, listings, logout
+ */
+export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
+  return ReactDOM.createPortal(
+    <div className="user-menu" onClick={props.closeUserMenu}>
+      <div
+        className="user-menu__container"
+        onClick={event => event.stopPropagation()}
+      >
+        <div className="user-menu__option">
+          <Link
+            to={`/user/${props.user.id}`}
+            className="user-menu__option__hover"
+            onClick={props.closeUserMenu}
+          >
+            {props.user.photo ? (
+              <img alt="User Avatar" className="user-menu__option__avatar" />
+            ) : (
+              <BsPersonFill
+                title="Default Avatar"
+                className="user-menu__option__avatar"
+              />
+            )}
+            <div className="user-menu__brief-info">
+              <span className="heading-tertiary">{props.user.name}</span>
+              <span className="sub-heading-tertiary">
+                {props.user.location.city}
+              </span>
+            </div>
+          </Link>
+        </div>
+        <hr className="user-menu__divider" />
+        <div className="user-menu__option">
+          <Link
+            to="/user/settings"
+            className="user-menu__option__hover"
+            onClick={props.closeUserMenu}
+          >
+            <div className="user-menu__option__icon icon">
+              <AiFillSetting />
+            </div>
+            <div className="user-menu__option__content">
+              <span className="heading-quaternary">Settings</span>
+              <IoIosArrowForward />
+            </div>
+          </Link>
+        </div>
+        <div className="user-menu__option">
+          <Link
+            to="/user/listings"
+            className="user-menu__option__hover"
+            onClick={props.closeUserMenu}
+          >
+            <div className="user-menu__option__icon icon">
+              <BsListNested />
+            </div>
+            <div className="user-menu__option__content">
+              <span className="heading-quaternary">Listings</span>
+              <IoIosArrowForward />
+            </div>
+          </Link>
+        </div>
+        <div className="user-menu__option">
+          <div
+            className="user-menu__option__hover"
+            onClick={() => {
+              props.logout();
+              props.closeUserMenu();
+            }}
+          >
+            <div className="user-menu__option__icon icon">
+              <RiLogoutBoxRLine />
+            </div>
+            <div className="heading-quaternary">Log Out</div>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.querySelector('#modal')!
   );
 };
