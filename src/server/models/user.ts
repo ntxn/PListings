@@ -75,10 +75,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail, ErrMsg.EmailInvalid],
     },
-    photo: {
-      type: String,
-      default: 'default.jpg',
-    },
+    photo: String,
     location: {
       type: {
         type: String,
