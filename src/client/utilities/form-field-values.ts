@@ -1,0 +1,55 @@
+export const formFieldValues = {
+  name: {
+    name: 'name',
+    type: 'text',
+    required: true,
+    placeholder: 'Steve Johnson',
+    label: 'Full name',
+  },
+  email: {
+    name: 'email',
+    type: 'email',
+    required: true,
+    placeholder: 'steve@plistings.io',
+    label: 'Email',
+  },
+  password: {
+    name: 'password',
+    type: 'password',
+    required: true,
+    placeholder: 'Password',
+    label: 'Password',
+  },
+  passwordConfirm: {
+    name: 'passwordConfirm',
+    type: 'password',
+    required: true,
+    placeholder: 'Confirm Password',
+    label: 'Confirm Password',
+  },
+  currentPassword: {
+    name: 'currentPassword',
+    type: 'password',
+    required: true,
+    placeholder: 'Current Password',
+    label: 'Current Password',
+  },
+  location: {
+    name: 'location',
+    type: 'text',
+    required: true,
+    placeholder: 'San Francisco, California',
+    label: 'Location',
+  },
+  photo: {
+    name: 'photo',
+    type: 'file',
+    required: false,
+  },
+  bio: {
+    name: 'bio',
+    placeholder: 'Tell us about yourself',
+    label: 'About me',
+    required: false,
+  },
+};
