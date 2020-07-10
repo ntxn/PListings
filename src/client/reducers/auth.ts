@@ -14,6 +14,10 @@ export const authReducer = (
       return action.payload;
     case ActionTypes.logOut:
       return action.payload;
+    case ActionTypes.updatePassword:
+      return action.payload;
+    case ActionTypes.updateProfile:
+      return action.payload;
     default:
       return state;
   }
