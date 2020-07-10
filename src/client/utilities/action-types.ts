@@ -4,6 +4,8 @@ export enum ActionTypes {
   signUp,
   logOut,
   logIn,
+  updateProfile,
+  updatePassword,
 
   // location
   getLocationWithPermission,
