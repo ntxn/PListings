@@ -1,84 +1,95 @@
 import axios from 'axios';
-import { Dispatch } from 'redux';
-import { SubmissionError } from 'redux-form';
 import { history } from '../history';
 import {
   ActionTypes,
+  catchSubmissionError,
   FetchCurrentUserAction,
   SignUpAction,
   LogInAction,
   LogOutAction,
-  StoreState,
+  UpdateProfileAction,
+  UpdateProfileAttrs,
+  UpdatePasswordAction,
+  UpdatePasswordAttrs,
+  FunctionalAction,
 } from '../utilities';
 import { UserAttrs } from '../../server/models';
 import { ApiRoutes } from '../../common';
 
-export const fetchCurrentUser = () => {
-  return async (dispatch: Dispatch): Promise<void> => {
-    const { data } = await axios.get(ApiRoutes.CurrentUser);
+export const fetchCurrentUser = (): FunctionalAction<
+  FetchCurrentUserAction
+> => async dispatch => {
+  const { data } = await axios.get(ApiRoutes.CurrentUser);
 
-    dispatch<FetchCurrentUserAction>({
-      type: ActionTypes.fetchCurrentUser,
+  dispatch({
+    type: ActionTypes.fetchCurrentUser,
+    payload: data.data,
+  });
+};
+
+export const signUp = (formValues: UserAttrs): FunctionalAction<SignUpAction> =>
+  catchSubmissionError(async (dispatch, getState) => {
+    const { data } = await axios.post(ApiRoutes.SignUp, {
+      ...formValues,
+      location: getState!().location,
+    });
+
+    dispatch({
+      type: ActionTypes.signUp,
       payload: data.data,
     });
-  };
-};
 
-export const signUp = (formValues: UserAttrs) => {
-  return async (
-    dispatch: Dispatch,
-    getState: () => StoreState
-  ): Promise<void> => {
-    try {
-      const { data } = await axios.post(ApiRoutes.SignUp, {
-        ...formValues,
-        location: getState().location,
-      });
+    history.push('/');
+  });
 
-      dispatch<SignUpAction>({
-        type: ActionTypes.signUp,
-        payload: data.data,
-      });
+export const logIn = (formValue: {
+  email: string;
+  password: string;
+}): FunctionalAction<LogInAction> =>
+  catchSubmissionError(async dispatch => {
+    const { data } = await axios.post(ApiRoutes.LogIn, formValue);
 
-      history.push('/');
-    } catch (err) {
-      const { data } = err.response;
-      if (data.errors) throw new SubmissionError(data.errors);
+    dispatch({
+      type: ActionTypes.logIn,
+      payload: data.data,
+    });
 
-      throw new SubmissionError({ _error: data.message });
-    }
-  };
-};
+    history.push('/');
+  });
 
-export const logIn = (formValue: { email: string; password: string }) => {
-  return async (dispatch: Dispatch): Promise<void> => {
-    try {
-      const { data } = await axios.post(ApiRoutes.LogIn, formValue);
-
-      dispatch<LogInAction>({
-        type: ActionTypes.logIn,
-        payload: data.data,
-      });
-
-      history.push('/');
-    } catch (err) {
-      const { data } = err.response;
-      if (data.errors) throw new SubmissionError(data.errors);
-
-      throw new SubmissionError({ _error: data.message });
-    }
-  };
-};
-
-export const logOut = () => {
-  return async (dispatch: Dispatch): Promise<void> => {
+export const logOut = (nextRoute = '/'): FunctionalAction<LogOutAction> => {
+  return async dispatch => {
     await axios.get(ApiRoutes.LogOut);
 
-    dispatch<LogOutAction>({
+    dispatch({
       type: ActionTypes.logOut,
       payload: null,
     });
 
-    history.push('/');
+    history.push(nextRoute);
   };
 };
+
+export const updatePassword = (
+  formValue: UpdatePasswordAttrs
+): FunctionalAction<UpdatePasswordAction> =>
+  catchSubmissionError(async dispatch => {
+    const { data } = await axios.post(ApiRoutes.UpdateMyPassword, formValue);
+
+    dispatch({
+      type: ActionTypes.updatePassword,
+      payload: data.data,
+    });
+  });
+
+export const updateProfile = (
+  formValue: UpdateProfileAttrs
+): FunctionalAction<UpdateProfileAction> =>
+  catchSubmissionError(async dispatch => {
+    const { data } = await axios.post(ApiRoutes.UpdateMyAccount, formValue);
+
+    dispatch({
+      type: ActionTypes.updateProfile,
+      payload: data.data,
+    });
+  });
