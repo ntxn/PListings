@@ -125,7 +125,7 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
         <hr className="user-menu__divider" />
         <div className="user-menu__option">
           <Link
-            to="/user/settings"
+            to="/user/account-settings"
             className="user-menu__option__hover"
             onClick={props.closeUserMenu}
           >
