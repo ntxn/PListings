@@ -33,6 +33,9 @@ interface FormProps<Attrs> {
 class Form extends React.Component<
   InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
 > {
+  /**
+   * Render text input for simple input like name, email
+   */
   renderInput: React.StatelessComponent<
     WrappedFieldProps & CustomFormProps
   > = ({ input, meta, ...props }): JSX.Element => {
@@ -54,6 +57,9 @@ class Form extends React.Component<
     );
   };
 
+  /**
+   * Render a textarea for user's about me
+   */
   renderTextarea: React.StatelessComponent<
     WrappedFieldProps & CustomFormProps
   > = ({ input, meta, ...props }): JSX.Element => {
@@ -142,12 +148,33 @@ class Form extends React.Component<
           onChange={onChange}
           className="form__upload"
         />
-        <label
-          htmlFor={name}
-          className="btn-text btn-text--orange u-margin-top-xxsmall"
-        >
+        <label htmlFor={name} className="btn-text btn-text--underlined--orange">
           Choose new photo
         </label>
+        <div className="form__error">{err ? meta.error : null}</div>
+      </div>
+    );
+  };
+
+  /***
+   * render a text input field with autocomplete when user enters addresses
+   */
+  renderLocation: React.StatelessComponent<
+    WrappedFieldProps & CustomFormProps
+  > = ({ input, meta, ...props }): JSX.Element => {
+    const err = meta.error && meta.touched;
+    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
+    return (
+      <div className="form__group">
+        <label className="form__label" htmlFor={input.name}>
+          {props.label}
+        </label>
+        <input
+          className={inputClassName}
+          id={input.name}
+          {...input}
+          {...props}
+        />
         <div className="form__error">{err ? meta.error : null}</div>
       </div>
     );
@@ -162,6 +189,15 @@ class Form extends React.Component<
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
+        {[name, disabledEmail].map(field => (
+          <Field key={field.name} component={this.renderInput} {...field} />
+        ))}
+        <Field
+          key={location.name}
+          component={this.renderLocation}
+          {...location}
+        />
+        <Field key={bio.name} component={this.renderTextarea} {...bio} />
         <Field
           key={photo.name}
           component={this.renderPhoto}
@@ -169,21 +205,16 @@ class Form extends React.Component<
           initialPhoto={this.props.photo}
           userName={this.props.userName}
         />
-        {[name, disabledEmail].map(field => (
-          <Field key={field.name} component={this.renderInput} {...field} />
-        ))}
-        {/* <Field key={location.name} component={this.renderLocation} /> */}
-        <Field key={bio.name} component={this.renderTextarea} {...bio} />
         <div className="form__error form__error-general">
           {error ? error : null}
         </div>
-        <div className="form__btn">
+        <div className="form__btn form__btn--right">
           <button
             type="submit"
             disabled={pristine || invalid || submitting}
             className="btn btn--filled"
           >
-            Submit
+            Update Profile
           </button>
         </div>
       </form>
