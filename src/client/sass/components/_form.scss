@@ -65,11 +65,20 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+
+    &--right {
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border-radius: 2rem;
+      padding: 1rem 2rem;
+    }
   }
 
   &__photo-upload {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
   }
 
@@ -82,6 +91,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    margin-right: 2rem;
 
     svg {
       width: 7rem;
