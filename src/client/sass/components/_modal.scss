@@ -59,14 +59,6 @@
     box-shadow: 0 0 1.5rem 0.2rem rgba(0, 0, 0, 0.3);
   }
 
-  &__divider {
-    background-color: var(--color-grey-light-2);
-    color: var(--color-grey-light-2);
-    height: 1px;
-    border-width: 0;
-    margin: 1rem;
-  }
-
   &__option {
     &__avatar {
       width: 6rem;

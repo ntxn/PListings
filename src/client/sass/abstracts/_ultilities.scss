@@ -49,3 +49,10 @@
 .u-hide {
   display: none;
 }
+
+.u-divider {
+  background-color: var(--color-grey-light-2);
+  color: var(--color-grey-light-2);
+  height: 1px;
+  border-width: 0;
+}

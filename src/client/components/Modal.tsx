@@ -122,7 +122,7 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
             </div>
           </Link>
         </div>
-        <hr className="user-menu__divider" />
+        <hr className="u-divider" />
         <div className="user-menu__option">
           <Link
             to="/user/account-settings"
