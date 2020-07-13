@@ -6,6 +6,14 @@
   background-color: var(--color-white);
 }
 
+.u-margin-bottom-xxsmall {
+  margin-bottom: 0.5rem;
+}
+
+.u-margin-bottom-xsmall {
+  margin-bottom: 1rem;
+}
+
 .u-margin-bottom-small {
   margin-bottom: 1.5rem;
 }
@@ -18,6 +26,14 @@
   margin-bottom: 4.5rem;
 }
 
+.u-margin-top-xxsmall {
+  margin-top: 0.5rem;
+}
+
+.u-margin-top-xsmall {
+  margin-top: 1rem;
+}
+
 .u-margin-top-small {
   margin-top: 1.5rem;
 }
@@ -28,4 +44,8 @@
 
 .u-margin-top-big {
   margin-top: 4.5rem;
+}
+
+.u-hide {
+  display: none;
 }
