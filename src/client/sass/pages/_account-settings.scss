@@ -1,0 +1,57 @@
+.settings {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 2rem auto;
+  max-width: 70vw;
+
+  .container__form {
+    margin: 0;
+  }
+
+  &__dropdown {
+    font-size: var(--default-font-size);
+    text-transform: uppercase;
+    font-weight: 300;
+    line-height: 3rem;
+    border-right: 1px solid var(--color-grey-light-2);
+    flex: 1;
+    width: 20rem;
+
+    &__option {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 1rem 2rem 1rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      svg {
+        width: 2rem;
+        height: 2rem;
+      }
+
+      span {
+        margin-left: 1rem;
+      }
+
+      &:hover {
+        background-color: var(--color-grey-light-1);
+        border-left: 4px solid var(--color-primary);
+      }
+
+      &__active {
+        border-left: 4px solid var(--color-primary);
+      }
+    }
+
+    &__btn {
+      display: none;
+    }
+  }
+
+  &__content {
+    margin-left: 2rem;
+    flex: 3;
+  }
+}
