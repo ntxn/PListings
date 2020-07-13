@@ -35,7 +35,11 @@ const _LogIn = (props: LogInProps): JSX.Element => {
           <div className="u-center-text u-margin-bottom-medium">
             <h2 className="heading-primary">Log In</h2>
           </div>
-          <LogInForm onSubmit={onSubmit} formFields={formFields} />
+          <LogInForm
+            onSubmit={onSubmit}
+            formFields={formFields}
+            submitBtnText="Log In"
+          />
           <div className="u-center-text u-margin-top-small u-margin-bottom-medium">
             <Link to="/auth/signup" className="btn-text btn-text--orange">
               Don&apos;t have an account?

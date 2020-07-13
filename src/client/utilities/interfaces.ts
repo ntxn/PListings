@@ -87,6 +87,7 @@ interface FormFields extends CustomFormProps {
 export interface FormProps<Attrs> {
   onSubmit(formValues: Attrs): void;
   formFields: FormFields[];
+  submitBtnText: string;
 }
 
 export interface LogInAttrs {

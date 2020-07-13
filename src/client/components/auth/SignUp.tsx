@@ -35,7 +35,11 @@ const _SignUp = (props: SignUpProps): JSX.Element => {
           <div className="u-center-text u-margin-bottom-medium">
             <h2 className="heading-primary">Create Your Account</h2>
           </div>
-          <SignUpForm onSubmit={onSubmit} formFields={formFields} />
+          <SignUpForm
+            onSubmit={onSubmit}
+            formFields={formFields}
+            submitBtnText="Sign Up"
+          />
           <div className="u-center-text u-margin-top-small">
             <Link
               to="/auth/forgot-password"

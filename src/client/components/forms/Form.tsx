@@ -3,6 +3,10 @@ import { Field, WrappedFieldProps, InjectedFormProps } from 'redux-form';
 
 import { FormProps, CustomFormProps } from '../../utilities';
 
+/**
+ * A generic Form to render input text.
+ * It is used with reduxForm to store form values in Redux Store
+ */
 export class Form<Attrs> extends React.Component<
   InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
 > {
@@ -40,13 +44,19 @@ export class Form<Attrs> extends React.Component<
         <div className="form__error form__error-general">
           {error ? error : null}
         </div>
-        <div className="form__btn">
+        <div
+          className={`form__btn ${
+            this.props.submitBtnText === 'Update Password'
+              ? 'form__btn--right'
+              : ''
+          }`}
+        >
           <button
             type="submit"
             disabled={invalid || submitting}
             className="btn btn--filled"
           >
-            Submit
+            {this.props.submitBtnText}
           </button>
         </div>
       </form>
