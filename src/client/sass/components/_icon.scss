@@ -2,7 +2,7 @@
   width: 4rem;
   height: 4rem;
 
-  background-color: var(--color-grey-light-3);
+  background-color: var(--color-grey-light-2);
   border-radius: var(--border-radius-medium);
 
   display: flex;
@@ -18,7 +18,7 @@
   }
 
   &:hover {
-    background-color: var(--color-grey-light-4);
+    background-color: var(--color-grey-light-3);
     transition: background-color 0.2s;
   }
 
