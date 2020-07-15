@@ -1,7 +1,7 @@
 import { GeoLocation, DEFAULT_LOCATION } from '../../common';
-import { Action, ActionTypes } from '../utilities';
+import { Action, ActionTypes, SearchedLocation } from '../utilities';
 
-export const locationReducer = (
+export const currentLocationReducer = (
   state: GeoLocation = DEFAULT_LOCATION,
   action: Action
 ): GeoLocation => {
@@ -10,6 +10,18 @@ export const locationReducer = (
       return action.payload;
     case ActionTypes.getLocationByIP:
       return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const searchLocationReducer = (
+  state: SearchedLocation[] = [],
+  action: Action
+): SearchedLocation[] => {
+  switch (action.type) {
+    case ActionTypes.searchLocation:
+      return [...action.payload];
     default:
       return state;
   }
