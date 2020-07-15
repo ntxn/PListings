@@ -7,12 +7,11 @@ import {
   StoreState,
   UpdatePasswordAttrs,
   formFieldValues,
-  UpdateProfileAttrs,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
 import { AuthRequired } from '../AuthRequired';
 import { UpdatePasswordForm, UpdateProfileForm } from '../forms';
-import { updatePassword, updateProfile } from '../../actions';
+import { updatePassword } from '../../actions';
 
 interface StateProps {
   user: UserDoc | null;
@@ -20,7 +19,6 @@ interface StateProps {
 
 interface DispatchProps {
   updatePassword(formValue: UpdatePasswordAttrs): void;
-  updateProfile(formValue: UpdateProfileAttrs): void;
 }
 
 type AccountSettingsProps = StateProps & DispatchProps;
@@ -58,29 +56,13 @@ const _AccountSettings = (props: AccountSettingsProps): JSX.Element => {
   };
 
   const renderUpdateProfileForm = () => {
-    const onSubmit = (formValues: UpdateProfileAttrs) =>
-      props.updateProfile(formValues);
-
-    const { name, email, location, photo, bio } = props.user!;
-    const initialValues = {
-      name,
-      email,
-      location: `${location.city}`,
-      bio,
-    };
-
     return (
       <div className="container__form" id={FormIds.profile}>
         <h2 className="heading-primary u-margin-bottom-xxsmall">
           Public profile
         </h2>
         <hr className="u-divider u-margin-bottom-medium" />
-        <UpdateProfileForm
-          onSubmit={onSubmit}
-          initialValues={initialValues}
-          photo={photo}
-          userName={name}
-        />
+        <UpdateProfileForm />
       </div>
     );
   };
@@ -153,5 +135,4 @@ const mapStateToProps = (state: StoreState): StateProps => {
 
 export const AccountSettings = connect(mapStateToProps, {
   updatePassword,
-  updateProfile,
 })(_AccountSettings);

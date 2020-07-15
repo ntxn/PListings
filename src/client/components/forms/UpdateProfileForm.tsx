@@ -1,44 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, Dispatch } from 'react';
+import { connect } from 'react-redux';
 import { BsPersonFill } from 'react-icons/bs';
-
 import {
   Field,
   reduxForm,
   WrappedFieldProps,
   InjectedFormProps,
+  EventOrValueHandler,
+  DecoratedFormProps,
 } from 'redux-form';
+import { searchLocation, updateProfile } from '../../actions';
 import { ErrMsg } from '../../../common';
 import {
   UpdateProfileAttrs as Attrs,
   formFieldValues,
-  EventWithTarget,
+  SearchedLocation,
+  StoreState,
+  UpdateProfileAttrs,
 } from '../../utilities';
+import { UserDoc } from '../../../server/models';
 
-interface CustomFormProps {
+interface FieldProps {
   label: string;
   type: string;
   placeholder?: string;
   required: boolean;
   disabled?: boolean;
-  initialPhoto?: string;
-  userName: string;
 }
 
-interface FormProps<Attrs> {
-  onSubmit(formValues: Attrs): void;
-  photo?: string;
-  userName: string;
+interface StateProps {
+  user: UserDoc;
+  searchedLocations: SearchedLocation[];
 }
+
+interface DispatchProps<A> {
+  updateProfile(formValues: A): void;
+  searchLocation(term?: string): void;
+}
+
+type FormProps<A> = StateProps & DispatchProps<A>;
 
 class Form extends React.Component<
   InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
 > {
+  typingTimeout: NodeJS.Timeout = setTimeout(() => {}, 10000);
+
   /**
    * Render text input for simple input like name, email
    */
-  renderInput: React.StatelessComponent<
-    WrappedFieldProps & CustomFormProps
-  > = ({ input, meta, ...props }): JSX.Element => {
+  renderInput: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
+    input,
+    meta,
+    ...props
+  }): JSX.Element => {
     const err = meta.error && meta.touched;
     const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
     return (
@@ -60,9 +74,11 @@ class Form extends React.Component<
   /**
    * Render a textarea for user's about me
    */
-  renderTextarea: React.StatelessComponent<
-    WrappedFieldProps & CustomFormProps
-  > = ({ input, meta, ...props }): JSX.Element => {
+  renderTextarea: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
+    input,
+    meta,
+    ...props
+  }): JSX.Element => {
     const err = meta.error && meta.touched;
     const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
     const maxChars = 150;
@@ -88,21 +104,19 @@ class Form extends React.Component<
   /**
    * Render user's profile photo and a file upload button to change their profile photo
    */
-  renderPhoto: React.StatelessComponent<
-    WrappedFieldProps & CustomFormProps
-  > = ({
+  renderPhoto: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
     input: { value, name, ...inputProps },
     meta,
-    initialPhoto,
-    userName,
   }): JSX.Element => {
     const err = meta.error && meta.touched;
     const [photoAdded, setPhotoAdded] = useState(false);
     const imgId = 'form-profile-photo';
+    const { photo: initialPhoto, name: userName } = this.props.user;
+
     /**
      * Handle changes to profile photo image upload.
      */
-    const onChange = (event: EventWithTarget) => {
+    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
       const reader = new FileReader();
       const img = document.getElementById(imgId);
       if (!event.target.files) return;
@@ -156,31 +170,71 @@ class Form extends React.Component<
     );
   };
 
+  renderSearchedLocations = (): JSX.Element => {
+    const selectLocation = (location: SearchedLocation) => {
+      this.props.change('location', location.fields);
+      this.props.searchLocation();
+    };
+
+    return (
+      <ul>
+        {this.props.searchedLocations.map(location => (
+          <li key={location.recordid} onClick={() => selectLocation(location)}>
+            {location.fields.city}, {location.fields.state},
+            {location.fields.zip}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   /***
    * render a text input field with autocomplete when user enters addresses
    */
-  renderLocation: React.StatelessComponent<
-    WrappedFieldProps & CustomFormProps
-  > = ({ input, meta, ...props }): JSX.Element => {
+  renderLocation: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
+    input: { value, name, onChange: inputOnChange, ...inputProps },
+    meta,
+    ...props
+  }): JSX.Element => {
     const err = meta.error && meta.touched;
     const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
+    const onChange = (inputOnChange: EventOrValueHandler<ChangeEvent>) => (
+      event: ChangeEvent<HTMLInputElement>
+    ) => {
+      const { value } = event.target;
+      clearTimeout(this.typingTimeout);
+      this.typingTimeout = setTimeout(
+        () => this.props.searchLocation(value),
+        150
+      );
+      inputOnChange(event);
+    };
+
     return (
       <div className="form__group">
-        <label className="form__label" htmlFor={input.name}>
+        <label className="form__label" htmlFor={name}>
           {props.label}
         </label>
         <input
-          className={inputClassName}
-          id={input.name}
-          {...input}
+          {...inputProps}
           {...props}
+          autoComplete="off"
+          placeholder="Enter city or zip code"
+          className={inputClassName}
+          id={name}
+          onChange={onChange(inputOnChange)}
+          value={
+            typeof value === 'string'
+              ? value
+              : `${value.city}, ${value.state} ${value.zip}`
+          }
         />
         <div className="form__error">{err ? meta.error : null}</div>
       </div>
     );
   };
 
-  onSubmit = (formValues: Attrs): void => this.props.onSubmit(formValues);
+  onSubmit = (formValues: Attrs): void => this.props.updateProfile(formValues);
 
   render() {
     const { handleSubmit, invalid, submitting, error, pristine } = this.props;
@@ -189,6 +243,7 @@ class Form extends React.Component<
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
+        <input type="submit" disabled style={{ display: 'none' }} />
         {[name, disabledEmail].map(field => (
           <Field key={field.name} component={this.renderInput} {...field} />
         ))}
@@ -197,14 +252,9 @@ class Form extends React.Component<
           component={this.renderLocation}
           {...location}
         />
+        {this.renderSearchedLocations()}
         <Field key={bio.name} component={this.renderTextarea} {...bio} />
-        <Field
-          key={photo.name}
-          component={this.renderPhoto}
-          {...photo}
-          initialPhoto={this.props.photo}
-          userName={this.props.userName}
-        />
+        <Field key={photo.name} component={this.renderPhoto} {...photo} />
         <div className="form__error form__error-general">
           {error ? error : null}
         </div>
@@ -216,19 +266,28 @@ class Form extends React.Component<
           >
             Update Profile
           </button>
+
+          <button
+            type="button"
+            disabled={pristine || submitting}
+            className="btn btn--outline"
+            onClick={this.props.reset}
+          >
+            Reset
+          </button>
         </div>
       </form>
     );
   }
 }
 
-export const UpdateProfileForm = reduxForm<Attrs, FormProps<Attrs>>({
+const ReduxForm = reduxForm<Attrs, FormProps<Attrs>>({
   form: 'updateProfileForm',
   // enableReinitialize: true,
-  validate: ({ name, location }: Attrs) => {
+  validate: ({ name, location }) => {
     const errors = {
       name: ErrMsg.NameRequired,
-      location: ErrMsg.LocationCityRequired,
+      location: ErrMsg.LocationRequired,
     };
 
     if (name) delete errors.name;
@@ -237,3 +296,19 @@ export const UpdateProfileForm = reduxForm<Attrs, FormProps<Attrs>>({
     return errors;
   },
 })(Form);
+
+const mapStateToProps = (state: StoreState) => {
+  const { user, searchedLocations } = state;
+  const { name, email, location, bio } = user!;
+  return {
+    searchedLocations,
+    user,
+    initialValues: { name, email, location, bio },
+  };
+};
+
+export const UpdateProfileForm = connect(mapStateToProps, {
+  searchLocation,
+  updateProfile,
+  // @ts-ignore
+})(ReduxForm);
