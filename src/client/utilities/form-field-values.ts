@@ -49,7 +49,7 @@ export const formFieldValues = {
   bio: {
     name: 'bio',
     placeholder: 'Tell us about yourself',
-    label: 'About me',
+    label: 'Bio',
     required: false,
   },
 };

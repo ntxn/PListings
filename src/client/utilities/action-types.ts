@@ -10,4 +10,7 @@ export enum ActionTypes {
   // location
   getLocationWithPermission,
   getLocationByIP,
+
+  // search for matching locations from opendata soft - US Zip Code Latitude and Longitude
+  searchLocation,
 }
