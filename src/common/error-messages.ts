@@ -20,10 +20,13 @@ export enum ErrMsg {
   // Location
   LocationCoorsRequired = 'Location Coordinates are required',
   LocationCoorsLength = 'Location Coordinates must have exactly two values: [long, lat]',
-  LocationPostalRequired = 'Location Postal Code is required',
+  LocationZipRequired = 'Location Zipcode is required',
   LocationCityRequired = 'Location City is required',
   LocationStateRequired = 'Location State is required',
   LocationCountryRequired = 'Location Country is required',
+  LocationInvalid = 'Please enter a valid location',
+  LocationRequired = 'Please provide a location',
+  LocationDropdownListSelection = 'Please select a location from the dropdown list',
 
   // Users
   NameRequired = 'Please enter your name',

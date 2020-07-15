@@ -105,13 +105,13 @@ const listingSchema = new mongoose.Schema(
           ErrMsg.LocationCoorsLength,
         ],
       },
-      postal: Number,
+      zip: Number,
       city: String,
       state: String,
       country: String,
-      // postal: {
+      // zip: {
       //   type: Number,
-      //   required: [true, ErrMsg.LocationPostalRequired],
+      //   required: [true, ErrMsg.LocationZipRequired],
       // },
       // city: {
       //   type: String,

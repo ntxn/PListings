@@ -90,9 +90,9 @@ const userSchema = new mongoose.Schema(
           ErrMsg.LocationCoorsLength,
         ],
       },
-      postal: {
+      zip: {
         type: Number,
-        required: [true, ErrMsg.LocationPostalRequired],
+        required: [true, ErrMsg.LocationZipRequired],
       },
       city: {
         type: String,

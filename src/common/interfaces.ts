@@ -1,6 +1,6 @@
 export interface GeoLocation {
   coordinates: number[];
-  postal: number;
+  zip: number;
   city: string;
   state: string;
   country: string;
