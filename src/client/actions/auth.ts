@@ -14,7 +14,8 @@ import {
   FunctionalAction,
 } from '../utilities';
 import { UserAttrs } from '../../server/models';
-import { ApiRoutes } from '../../common';
+import { ApiRoutes, ErrMsg } from '../../common';
+import { SubmissionError } from 'redux-form';
 
 export const fetchCurrentUser = (): FunctionalAction<
   FetchCurrentUserAction
@@ -31,7 +32,7 @@ export const signUp = (formValues: UserAttrs): FunctionalAction<SignUpAction> =>
   catchSubmissionError(async (dispatch, getState) => {
     const { data } = await axios.post(ApiRoutes.SignUp, {
       ...formValues,
-      location: getState!().location,
+      location: getState!().currentLocation,
     });
 
     dispatch({
@@ -85,7 +86,17 @@ export const updatePassword = (
 export const updateProfile = (
   formValue: UpdateProfileAttrs
 ): FunctionalAction<UpdateProfileAction> =>
-  catchSubmissionError(async dispatch => {
+  catchSubmissionError(async (dispatch, getState) => {
+    const { location } = formValue;
+    if (location && typeof location === 'string') {
+      const error = { location: ErrMsg.LocationDropdownListSelection };
+
+      if (getState!().searchedLocations.length === 0)
+        error.location = ErrMsg.LocationInvalid;
+
+      throw new SubmissionError(error);
+    }
+
     const { data } = await axios.post(ApiRoutes.UpdateMyAccount, formValue);
 
     dispatch({
