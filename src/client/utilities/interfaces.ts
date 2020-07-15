@@ -49,6 +49,12 @@ export interface GetLocationByIPAction {
   payload: GeoLocation;
 }
 
+// Search location
+export interface SearchLocationAction {
+  type: ActionTypes.searchLocation;
+  payload: SearchedLocation[];
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -57,13 +63,26 @@ export type Action =
   | UpdateProfileAction
   | UpdatePasswordAction
   | GetLocationWithPermissionAction
-  | GetLocationByIPAction;
+  | GetLocationByIPAction
+  | SearchLocationAction;
 
 // Store State
 export interface StoreState {
   user: UserDoc | null;
   form: FormStateMap;
-  location: GeoLocation;
+  currentLocation: GeoLocation;
+  searchedLocations: SearchedLocation[];
+}
+
+export interface SearchedLocation {
+  fields: {
+    city: string;
+    longitude: number;
+    latitude: number;
+    state: number;
+    zip: number;
+  };
+  recordid: string;
 }
 
 //
@@ -73,14 +92,14 @@ export type FunctionalAction<A extends ReduxAction> = (
 ) => Promise<void>;
 
 // FORM
-export interface CustomFormProps {
+export interface FieldProps {
   label: string;
   type: string;
   placeholder: string;
   required: boolean;
 }
 
-interface FormFields extends CustomFormProps {
+interface FormFields extends FieldProps {
   name: string;
 }
 
@@ -114,9 +133,4 @@ export interface UpdateProfileAttrs {
   location: string;
   photo?: string;
   bio?: string;
-}
-
-// HTML ELEMENT
-export interface EventWithTarget {
-  target: HTMLInputElement;
 }
