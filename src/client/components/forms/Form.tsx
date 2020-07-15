@@ -1,7 +1,7 @@
 import React from 'react';
 import { Field, WrappedFieldProps, InjectedFormProps } from 'redux-form';
 
-import { FormProps, CustomFormProps } from '../../utilities';
+import { FormProps, FieldProps } from '../../utilities';
 
 /**
  * A generic Form to render input text.
@@ -10,9 +10,11 @@ import { FormProps, CustomFormProps } from '../../utilities';
 export class Form<Attrs> extends React.Component<
   InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
 > {
-  renderInput: React.StatelessComponent<
-    WrappedFieldProps & CustomFormProps
-  > = ({ input, meta, ...props }): JSX.Element => {
+  renderInput: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
+    input,
+    meta,
+    ...props
+  }): JSX.Element => {
     const err = meta.error && meta.touched;
     const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
     return (
@@ -38,6 +40,7 @@ export class Form<Attrs> extends React.Component<
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
+        <input type="submit" disabled style={{ display: 'none' }} />
         {formFields.map(field => (
           <Field key={field.name} component={this.renderInput} {...field} />
         ))}
