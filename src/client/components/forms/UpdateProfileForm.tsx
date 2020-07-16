@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent, Dispatch } from 'react';
+import React, { useState, ChangeEvent } from 'react';
+import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { BsPersonFill } from 'react-icons/bs';
 import {
@@ -7,16 +8,16 @@ import {
   WrappedFieldProps,
   InjectedFormProps,
   EventOrValueHandler,
-  DecoratedFormProps,
+  formValueSelector,
+  SubmissionError,
 } from 'redux-form';
 import { searchLocation, updateProfile } from '../../actions';
-import { ErrMsg } from '../../../common';
+import { ErrMsg, GeoLocation } from '../../../common';
 import {
   UpdateProfileAttrs as Attrs,
   formFieldValues,
   SearchedLocation,
   StoreState,
-  UpdateProfileAttrs,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
 
@@ -31,6 +32,7 @@ interface FieldProps {
 interface StateProps {
   user: UserDoc;
   searchedLocations: SearchedLocation[];
+  locationValue: string | Geolocation;
 }
 
 interface DispatchProps<A> {
@@ -43,7 +45,17 @@ type FormProps<A> = StateProps & DispatchProps<A>;
 class Form extends React.Component<
   InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
 > {
+  state = {
+    location: this.props.initialValues.location!,
+  };
+
   typingTimeout: NodeJS.Timeout = setTimeout(() => {}, 10000);
+
+  isSameLocation = (value: string, location: GeoLocation): boolean =>
+    value === this.getLocationStr(location);
+
+  getLocationStr = (location: GeoLocation): string =>
+    `${location.city}, ${location.state} ${location.zip}`;
 
   /**
    * Render text input for simple input like name, email
@@ -174,6 +186,7 @@ class Form extends React.Component<
     const selectLocation = (location: SearchedLocation) => {
       this.props.change('location', location.fields);
       this.props.searchLocation();
+      this.setState({ location: location.fields });
     };
 
     return (
@@ -223,23 +236,69 @@ class Form extends React.Component<
           className={inputClassName}
           id={name}
           onChange={onChange(inputOnChange)}
-          value={
-            typeof value === 'string'
-              ? value
-              : `${value.city}, ${value.state} ${value.zip}`
-          }
+          value={typeof value === 'object' ? this.getLocationStr(value) : value}
         />
         <div className="form__error">{err ? meta.error : null}</div>
       </div>
     );
   };
 
-  onSubmit = (formValues: Attrs): void => this.props.updateProfile(formValues);
+  /**
+   * An async validator to check if the location input is valid.
+   * Location input validator has to be asynchorous because we don't
+   * query for locations on every keystroke, but waiting for the
+   * user to stop typing before running a query.
+   */
+  asyncValidatorDispatcher = (
+    formValues: Attrs
+  ): ((dispatch: Dispatch, getState: () => StoreState) => Promise<void>) => (
+    dispatch,
+    getState
+  ) => {
+    const { location } = formValues;
+    if (location && typeof location === 'string') {
+      // If the location input value is a string representation of the currently
+      // chosen location object (which is store in this class state object),
+      // then restore the location value to be that object because we submit an
+      // object to the db, not a string.
+      if (this.isSameLocation(location, this.state.location))
+        formValues.location = this.state.location;
+
+      const error = { location: ErrMsg.LocationDropdownListSelection };
+
+      if (getState!().searchedLocations.length === 0)
+        error.location = ErrMsg.LocationInvalid;
+
+      return Promise.reject(error);
+    }
+    return Promise.resolve();
+  };
+
+  /**
+   * Handle form submission.
+   * Before calling updateProfile, check if the location input value is valid
+   */
+  onSubmit = (formValues: Attrs, dispatch: Dispatch): void => {
+    return (
+      //@ts-ignore
+      dispatch(this.asyncValidatorDispatcher(formValues))
+        .then(() => this.props.updateProfile(formValues))
+        .catch((err: Record<string, string>) => {
+          throw new SubmissionError(err);
+        })
+    );
+  };
 
   render() {
     const { handleSubmit, invalid, submitting, error, pristine } = this.props;
     const { name, email, location, photo, bio } = formFieldValues;
     const disabledEmail = { ...email, disabled: true };
+    const isInitialLocation =
+      typeof this.props.locationValue === 'string' &&
+      this.isSameLocation(
+        this.props.locationValue,
+        this.props.initialValues.location!
+      );
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
@@ -261,7 +320,7 @@ class Form extends React.Component<
         <div className="form__btn form__btn--right">
           <button
             type="submit"
-            disabled={pristine || invalid || submitting}
+            disabled={pristine || invalid || submitting || isInitialLocation}
             className="btn btn--filled"
           >
             Update Profile
@@ -269,7 +328,7 @@ class Form extends React.Component<
 
           <button
             type="button"
-            disabled={pristine || submitting}
+            disabled={pristine || submitting || isInitialLocation}
             className="btn btn--outline"
             onClick={this.props.reset}
           >
@@ -297,12 +356,16 @@ const ReduxForm = reduxForm<Attrs, FormProps<Attrs>>({
   },
 })(Form);
 
+const selector = formValueSelector('updateProfileForm');
+
 const mapStateToProps = (state: StoreState) => {
+  const locationValue = selector(state, 'location');
   const { user, searchedLocations } = state;
   const { name, email, location, bio } = user!;
   return {
     searchedLocations,
     user,
+    locationValue,
     initialValues: { name, email, location, bio },
   };
 };

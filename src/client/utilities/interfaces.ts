@@ -130,7 +130,7 @@ export interface UpdatePasswordAttrs {
 export interface UpdateProfileAttrs {
   name: string;
   email: string;
-  location: string;
+  location: GeoLocation & { longitude?: number; latitude?: number };
   photo?: string;
   bio?: string;
 }

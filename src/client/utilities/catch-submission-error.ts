@@ -6,7 +6,7 @@ export const catchSubmissionError = <A extends Action>(
   callback: FunctionalAction<A>
 ): FunctionalAction<A> => (dispatch, getState): Promise<void> =>
   callback(dispatch, getState).catch(err => {
-    const errors = err.errors || err.response.data.errors;
+    const { errors } = err.response.data;
     if (errors) throw new SubmissionError(errors);
 
     throw new SubmissionError({ _error: err.response.data.message });
