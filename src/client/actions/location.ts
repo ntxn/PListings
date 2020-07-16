@@ -1,23 +1,20 @@
 import axios from 'axios';
 import { Dispatch } from 'redux';
-import { SubmissionError } from 'redux-form';
 import { ActionTypes } from '../utilities/action-types';
-import { GeoLocation, ErrMsg } from '../../common';
+import { GeoLocation } from '../../common';
 import {
   GetLocationWithPermissionAction,
   GetLocationByIPAction,
   SearchLocationAction,
   SearchedLocation,
-  catchSubmissionError,
-  FunctionalAction,
 } from '../utilities';
 
 export const getLocationWithPermission = (): GetLocationWithPermissionAction => {
   const location: GeoLocation = {
     coordinates: [-122.437598, 37.757591], // [longitude, latitude]
-    zip: 94114,
+    zip: '94114',
     city: 'San Francisco',
-    state: 'California',
+    state: 'CA',
     country: 'United States',
   };
 
@@ -38,14 +35,15 @@ export const getLocationByIP = () => {
       `https://geolocation-db.com/json/${process.env.GEOLOCATION_DB_KEY}`
     );
 
-    const { longitude, latitude, zip, city, state, country_name } = data;
+    const { longitude, latitude, postal, city, state, country_name } = data;
+
     dispatch<GetLocationByIPAction>({
       type: ActionTypes.getLocationByIP,
       payload: {
         coordinates: [longitude, latitude], // [longitude, latitude]
-        zip: parseInt(zip),
+        zip: postal,
         city,
-        state,
+        state: state.slice(0, 2).toUpperCase(),
         country: country_name,
       },
     });

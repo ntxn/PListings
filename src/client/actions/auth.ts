@@ -84,20 +84,19 @@ export const updatePassword = (
   });
 
 export const updateProfile = (
-  formValue: UpdateProfileAttrs
+  formValues: UpdateProfileAttrs
 ): FunctionalAction<UpdateProfileAction> =>
-  catchSubmissionError(async (dispatch, getState) => {
-    const { location } = formValue;
-    if (location && typeof location === 'string') {
-      const error = { location: ErrMsg.LocationDropdownListSelection };
+  catchSubmissionError(async dispatch => {
+    const { location } = formValues;
+    formValues.location = {
+      coordinates: [location.longitude!, location.latitude!],
+      zip: location.zip,
+      city: location.city,
+      state: location.state,
+      country: 'United States',
+    };
 
-      if (getState!().searchedLocations.length === 0)
-        error.location = ErrMsg.LocationInvalid;
-
-      throw new SubmissionError(error);
-    }
-
-    const { data } = await axios.post(ApiRoutes.UpdateMyAccount, formValue);
+    const { data } = await axios.patch(ApiRoutes.UpdateMyAccount, formValues);
 
     dispatch({
       type: ActionTypes.updateProfile,
