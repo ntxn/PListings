@@ -91,7 +91,7 @@ const userSchema = new mongoose.Schema(
         ],
       },
       zip: {
-        type: Number,
+        type: String,
         required: [true, ErrMsg.LocationZipRequired],
       },
       city: {
