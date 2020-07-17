@@ -7,19 +7,25 @@ import {
   reduxForm,
   WrappedFieldProps,
   InjectedFormProps,
-  EventOrValueHandler,
   formValueSelector,
   SubmissionError,
 } from 'redux-form';
 import { searchLocation, updateProfile } from '../../actions';
-import { ErrMsg, GeoLocation } from '../../../common';
+import { ErrMsg } from '../../../common';
 import {
   UpdateProfileAttrs as Attrs,
   formFieldValues,
   SearchedLocation,
   StoreState,
+  isSameLocation,
+  LocationInputFieldProps,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
+import {
+  renderLocations,
+  renderLocationInputField,
+  asyncValidatorDispatcher,
+} from '../LocationSearchInput';
 
 interface FieldProps {
   label: string;
@@ -50,12 +56,6 @@ class Form extends React.Component<
   };
 
   typingTimeout: NodeJS.Timeout = setTimeout(() => {}, 10000);
-
-  isSameLocation = (value: string, location: GeoLocation): boolean =>
-    value === this.getLocationStr(location);
-
-  getLocationStr = (location: GeoLocation): string =>
-    `${location.city}, ${location.state} ${location.zip}`;
 
   /**
    * Render text input for simple input like name, email
@@ -189,89 +189,7 @@ class Form extends React.Component<
       this.setState({ location: location.fields });
     };
 
-    return (
-      <ul>
-        {this.props.searchedLocations.map(location => (
-          <li key={location.recordid} onClick={() => selectLocation(location)}>
-            {location.fields.city}, {location.fields.state},
-            {location.fields.zip}
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-  /***
-   * render a text input field with autocomplete when user enters addresses
-   */
-  renderLocation: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input: { value, name, onChange: inputOnChange, ...inputProps },
-    meta,
-    ...props
-  }): JSX.Element => {
-    const err = meta.error && meta.touched;
-    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
-    const onChange = (inputOnChange: EventOrValueHandler<ChangeEvent>) => (
-      event: ChangeEvent<HTMLInputElement>
-    ) => {
-      const { value } = event.target;
-      clearTimeout(this.typingTimeout);
-      this.typingTimeout = setTimeout(
-        () => this.props.searchLocation(value),
-        150
-      );
-      inputOnChange(event);
-    };
-
-    return (
-      <div className="form__group">
-        <label className="form__label" htmlFor={name}>
-          {props.label}
-        </label>
-        <input
-          {...inputProps}
-          {...props}
-          autoComplete="off"
-          placeholder="Enter city or zip code"
-          className={inputClassName}
-          id={name}
-          onChange={onChange(inputOnChange)}
-          value={typeof value === 'object' ? this.getLocationStr(value) : value}
-        />
-        <div className="form__error">{err ? meta.error : null}</div>
-      </div>
-    );
-  };
-
-  /**
-   * An async validator to check if the location input is valid.
-   * Location input validator has to be asynchorous because we don't
-   * query for locations on every keystroke, but waiting for the
-   * user to stop typing before running a query.
-   */
-  asyncValidatorDispatcher = (
-    formValues: Attrs
-  ): ((dispatch: Dispatch, getState: () => StoreState) => Promise<void>) => (
-    dispatch,
-    getState
-  ) => {
-    const { location } = formValues;
-    if (location && typeof location === 'string') {
-      // If the location input value is a string representation of the currently
-      // chosen location object (which is store in this class state object),
-      // then restore the location value to be that object because we submit an
-      // object to the db, not a string.
-      if (this.isSameLocation(location, this.state.location))
-        formValues.location = this.state.location;
-
-      const error = { location: ErrMsg.LocationDropdownListSelection };
-
-      if (getState!().searchedLocations.length === 0)
-        error.location = ErrMsg.LocationInvalid;
-
-      return Promise.reject(error);
-    }
-    return Promise.resolve();
+    return renderLocations(this.props.searchedLocations, selectLocation);
   };
 
   /**
@@ -281,8 +199,10 @@ class Form extends React.Component<
   onSubmit = (formValues: Attrs, dispatch: Dispatch): void => {
     return (
       //@ts-ignore
-      dispatch(this.asyncValidatorDispatcher(formValues))
-        .then(() => this.props.updateProfile(formValues))
+      dispatch(asyncValidatorDispatcher(formValues, this.state.location))
+        .then((updatedFormValues: Attrs) =>
+          this.props.updateProfile(updatedFormValues)
+        )
         .catch((err: Record<string, string>) => {
           throw new SubmissionError(err);
         })
@@ -291,24 +211,35 @@ class Form extends React.Component<
 
   render() {
     const { handleSubmit, invalid, submitting, error, pristine } = this.props;
-    const { name, email, location, photo, bio } = formFieldValues;
-    const disabledEmail = { ...email, disabled: true };
-    const isInitialLocation =
-      typeof this.props.locationValue === 'string' &&
-      this.isSameLocation(
-        this.props.locationValue,
-        this.props.initialValues.location!
-      );
+    const { name, photo, bio } = formFieldValues;
+    const email = { ...formFieldValues.email, disabled: true };
+    const location: LocationInputFieldProps = {
+      ...formFieldValues.location,
+      addTimeout: inputOnChange => event => {
+        const { value } = event.target; // To avoid `accessing the property `target` on a released/nullified synthetic event`
+        clearTimeout(this.typingTimeout);
+        this.typingTimeout = setTimeout(
+          () => this.props.searchLocation(value),
+          150
+        );
+        inputOnChange(event);
+      },
+    };
+
+    const isInitialLocation = isSameLocation(
+      this.props.locationValue,
+      this.props.initialValues.location!
+    );
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
         <input type="submit" disabled style={{ display: 'none' }} />
-        {[name, disabledEmail].map(field => (
+        {[name, email].map(field => (
           <Field key={field.name} component={this.renderInput} {...field} />
         ))}
         <Field
           key={location.name}
-          component={this.renderLocation}
+          component={renderLocationInputField}
           {...location}
         />
         {this.renderSearchedLocations()}
