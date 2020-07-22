@@ -1,6 +1,5 @@
-import { ChangeEvent } from 'react';
 import { Dispatch, Action as ReduxAction } from 'redux';
-import { FormStateMap, EventOrValueHandler } from 'redux-form';
+import { FormStateMap } from 'redux-form';
 
 import { ActionTypes } from './action-types';
 import { UserDoc } from '../../server/models';
@@ -102,12 +101,6 @@ export interface FieldProps {
 
 interface FormFields extends FieldProps {
   name: string;
-}
-
-export interface LocationInputFieldProps extends FormFields {
-  addTimeout(
-    inputOnChange: EventOrValueHandler<ChangeEvent>
-  ): (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export interface FormProps<Attrs> {

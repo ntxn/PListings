@@ -14,7 +14,8 @@ import {
   FunctionalAction,
 } from '../utilities';
 import { UserAttrs } from '../../server/models';
-import { ApiRoutes } from '../../common';
+import { ApiRoutes, ErrMsg } from '../../common';
+import { SubmissionError } from 'redux-form';
 
 export const fetchCurrentUser = (): FunctionalAction<
   FetchCurrentUserAction
