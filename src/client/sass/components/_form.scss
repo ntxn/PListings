@@ -19,7 +19,7 @@
 
     &:focus {
       outline: none;
-      box-shadow: $shadow-green;
+      box-shadow: 0 0 0 1px var(--color-secondary-light);
     }
 
     &::-webkit-input-placeholder {

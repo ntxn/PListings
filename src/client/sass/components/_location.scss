@@ -1,0 +1,33 @@
+.locations {
+  &__form__group {
+    margin-bottom: 1rem;
+  }
+
+  &__list {
+    list-style-type: none;
+    font-size: 1.3rem;
+    border-radius: var(--border-radius-xsmall);
+    margin-bottom: 2rem;
+    box-shadow: $shadow-grey;
+
+    &__item {
+      padding: 1rem 2rem;
+      cursor: pointer;
+
+      &:hover,
+      &--active {
+        background-color: var(--color-grey-light-1);
+      }
+
+      &:first-of-type {
+        border-top-left-radius: var(--border-radius-xsmall);
+        border-top-right-radius: var(--border-radius-xsmall);
+      }
+
+      &:last-of-type {
+        border-bottom-left-radius: var(--border-radius-xsmall);
+        border-bottom-right-radius: var(--border-radius-xsmall);
+      }
+    }
+  }
+}
