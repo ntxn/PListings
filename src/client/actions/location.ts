@@ -59,7 +59,7 @@ export const searchLocation = (searchTerm = '') => {
         const response = await axios.get(
           `https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=${encodeURI(
             searchTerm
-          )}`,
+          )}&rows=6`,
           { headers: { Authorization: process.env.OPEN_DATA_SOFT_KEY } }
         );
         payload = response.data.records;
