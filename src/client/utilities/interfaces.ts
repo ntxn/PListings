@@ -3,7 +3,7 @@ import { FormStateMap } from 'redux-form';
 
 import { ActionTypes } from './action-types';
 import { UserDoc } from '../../server/models';
-import { GeoLocation } from '../../common';
+import { GeoLocation, BaseLocation } from '../../common';
 
 // ACTIONS
 
@@ -75,12 +75,9 @@ export interface StoreState {
 }
 
 export interface SearchedLocation {
-  fields: {
-    city: string;
+  fields: BaseLocation & {
     longitude: number;
     latitude: number;
-    state: number;
-    zip: number;
   };
   recordid: string;
 }
@@ -127,10 +124,16 @@ export interface UpdatePasswordAttrs {
   passwordConfirm: string;
 }
 
+export interface CombinedLocation extends BaseLocation {
+  coordinates?: number[];
+  country?: string;
+  longitude?: number;
+  latitude?: number;
+}
 export interface UpdateProfileAttrs {
   name: string;
   email: string;
-  location: GeoLocation & { longitude?: number; latitude?: number };
+  location: CombinedLocation;
   photo?: string;
   bio?: string;
 }
