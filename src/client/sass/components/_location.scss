@@ -1,14 +1,14 @@
-.locations {
-  &__form__group {
-    margin-bottom: 1rem;
-  }
+.location {
+  position: relative;
 
   &__list {
+    width: 100%;
+    position: absolute;
     list-style-type: none;
     font-size: 1.3rem;
     border-radius: var(--border-radius-xsmall);
-    margin-bottom: 2rem;
     box-shadow: $shadow-grey;
+    background-color: var(--color-white);
 
     &__item {
       padding: 1rem 2rem;
@@ -29,5 +29,11 @@
         border-bottom-right-radius: var(--border-radius-xsmall);
       }
     }
+  }
+
+  &__loader {
+    position: absolute;
+    top: 4rem;
+    right: 2rem;
   }
 }

@@ -46,4 +46,10 @@ $shadow-grey: 0 0 0 1px var(--color-grey-light-2),
   0 2px 4px 0 rgba(0, 0, 0, 0.07), 0 1px 1.5px 0 rgba(0, 0, 0, 0.05);
 
 $shadow-green: 0 0 0 1px var(--color-secondary-light),
-  0 2px 4px 0 rgba(126, 213, 111, 0.07), 0 1px 1.5px 0 rgba(126, 213, 111, 0.05);
+  0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1);
+
+$shadow-red: 0 0 0 1px #ff7d7d, 0 2px 4px 0 rgba(243, 0, 0, 0.1),
+  0 1px 1.5px 0 rgba(243, 0, 0, 0.1);
+
+$shadow-red--focus: 0 0 0 1px var(--color-red),
+  0 2px 4px 0 rgba(243, 0, 0, 0.15), 0 1px 1.5px 0 rgba(243, 0, 0, 0.1);
