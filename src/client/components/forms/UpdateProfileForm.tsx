@@ -12,12 +12,13 @@ import {
   SubmissionError,
 } from 'redux-form';
 import { searchLocation, updateProfile } from '../../actions';
-import { ErrMsg, GeoLocation } from '../../../common';
+import { ErrMsg, BaseLocation } from '../../../common';
 import {
   UpdateProfileAttrs as Attrs,
   formFieldValues,
   SearchedLocation,
   StoreState,
+  CombinedLocation,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
 
@@ -26,7 +27,6 @@ interface FieldProps {
   type: string;
   placeholder?: string;
   required: boolean;
-  disabled?: boolean;
 }
 
 interface StateProps {
@@ -41,20 +41,31 @@ interface DispatchProps<A> {
 }
 
 type FormProps<A> = StateProps & DispatchProps<A>;
+type ReduxFormProps = InjectedFormProps<Attrs, FormProps<Attrs>> &
+  FormProps<Attrs>;
 
-class Form extends React.Component<
-  InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
-> {
-  state = {
-    location: this.props.initialValues.location!,
-  };
+interface FormState {
+  location: CombinedLocation;
+  activeOption: number;
+  invalidSearchTerm: boolean;
+}
+
+class Form extends React.Component<ReduxFormProps, FormState> {
+  constructor(props: ReduxFormProps) {
+    super(props);
+    this.state = {
+      location: this.props.initialValues.location!,
+      activeOption: 0,
+      invalidSearchTerm: false,
+    };
+  }
 
   typingTimeout: NodeJS.Timeout = setTimeout(() => {}, 10000);
 
-  isSameLocation = (value: string, location: GeoLocation): boolean =>
+  isSameLocation = (value: string, location: BaseLocation): boolean =>
     value === this.getLocationStr(location);
 
-  getLocationStr = (location: GeoLocation): string =>
+  getLocationStr = (location: BaseLocation): string =>
     `${location.city}, ${location.state} ${location.zip}`;
 
   /**
@@ -182,23 +193,67 @@ class Form extends React.Component<
     );
   };
 
-  renderSearchedLocations = (): JSX.Element => {
-    const selectLocation = (location: SearchedLocation) => {
-      this.props.change('location', location.fields);
-      this.props.searchLocation();
-      this.setState({ location: location.fields });
-    };
+  selectLocation = (location: SearchedLocation) => {
+    this.props.change('location', location.fields);
+    this.props.searchLocation();
+    this.setState({ location: location.fields });
+  };
 
+  renderSearchedLocations = (): JSX.Element => {
     return (
-      <ul>
-        {this.props.searchedLocations.map(location => (
-          <li key={location.recordid} onClick={() => selectLocation(location)}>
-            {location.fields.city}, {location.fields.state},
-            {location.fields.zip}
+      <ul
+        className={
+          this.props.searchedLocations.length > 0 ? 'locations__list' : ''
+        }
+      >
+        {this.props.searchedLocations.map((location, index) => (
+          <li
+            key={location.recordid}
+            onClick={() => this.selectLocation(location)}
+            className={`locations__list__item ${
+              this.state.activeOption === index
+                ? 'locations__list__item--active'
+                : ''
+            }`}
+          >
+            {this.getLocationStr(location.fields)}
           </li>
         ))}
       </ul>
     );
+  };
+
+  inputOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    const { activeOption } = this.state;
+    const { searchedLocations } = this.props;
+    if (searchedLocations.length === 0) return;
+
+    if (event.keyCode === 13) {
+      this.selectLocation(searchedLocations[activeOption]);
+      this.setState({ activeOption: 0 });
+    } else if (event.keyCode === 38) {
+      if (activeOption === 0) return;
+      this.setState(prevState => {
+        return { activeOption: prevState.activeOption - 1 };
+      });
+    } else if (event.keyCode === 40) {
+      if (activeOption + 1 === searchedLocations.length) return;
+      this.setState(prevState => {
+        return { activeOption: prevState.activeOption + 1 };
+      });
+    }
+  };
+
+  isInvalidSearchTerm = () => {
+    const { locationValue: value, searchedLocations } = this.props;
+    const { location } = this.state;
+    if (
+      typeof value === 'string' &&
+      !this.isSameLocation(value, location) &&
+      searchedLocations.length === 0
+    )
+      this.setState({ invalidSearchTerm: true });
+    else this.setState({ invalidSearchTerm: false });
   };
 
   /***
@@ -210,21 +265,31 @@ class Form extends React.Component<
     ...props
   }): JSX.Element => {
     const err = meta.error && meta.touched;
-    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
+    const inputClassName = `form__input ${
+      err || this.state.invalidSearchTerm ? 'form__input--error' : ''
+    } ${this.props.searchedLocations.length > 0 ? 'locations__input' : ''}`;
+
+    const containerClassName = `form__group ${
+      this.props.searchedLocations.length > 0 ? 'locations__form__group' : ''
+    }`;
+
     const onChange = (inputOnChange: EventOrValueHandler<ChangeEvent>) => (
       event: ChangeEvent<HTMLInputElement>
     ) => {
-      const { value } = event.target;
+      this.props.searchLocation();
       clearTimeout(this.typingTimeout);
-      this.typingTimeout = setTimeout(
-        () => this.props.searchLocation(value),
-        150
-      );
+
+      const { value: userInput } = event.target;
+      if (userInput)
+        this.typingTimeout = setTimeout(async () => {
+          await this.props.searchLocation(userInput);
+          this.isInvalidSearchTerm();
+        }, 500);
       inputOnChange(event);
     };
 
     return (
-      <div className="form__group">
+      <div className={containerClassName}>
         <label className="form__label" htmlFor={name}>
           {props.label}
         </label>
@@ -237,6 +302,7 @@ class Form extends React.Component<
           id={name}
           onChange={onChange(inputOnChange)}
           value={typeof value === 'object' ? this.getLocationStr(value) : value}
+          onKeyDown={this.inputOnKeyDown}
         />
         <div className="form__error">{err ? meta.error : null}</div>
       </div>
@@ -251,7 +317,7 @@ class Form extends React.Component<
    */
   asyncValidatorDispatcher = (
     formValues: Attrs
-  ): ((dispatch: Dispatch, getState: () => StoreState) => Promise<void>) => (
+  ): ((dispatch: Dispatch, getState: () => StoreState) => Promise<Attrs>) => (
     dispatch,
     getState
   ) => {
@@ -271,7 +337,7 @@ class Form extends React.Component<
 
       return Promise.reject(error);
     }
-    return Promise.resolve();
+    return Promise.resolve(formValues);
   };
 
   /**
@@ -282,28 +348,35 @@ class Form extends React.Component<
     return (
       //@ts-ignore
       dispatch(this.asyncValidatorDispatcher(formValues))
-        .then(() => this.props.updateProfile(formValues))
+        .then((newValues: Attrs) => this.props.updateProfile(newValues))
         .catch((err: Record<string, string>) => {
           throw new SubmissionError(err);
         })
     );
   };
 
+  resetForm = (): void => {
+    this.props.reset();
+    this.props.searchLocation();
+  };
+
   render() {
     const { handleSubmit, invalid, submitting, error, pristine } = this.props;
     const { name, email, location, photo, bio } = formFieldValues;
-    const disabledEmail = { ...email, disabled: true };
     const isInitialLocation =
       typeof this.props.locationValue === 'string' &&
       this.isSameLocation(
         this.props.locationValue,
         this.props.initialValues.location!
       );
+    const validLocation =
+      typeof this.props.locationValue === 'object' ||
+      this.isSameLocation(this.props.locationValue, this.state.location);
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
         <input type="submit" disabled style={{ display: 'none' }} />
-        {[name, disabledEmail].map(field => (
+        {[name, email].map(field => (
           <Field key={field.name} component={this.renderInput} {...field} />
         ))}
         <Field
@@ -320,7 +393,13 @@ class Form extends React.Component<
         <div className="form__btn form__btn--right">
           <button
             type="submit"
-            disabled={pristine || invalid || submitting || isInitialLocation}
+            disabled={
+              pristine ||
+              invalid ||
+              submitting ||
+              isInitialLocation ||
+              !validLocation
+            }
             className="btn btn--filled"
           >
             Update Profile
@@ -330,7 +409,7 @@ class Form extends React.Component<
             type="button"
             disabled={pristine || submitting || isInitialLocation}
             className="btn btn--outline"
-            onClick={this.props.reset}
+            onClick={this.resetForm}
           >
             Reset
           </button>
