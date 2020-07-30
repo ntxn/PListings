@@ -309,6 +309,15 @@ body {
     .icon:active svg, .icon:focus svg {
       color: var(--color-primary); }
 
+.btn-loader {
+  width: 14rem;
+  background-color: var(--color-primary);
+  border-radius: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem; }
+
 .location {
   position: relative; }
   .location__list {

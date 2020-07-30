@@ -13,7 +13,7 @@ import {
 } from 'redux-form';
 import PulseLoader from 'react-spinners/PulseLoader';
 
-import { searchLocation, updateProfile } from '../../actions';
+import { searchLocation, updateProfile, setBtnLoader } from '../../actions';
 import { ErrMsg, BaseLocation } from '../../../common';
 import {
   UpdateProfileAttrs as Attrs,
@@ -23,6 +23,7 @@ import {
   CombinedLocation,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
+import { BtnLoader } from '../Loader';
 
 interface FieldProps {
   label: string;
@@ -36,11 +37,13 @@ interface StateProps {
   user: UserDoc;
   searchedLocations: SearchedLocation[];
   locationValue: string | Geolocation;
+  btnLoading: boolean;
 }
 
 interface DispatchProps<A> {
   updateProfile(formValues: A): void;
   searchLocation(term?: string): void;
+  setBtnLoader(value: boolean): void;
 }
 
 type FormProps<A> = StateProps & DispatchProps<A>;
@@ -330,23 +333,25 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     dispatch,
     getState
   ) => {
-    const { location } = formValues;
-    if (location && typeof location === 'string') {
-      // If the location input value is a string representation of the currently
-      // chosen location object (which is store in this class state object),
-      // then restore the location value to be that object because we submit an
-      // object to the db, not a string.
-      if (this.isSameLocation(location, this.state.location))
-        formValues.location = this.state.location;
+    // If the location input value is a string representation of the currently
+    // chosen location object (which is store in this class state object),
+    // then restore the location value to be that object because we submit an
+    // object to the db, not a string.
+    if (
+      typeof formValues.location === 'string' &&
+      this.isSameLocation(formValues.location, this.state.location)
+    )
+      formValues.location = this.state.location;
 
-      const error = { location: ErrMsg.LocationDropdownListSelection };
+    if (typeof formValues.location === 'object')
+      return Promise.resolve(formValues);
 
-      if (getState!().searchedLocations.length === 0)
-        error.location = ErrMsg.LocationInvalid;
+    const error = { location: ErrMsg.LocationDropdownListSelection };
 
-      return Promise.reject(error);
-    }
-    return Promise.resolve(formValues);
+    if (getState!().searchedLocations.length === 0)
+      error.location = ErrMsg.LocationInvalid;
+
+    return Promise.reject(error);
   };
 
   /**
@@ -354,6 +359,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
    * Before calling updateProfile, check if the location input value is valid
    */
   onSubmit = (formValues: Attrs, dispatch: Dispatch): void => {
+    this.props.setBtnLoader(true);
     return (
       //@ts-ignore
       dispatch(this.asyncValidatorDispatcher(formValues))
@@ -361,6 +367,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
         .catch((err: Record<string, string>) => {
           throw new SubmissionError(err);
         })
+        .finally(() => this.props.setBtnLoader(false))
     );
   };
 
@@ -417,20 +424,6 @@ class Form extends React.Component<ReduxFormProps, FormState> {
         </div>
         <div className="form__btn form__btn--right">
           <button
-            type="submit"
-            disabled={
-              pristine ||
-              invalid ||
-              submitting ||
-              isInitialLocation ||
-              !validLocation
-            }
-            className="btn btn--filled"
-          >
-            Update Profile
-          </button>
-
-          <button
             type="button"
             disabled={pristine || submitting || isInitialLocation}
             className="btn btn--outline"
@@ -438,6 +431,24 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           >
             Reset
           </button>
+
+          {this.props.btnLoading ? (
+            <BtnLoader />
+          ) : (
+            <button
+              type="submit"
+              disabled={
+                pristine ||
+                invalid ||
+                submitting ||
+                isInitialLocation ||
+                !validLocation
+              }
+              className="btn btn--filled"
+            >
+              Update Profile
+            </button>
+          )}
         </div>
       </form>
     );
@@ -446,6 +457,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
 const ReduxForm = reduxForm<Attrs, FormProps<Attrs>>({
   form: 'updateProfileForm',
+  enableReinitialize: true,
   validate: ({ name, email, location }) => {
     const errors = {
       name: ErrMsg.NameRequired,
@@ -465,12 +477,13 @@ const selector = formValueSelector('updateProfileForm');
 
 const mapStateToProps = (state: StoreState) => {
   const locationValue = selector(state, 'location');
-  const { user, searchedLocations } = state;
+  const { user, searchedLocations, btnLoading } = state;
   const { name, email, location, bio } = user!;
   return {
     searchedLocations,
     user,
     locationValue,
+    btnLoading,
     initialValues: { name, email, location, bio },
   };
 };
@@ -478,5 +491,6 @@ const mapStateToProps = (state: StoreState) => {
 export const UpdateProfileForm = connect(mapStateToProps, {
   searchLocation,
   updateProfile,
+  setBtnLoader,
   // @ts-ignore
 })(ReduxForm);
