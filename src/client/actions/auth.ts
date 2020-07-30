@@ -75,7 +75,7 @@ export const updatePassword = (
   formValue: UpdatePasswordAttrs
 ): FunctionalAction<UpdatePasswordAction> =>
   catchSubmissionError(async dispatch => {
-    const { data } = await axios.post(ApiRoutes.UpdateMyPassword, formValue);
+    const { data } = await axios.patch(ApiRoutes.UpdateMyPassword, formValue);
 
     dispatch({
       type: ActionTypes.updatePassword,
@@ -102,4 +102,6 @@ export const updateProfile = (
       type: ActionTypes.updateProfile,
       payload: data.data,
     });
+
+    history.replace('/user/account-settings');
   });
