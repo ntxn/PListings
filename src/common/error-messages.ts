@@ -63,4 +63,7 @@ export enum ErrMsg {
   BrandMaxLength = 'Brand length cannot be over 100 characters',
   OwnerRequired = 'A listing must belong to a user',
   UnauthorizedToMadeChangesToOtherUsersListings = 'You cannot make changes to listings that you do not own',
+
+  // Image
+  ImageInvalid = 'Not an image. Please upload only image',
 }
