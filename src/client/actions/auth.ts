@@ -95,18 +95,34 @@ export const updateProfile = (
   catchSubmissionError(async dispatch => {
     const { location } = formValues;
     formValues.location = {
-      coordinates: [location.longitude!, location.latitude!],
+      coordinates: location.coordinates || [
+        location.longitude!,
+        location.latitude!,
+      ],
       zip: location.zip,
       city: location.city,
       state: location.state,
       country: 'United States',
     };
 
-    const { data } = await axios.patch(ApiRoutes.UpdateMyAccount, formValues);
+    let response;
+
+    if (!formValues.photo)
+      response = await axios.patch(ApiRoutes.UpdateMyAccount, formValues);
+    else {
+      const formData = new FormData();
+      formData.append('name', formValues.name);
+      formData.append('email', formValues.email);
+      formData.append('location', JSON.stringify(formValues.location));
+      if (formValues.bio) formData.append('bio', formValues.bio);
+      formData.append('photo', formValues.photo[0]);
+
+      response = await axios.patch(ApiRoutes.UpdateMyAccount, formData);
+    }
 
     dispatch({
       type: ActionTypes.updateProfile,
-      payload: data.data,
+      payload: response!.data.data,
     });
 
     history.replace('/user/account-settings');
