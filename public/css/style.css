@@ -91,6 +91,7 @@
   --color-white: #fff;
   --color-black: #000;
   --color-red: #f30000;
+  --color-red-light: #eb4d4b;
   --color-grey-light-1: #f3f3f3;
   --color-grey-light-2: #e0e0e0;
   --color-grey-light-3: #cecece;
@@ -125,6 +126,23 @@ body {
   font-weight: 400;
   line-height: 1.7;
   color: var(--color-grey-dark-3); }
+
+.alert {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  color: var(--color-white);
+  padding: 1rem 4rem;
+  font-size: 1.6rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25); }
+  .alert--success {
+    background-color: var(--color-secondary-dark); }
+  .alert--error {
+    background-color: var(--color-red-light); }
 
 .btn, .btn:link, .btn:visited {
   font-size: var(--default-font-size);

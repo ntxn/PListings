@@ -14,8 +14,9 @@ import {
   FunctionalAction,
 } from '../utilities';
 import { UserAttrs } from '../../server/models';
-import { ApiRoutes, ErrMsg } from '../../common';
-import { SubmissionError } from 'redux-form';
+import { ApiRoutes } from '../../common';
+import { reset } from 'redux-form';
+import { AlertType, showAlert } from '.././components/alert';
 
 export const fetchCurrentUser = (): FunctionalAction<
   FetchCurrentUserAction
@@ -55,6 +56,7 @@ export const logIn = (formValue: {
       payload: data.data,
     });
 
+    showAlert(AlertType.Success, 'Logged in successfully');
     history.push('/');
   });
 
@@ -81,6 +83,10 @@ export const updatePassword = (
       type: ActionTypes.updatePassword,
       payload: data.data,
     });
+
+    showAlert(AlertType.Success, 'Password updated successfully');
+    //@ts-ignore
+    dispatch(reset('updatePasswordForm'));
   });
 
 export const updateProfile = (
@@ -104,4 +110,5 @@ export const updateProfile = (
     });
 
     history.replace('/user/account-settings');
+    showAlert(AlertType.Success, 'Account updated successfully');
   });
