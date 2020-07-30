@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import { Request, Response, NextFunction } from 'express';
 import {
   controller,
@@ -23,6 +26,8 @@ import {
   NotFoundError,
   BadRequestError,
   NotAuthorizedError,
+  multerUpload,
+  resizeImage,
   propLengthValidator,
   createSendCookieWithToken,
   removeSendExpiredCookieToken,
@@ -57,6 +62,21 @@ const updatePasswordRestrictor: MiddlewareHandler = (
 
   next();
 };
+
+const resizeUserPhoto = catchAsync(async (req: CustomRequest, res, next) => {
+  if (!req.file) return next();
+
+  req.body.location = JSON.parse(req.body.location);
+
+  req.body.photo = `user-${req.user!.id}-${Date.now()}.jpeg`;
+  await resizeImage(req.file.buffer, 300, 300, 'users', req.body.photo);
+
+  fs.unlink(path.join('public/img/users', req.user!.photo!), err => {
+    console.log(`Issue with deleting user's previous photo`, err);
+  });
+
+  next();
+});
 
 /**
  * Controller for User resource routes
@@ -107,6 +127,8 @@ class UserController {
    * Update the current logged in user's account except password
    */
   @use(updateOne(User))
+  @use(resizeUserPhoto)
+  @use(multerUpload.single('photo'))
   @use(updatePasswordRestrictor)
   @use(addIdToReqParams)
   @use(authenticationChecker)
