@@ -13,4 +13,7 @@ export enum ActionTypes {
 
   // search for matching locations from opendata soft - US Zip Code Latitude and Longitude
   searchLocation,
+
+  // loader
+  setBtnLoader,
 }

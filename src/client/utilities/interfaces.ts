@@ -55,6 +55,12 @@ export interface SearchLocationAction {
   payload: SearchedLocation[];
 }
 
+// Loader
+export interface SetBtnLoaderAction {
+  type: ActionTypes.setBtnLoader;
+  payload: boolean;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -64,7 +70,8 @@ export type Action =
   | UpdatePasswordAction
   | GetLocationWithPermissionAction
   | GetLocationByIPAction
-  | SearchLocationAction;
+  | SearchLocationAction
+  | SetBtnLoaderAction;
 
 // Store State
 export interface StoreState {
@@ -72,6 +79,7 @@ export interface StoreState {
   form: FormStateMap;
   currentLocation: GeoLocation;
   searchedLocations: SearchedLocation[];
+  btnLoading: boolean;
 }
 
 export interface SearchedLocation {
