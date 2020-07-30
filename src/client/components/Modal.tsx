@@ -107,7 +107,11 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
             onClick={props.closeUserMenu}
           >
             {props.user.photo ? (
-              <img alt="User Avatar" className="user-menu__option__avatar" />
+              <img
+                src={`/img/users/${props.user.photo}`}
+                alt={`${props.user.name} photo`}
+                className="user-menu__option__avatar"
+              />
             ) : (
               <BsPersonFill
                 title="Default Avatar"

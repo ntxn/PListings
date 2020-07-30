@@ -137,7 +137,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
    * Render user's profile photo and a file upload button to change their profile photo
    */
   renderPhoto: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input: { value, name, ...inputProps },
+    input: { value, ...inputProps },
     meta,
   }): JSX.Element => {
     const err = meta.error && meta.touched;
@@ -177,7 +177,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
         <div className="form__user-photo">
           <img
             id={imgId}
-            src={initialPhoto}
+            src={`/img/users/${initialPhoto}`}
             alt={`${userName} photo`}
             className={displayImage ? '' : 'u-hide'}
           />
@@ -189,12 +189,15 @@ class Form extends React.Component<ReduxFormProps, FormState> {
         <input
           {...inputProps}
           type="file"
-          id={name}
+          id={inputProps.name}
           accept="image/*"
           onChange={onChange}
           className="form__upload"
         />
-        <label htmlFor={name} className="btn-text btn-text--underlined--orange">
+        <label
+          htmlFor={inputProps.name}
+          className="btn-text btn-text--underlined--orange"
+        >
           Choose new photo
         </label>
         <div className="form__error">{err ? meta.error : null}</div>
@@ -271,7 +274,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
    * render a text input field with autocomplete when user enters addresses
    */
   renderLocation: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input: { value, name, onChange: inputOnChange, ...inputProps },
+    input: { value, onChange: inputOnChange, ...inputProps },
     meta,
     inputClassName,
     ...props
@@ -302,7 +305,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
     return (
       <>
-        <label className="form__label" htmlFor={name}>
+        <label className="form__label" htmlFor={inputProps.name}>
           {props.label}
         </label>
         <input
@@ -311,7 +314,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           autoComplete="off"
           placeholder="Enter city or zip code"
           className={`${err ? 'form__input--error' : ''} ${inputClassName}`}
-          id={name}
+          id={inputProps.name}
           onChange={onChange(inputOnChange)}
           value={typeof value === 'object' ? this.getLocationStr(value) : value}
           onKeyDown={this.inputOnKeyDown}
@@ -360,6 +363,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
    */
   onSubmit = (formValues: Attrs, dispatch: Dispatch): void => {
     this.props.setBtnLoader(true);
+
     return (
       //@ts-ignore
       dispatch(this.asyncValidatorDispatcher(formValues))

@@ -26,9 +26,13 @@ const renderNavigationAuthenticated = (
       <div className="icon">
         <FaBell title="Notifications" />
       </div>
-      <div className="avatar" onClick={() => setUserMenuModal(true)}>
+      <div onClick={() => setUserMenuModal(true)}>
         {props.user!.photo ? (
-          <img alt="User photo" />
+          <img
+            src={`/img/users/${props.user!.photo}`}
+            alt={`${props.user!.name} photo`}
+            className="icon"
+          />
         ) : (
           <div className="icon">
             <BsPersonFill title="Default Avatar" />
