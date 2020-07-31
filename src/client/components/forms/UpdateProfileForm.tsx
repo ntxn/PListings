@@ -7,20 +7,20 @@ import {
   reduxForm,
   WrappedFieldProps,
   InjectedFormProps,
-  EventOrValueHandler,
   formValueSelector,
   SubmissionError,
 } from 'redux-form';
-import PulseLoader from 'react-spinners/PulseLoader';
 
 import { searchLocation, updateProfile, setBtnLoader } from '../../actions';
-import { ErrMsg, BaseLocation } from '../../../common';
+import { ErrMsg, GeoLocation } from '../../../common';
 import {
   UpdateProfileAttrs as Attrs,
   formFieldValues,
   SearchedLocation,
   StoreState,
   CombinedLocation,
+  LocationInputAutocomplete,
+  isSameLocation,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
@@ -36,7 +36,7 @@ interface FieldProps {
 interface StateProps {
   user: UserDoc;
   searchedLocations: SearchedLocation[];
-  locationValue: string | Geolocation;
+  locationValue: string | GeoLocation;
   btnLoading: boolean;
 }
 
@@ -51,31 +51,15 @@ type ReduxFormProps = InjectedFormProps<Attrs, FormProps<Attrs>> &
   FormProps<Attrs>;
 
 interface FormState {
-  location: CombinedLocation;
-  activeOption: number;
-  invalidSearchTerm: boolean;
-  locationLoading: boolean;
+  selectedLocation: CombinedLocation;
 }
-
 class Form extends React.Component<ReduxFormProps, FormState> {
   constructor(props: ReduxFormProps) {
     super(props);
     this.state = {
-      location: this.props.initialValues.location!,
-      activeOption: 0,
-      invalidSearchTerm: false,
-      locationLoading: false,
+      selectedLocation: props.initialValues.location!,
     };
   }
-
-  typingTimeout: NodeJS.Timeout = setTimeout(() => {}, 10000);
-  locationLoadingTimeout: NodeJS.Timeout = setTimeout(() => {}, 10000);
-
-  isSameLocation = (value: string, location: BaseLocation): boolean =>
-    value === this.getLocationStr(location);
-
-  getLocationStr = (location: BaseLocation): string =>
-    `${location.city}, ${location.state} ${location.zip}`;
 
   /**
    * Render text input for simple input like name, email
@@ -205,125 +189,6 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     );
   };
 
-  selectLocation = (location: SearchedLocation) => {
-    this.props.change('location', location.fields);
-    this.props.searchLocation();
-    this.setState({ location: location.fields });
-  };
-
-  inputOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-    const { activeOption } = this.state;
-    const { searchedLocations } = this.props;
-    if (searchedLocations.length === 0) return;
-
-    if (event.keyCode === 13) {
-      this.selectLocation(searchedLocations[activeOption]);
-      this.setState({ activeOption: 0 });
-    } else if (event.keyCode === 38) {
-      if (activeOption === 0) return;
-      this.setState(prevState => {
-        return { activeOption: prevState.activeOption - 1 };
-      });
-    } else if (event.keyCode === 40) {
-      if (activeOption + 1 === searchedLocations.length) return;
-      this.setState(prevState => {
-        return { activeOption: prevState.activeOption + 1 };
-      });
-    }
-  };
-
-  isInvalidSearchTerm = () => {
-    const { locationValue: value, searchedLocations } = this.props;
-    const { location } = this.state;
-    if (
-      typeof value === 'string' &&
-      !this.isSameLocation(value, location) &&
-      searchedLocations.length === 0
-    )
-      this.setState({ invalidSearchTerm: true });
-    else this.setState({ invalidSearchTerm: false });
-  };
-
-  renderSearchedLocations = (): JSX.Element => {
-    return (
-      <ul
-        className={
-          this.props.searchedLocations.length > 0
-            ? 'location__list u-margin-top-xxsmall'
-            : ''
-        }
-      >
-        {this.props.searchedLocations.map((location, index) => (
-          <li
-            key={location.recordid}
-            onClick={() => this.selectLocation(location)}
-            className={`location__list__item ${
-              this.state.activeOption === index
-                ? 'location__list__item--active'
-                : ''
-            }`}
-          >
-            {this.getLocationStr(location.fields)}
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-  /***
-   * render a text input field with autocomplete when user enters addresses
-   */
-  renderLocation: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input: { value, onChange: inputOnChange, ...inputProps },
-    meta,
-    inputClassName,
-    ...props
-  }): JSX.Element => {
-    const err = meta.error && meta.touched;
-
-    const onChange = (inputOnChange: EventOrValueHandler<ChangeEvent>) => (
-      event: ChangeEvent<HTMLInputElement>
-    ) => {
-      this.props.searchLocation();
-      clearTimeout(this.typingTimeout);
-      clearTimeout(this.locationLoadingTimeout);
-
-      const { value: userInput } = event.target;
-      if (userInput) {
-        this.locationLoadingTimeout = setTimeout(
-          () => this.setState({ locationLoading: true }),
-          200
-        );
-        this.typingTimeout = setTimeout(async () => {
-          await this.props.searchLocation(userInput);
-          this.setState({ locationLoading: false });
-          this.isInvalidSearchTerm();
-        }, 500);
-      }
-      inputOnChange(event);
-    };
-
-    return (
-      <>
-        <label className="form__label" htmlFor={inputProps.name}>
-          {props.label}
-        </label>
-        <input
-          {...inputProps}
-          {...props}
-          autoComplete="off"
-          placeholder="Enter city or zip code"
-          className={`${err ? 'form__input--error' : ''} ${inputClassName}`}
-          id={inputProps.name}
-          onChange={onChange(inputOnChange)}
-          value={typeof value === 'object' ? this.getLocationStr(value) : value}
-          onKeyDown={this.inputOnKeyDown}
-        />
-        <div className="form__error">{err ? meta.error : null}</div>
-      </>
-    );
-  };
-
   /**
    * An async validator to check if the location input is valid.
    * Location input validator has to be asynchorous because we don't
@@ -342,9 +207,9 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     // object to the db, not a string.
     if (
       typeof formValues.location === 'string' &&
-      this.isSameLocation(formValues.location, this.state.location)
+      isSameLocation(formValues.location, this.state.selectedLocation)
     )
-      formValues.location = this.state.location;
+      formValues.location = this.state.selectedLocation;
 
     if (typeof formValues.location === 'object')
       return Promise.resolve(formValues);
@@ -382,50 +247,45 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
   render() {
     const { handleSubmit, invalid, submitting, error, pristine } = this.props;
-    const { name, email, location, photo, bio } = formFieldValues;
+    const { name, email, photo, bio } = formFieldValues;
     const isInitialLocation =
       typeof this.props.locationValue === 'string' &&
-      this.isSameLocation(
+      isSameLocation(
         this.props.locationValue,
         this.props.initialValues.location!
       );
 
     const validLocation =
       typeof this.props.locationValue === 'object' ||
-      this.isSameLocation(this.props.locationValue, this.state.location);
-
-    const locationInputClassName = `form__input ${
-      this.state.invalidSearchTerm ? 'form__input--error' : ''
-    } ${this.props.searchedLocations.length > 0 ? 'location__input' : ''}`;
+      isSameLocation(this.props.locationValue, this.state.selectedLocation);
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
         <input type="submit" disabled style={{ display: 'none' }} />
+
         {[name, email].map(field => (
           <Field key={field.name} component={this.renderInput} {...field} />
         ))}
-        <div className="location">
-          <Field
-            key={location.name}
-            component={this.renderLocation}
-            {...location}
-            inputClassName={locationInputClassName}
-          />
-          <div className="location__loader">
-            <PulseLoader
-              size={5}
-              margin={2}
-              color={'#7ed56f'}
-              loading={this.state.locationLoading}
-            />
-          </div>
-          {this.renderSearchedLocations()}
-        </div>
+
+        <LocationInputAutocomplete
+          change={this.props.change}
+          selectedLocation={this.state.selectedLocation}
+          updateSelectedLocation={(selectedLocation: CombinedLocation) =>
+            this.setState({ selectedLocation })
+          }
+          currentLocationInputValue={this.props.locationValue}
+          searchLocation={this.props.searchLocation}
+          searchedLocations={this.props.searchedLocations}
+        />
+
         <Field key={bio.name} component={this.renderTextarea} {...bio} />
+
         <Field key={photo.name} component={this.renderPhoto} {...photo} />
+
         <div className="form__error form__error-general">
           {error ? error : null}
         </div>
+
         <div className="form__btn form__btn--right">
           <button
             type="button"
