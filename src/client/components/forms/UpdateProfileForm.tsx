@@ -19,11 +19,11 @@ import {
   SearchedLocation,
   StoreState,
   CombinedLocation,
-  LocationInputAutocomplete,
   isSameLocation,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
+import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
 
 interface FieldProps {
   label: string;
