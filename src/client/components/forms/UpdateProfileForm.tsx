@@ -20,18 +20,13 @@ import {
   StoreState,
   CombinedLocation,
   isSameLocation,
+  renderTextInput,
+  renderTextarea,
+  FieldProps,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
-
-interface FieldProps {
-  label: string;
-  type: string;
-  placeholder?: string;
-  required: boolean;
-  inputClassName: string;
-}
 
 interface StateProps {
   user: UserDoc;
@@ -60,62 +55,6 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       selectedLocation: props.initialValues.location!,
     };
   }
-
-  /**
-   * Render text input for simple input like name, email
-   */
-  renderInput: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input,
-    meta,
-    ...props
-  }): JSX.Element => {
-    const err = meta.error && meta.touched;
-    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
-    return (
-      <div className="form__group">
-        <label className="form__label" htmlFor={input.name}>
-          {props.label}
-        </label>
-        <input
-          className={inputClassName}
-          id={input.name}
-          {...input}
-          {...props}
-        />
-        <div className="form__error">{err ? meta.error : null}</div>
-      </div>
-    );
-  };
-
-  /**
-   * Render a textarea for user's about me
-   */
-  renderTextarea: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input,
-    meta,
-    ...props
-  }): JSX.Element => {
-    const err = meta.error && meta.touched;
-    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
-    const maxChars = 150;
-
-    return (
-      <div className="form__group u-margin-top-2rem">
-        <label className="form__label" htmlFor={input.name}>
-          {props.label}
-        </label>
-        <textarea
-          {...input}
-          maxLength={maxChars}
-          className={inputClassName}
-          id={input.name}
-          placeholder={props.placeholder}
-        />
-        <div className="form__length">{`${input.value.length} / ${maxChars}`}</div>
-        <div className="form__error">{err ? meta.error : null}</div>
-      </div>
-    );
-  };
 
   /**
    * Render user's profile photo and a file upload button to change their profile photo
@@ -264,7 +203,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
         <input type="submit" disabled style={{ display: 'none' }} />
 
         {[name, email].map(field => (
-          <Field key={field.name} component={this.renderInput} {...field} />
+          <Field key={field.name} component={renderTextInput} {...field} />
         ))}
 
         <LocationInputAutocomplete
@@ -278,7 +217,9 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           searchedLocations={this.props.searchedLocations}
         />
 
-        <Field key={bio.name} component={this.renderTextarea} {...bio} />
+        <div className="u-margin-top-2rem">
+          <Field key={bio.name} component={renderTextarea} {...bio} />
+        </div>
 
         <Field key={photo.name} component={this.renderPhoto} {...photo} />
 

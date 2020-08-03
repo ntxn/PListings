@@ -1,7 +1,7 @@
 import React from 'react';
-import { Field, WrappedFieldProps, InjectedFormProps } from 'redux-form';
+import { Field, InjectedFormProps } from 'redux-form';
 
-import { FormProps, FieldProps } from '../../utilities';
+import { FormProps, renderTextInput } from '../../utilities';
 
 /**
  * A generic Form to render input text.
@@ -10,29 +10,6 @@ import { FormProps, FieldProps } from '../../utilities';
 export class Form<Attrs> extends React.Component<
   InjectedFormProps<Attrs, FormProps<Attrs>> & FormProps<Attrs>
 > {
-  renderInput: React.StatelessComponent<WrappedFieldProps & FieldProps> = ({
-    input,
-    meta,
-    ...props
-  }): JSX.Element => {
-    const err = meta.error && meta.touched;
-    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
-    return (
-      <div className="form__group">
-        <label className="form__label" htmlFor={input.name}>
-          {props.label}
-        </label>
-        <input
-          className={inputClassName}
-          id={input.name}
-          {...input}
-          {...props}
-        />
-        <div className="form__error">{err ? meta.error : null}</div>
-      </div>
-    );
-  };
-
   onSubmit = (formValues: Attrs): void => this.props.onSubmit(formValues);
 
   render() {
@@ -42,7 +19,7 @@ export class Form<Attrs> extends React.Component<
       <form onSubmit={handleSubmit(this.onSubmit)} className="form">
         <input type="submit" disabled style={{ display: 'none' }} />
         {formFields.map(field => (
-          <Field key={field.name} component={this.renderInput} {...field} />
+          <Field key={field.name} component={renderTextInput} {...field} />
         ))}
         <div className="form__error form__error-general">
           {error ? error : null}
