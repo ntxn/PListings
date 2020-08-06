@@ -7,9 +7,9 @@ import { fetchCurrentUser, getLocationByIP } from '../actions';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { NotFound } from './NotFound';
-import { Listings } from './Listings';
 import { SignUp, LogIn } from './auth';
 import { AccountSettings } from './user';
+import { NewListing, Listings, Listing, EditListing } from './listings';
 
 interface AppProps {
   fetchCurrentUser(): Promise<void>;
@@ -37,6 +37,10 @@ const _App = (props: AppProps): JSX.Element => {
                 exact
                 component={AccountSettings}
               />
+              <Route path="/listings" exact component={Listings} />
+              <Route path="/listings/create" exact component={NewListing} />
+              <Route path="/listings/edit/:id" exact component={EditListing} />
+              <Route path="/listings/:id" exact component={Listing} />
               <Route component={NotFound} />
             </Switch>
           </div>
