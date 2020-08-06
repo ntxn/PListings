@@ -2,7 +2,7 @@ import { Dispatch, Action as ReduxAction } from 'redux';
 import { FormStateMap } from 'redux-form';
 
 import { ActionTypes } from './action-types';
-import { UserDoc } from '../../server/models';
+import { UserDoc, ListingDoc } from '../../server/models';
 import { GeoLocation, BaseLocation } from '../../common';
 
 // ACTIONS
@@ -61,6 +61,22 @@ export interface SetBtnLoaderAction {
   payload: boolean;
 }
 
+// Listings
+export interface CreateListingAction {
+  type: ActionTypes.createListing;
+  payload: ListingDoc;
+}
+
+export interface FetchListingAction {
+  type: ActionTypes.fetchListing;
+  payload: ListingDoc;
+}
+
+export interface EditListingAction {
+  type: ActionTypes.editListing;
+  payload: ListingDoc;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -71,11 +87,15 @@ export type Action =
   | GetLocationWithPermissionAction
   | GetLocationByIPAction
   | SearchLocationAction
-  | SetBtnLoaderAction;
+  | SetBtnLoaderAction
+  | CreateListingAction
+  | FetchListingAction
+  | EditListingAction;
 
 // Store State
 export interface StoreState {
   user: UserDoc | null;
+  listing: ListingDoc | null;
   form: FormStateMap;
   currentLocation: GeoLocation;
   searchedLocations: SearchedLocation[];
@@ -144,4 +164,10 @@ export interface UpdateProfileAttrs {
   location: CombinedLocation;
   photo?: string;
   bio?: string;
+}
+
+export interface ListingImagesParams {
+  newImages: Record<number, File>;
+  existingImages?: string[];
+  deletedImages?: string[];
 }
