@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import { Request, Response, NextFunction } from 'express';
 import { Listing } from '../models';
 import { controller, GET, POST, PATCH, DELETE, use } from '../decorators';
@@ -15,6 +18,8 @@ import {
   catchAsync,
   NotFoundError,
   NotAuthorizedError,
+  multerUpload,
+  resizeImage,
 } from '../utils';
 
 const listingProps = [
@@ -87,6 +92,46 @@ const listingOwnerChecker: MiddlewareHandler = catchAsync(
 );
 
 /**
+ * A middleware to esize all photos added to a listing
+ */
+const resizeListingPhotos = catchAsync(
+  async (req: CustomRequest, res, next) => {
+    if (!req.files) return next();
+
+    (req.files as Express.Multer.File[]).forEach(async (file, i) => {
+      req.body.photos.push(`listing-${req.user!.id}-${Date.now()}.jpeg`);
+      await resizeImage(file.buffer, 600, 600, 'listings', req.body.photos[i]);
+    });
+    next();
+  }
+);
+
+/**
+ * Middleware to parse string to array or object.
+ * When array/object is passed in a FormData obj, it has to be stringified
+ */
+const parseStrData: MiddlewareHandler = (req, res, next) => {
+  // req.body.location = JSON.parse(req.body.location);
+
+  req.body.photos =
+    req.body.photos && req.body.photos.length > 0
+      ? JSON.parse(req.body.photos)
+      : [];
+
+  if (req.body.deletedImages) {
+    const deletedImages = JSON.parse(req.body.deletedImages) as string[];
+    deletedImages.forEach(filename =>
+      fs.unlink(path.join('public/img/users', filename), err => {
+        console.log(`Issue with deleting old listing photos from db`, err);
+      })
+    );
+    delete req.body.deletedImages;
+  }
+
+  next();
+};
+
+/**
  * Handlers for listings' routes
  */
 @controller(Base.Listings)
@@ -117,6 +162,7 @@ class ListingController {
   getListing(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
       const listing = await Listing.findById(req.params.id);
+
       if (!listing) return next(new NotFoundError(ErrMsg.NoDocWithId));
 
       if (!req.user || (req.user && req.user.id !== listing.owner.id))
@@ -133,7 +179,10 @@ class ListingController {
    * category, subcategory, location, condition, description, brand, owner
    */
   @use(createOne(Listing))
+  @use(resizeListingPhotos)
+  @use(parseStrData)
   @use(prepListingReqBody(...listingProps, 'owner'))
+  @use(multerUpload.array('newImages'))
   @use(authenticationChecker)
   @POST(Routes.Listings)
   createListing(req: Request, res: Response): void {}
