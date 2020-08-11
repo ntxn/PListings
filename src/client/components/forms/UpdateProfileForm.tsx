@@ -23,9 +23,9 @@ import {
   renderTextInput,
   renderTextarea,
   FieldProps,
+  renderBtns,
 } from '../../utilities';
 import { UserDoc } from '../../../server/models';
-import { BtnLoader } from '../Loader';
 import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
 
 interface StateProps {
@@ -185,18 +185,8 @@ class Form extends React.Component<ReduxFormProps, FormState> {
   };
 
   render() {
-    const { handleSubmit, invalid, submitting, error, pristine } = this.props;
+    const { handleSubmit, error } = this.props;
     const { name, email, photo, bio } = formFieldValues;
-    const isInitialLocation =
-      typeof this.props.locationValue === 'string' &&
-      isSameLocation(
-        this.props.locationValue,
-        this.props.initialValues.location!
-      );
-
-    const validLocation =
-      typeof this.props.locationValue === 'object' ||
-      isSameLocation(this.props.locationValue, this.state.selectedLocation);
 
     return (
       <form onSubmit={handleSubmit(this.onSubmit)}>
@@ -227,34 +217,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           {error ? error : null}
         </div>
 
-        <div className="form__btn form__btn--right">
-          <button
-            type="button"
-            disabled={pristine || submitting || isInitialLocation}
-            className="btn btn--outline"
-            onClick={this.resetForm}
-          >
-            Reset
-          </button>
-
-          {this.props.btnLoading ? (
-            <BtnLoader />
-          ) : (
-            <button
-              type="submit"
-              disabled={
-                pristine ||
-                invalid ||
-                submitting ||
-                isInitialLocation ||
-                !validLocation
-              }
-              className="btn btn--filled"
-            >
-              Update Profile
-            </button>
-          )}
-        </div>
+        {renderBtns(this.props, 'Update Profile', this.state.selectedLocation)}
       </form>
     );
   }

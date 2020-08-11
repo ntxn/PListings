@@ -1,5 +1,5 @@
 /**
- *
+ * Process form values (except photos) to FormData before submission
  */
 export const processFormValuesToFormData = (
   formValues: Record<string, any>,

@@ -21,10 +21,11 @@ import {
   SearchedLocation,
   StoreState,
   isSameLocation,
+  renderBtns,
 } from '../../utilities';
 import { Categories, Subcategories, Conditions, ErrMsg } from '../../../common';
 import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
-import { searchLocation } from '../../actions';
+import { searchLocation, setBtnLoader } from '../../actions';
 
 interface DropdownFieldProps {
   fieldName: string;
@@ -43,11 +44,14 @@ interface StateProps {
   subcategory: string;
   user: UserDoc;
   locationValue: string;
+  btnLoading: boolean;
 }
 
 interface DispatchProps {
   searchLocation(term?: string): void;
+  setBtnLoader(value: boolean): void;
 }
+
 type FormProps = {
   submitBtnText: string;
   formTitle: string;
@@ -287,6 +291,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
   };
 
   onSubmit = (formValues: ListingAttrs, dispatch: Dispatch): void => {
+    this.props.setBtnLoader(true);
     delete formValues.photos;
 
     //@ts-ignore
@@ -314,7 +319,8 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       })
       .catch((err: Record<string, string>) => {
         throw new SubmissionError(err);
-      });
+      })
+      .finally(() => this.props.setBtnLoader(false));
   };
 
   render() {
@@ -322,6 +328,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     const subcategories = this.props.category
       ? (Object.values(Subcategories[this.props.category]) as string[])
       : [];
+    const { error } = this.props;
 
     return (
       <div className="container__form">
@@ -384,9 +391,15 @@ class Form extends React.Component<ReduxFormProps, FormState> {
             <Field component={renderTextarea} {...description} />
           </div>
 
-          <button type="submit" className="btn btn--filled">
-            {this.props.submitBtnText}
-          </button>
+          <div className="form__error form__error-general">
+            {error ? error : null}
+          </div>
+
+          {renderBtns(
+            this.props,
+            this.props.submitBtnText,
+            this.state.selectedLocation
+          )}
         </form>
       </div>
     );
@@ -427,6 +440,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     user: state.user!,
     searchedLocations: state.searchedLocations,
+    btnLoading: state.btnLoading,
     category,
     subcategory,
     locationValue,
@@ -434,7 +448,10 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export const ListingForm = connect(mapStateToProps, { searchLocation })(
+export const ListingForm = connect(mapStateToProps, {
+  searchLocation,
+  setBtnLoader,
+})(
   //@ts-ignore
   ReduxForm
 );
