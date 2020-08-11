@@ -8,6 +8,7 @@ import {
   InjectedFormProps,
   formValueSelector,
   SubmissionError,
+  stopSubmit,
 } from 'redux-form';
 import { MdAddToPhotos } from 'react-icons/md';
 
@@ -59,7 +60,6 @@ type FormProps = {
     formValues: ListingAttrs,
     imagesParams: ListingImagesParams
   ): void;
-  images?: string[];
 } & StateProps &
   DispatchProps;
 
@@ -152,6 +152,10 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
     const onChange = (event: ChangeEvent<HTMLInputElement>) => {
       if (!event.target.files) return;
+
+      if (event.target.files.length > 0)
+        //@ts-ignore
+        this.props.dispatch(stopSubmit('listingForm', { photos: undefined }));
 
       let reader: FileReader;
       const addPhotosLabel = document.getElementById('form__label--add-photos');
