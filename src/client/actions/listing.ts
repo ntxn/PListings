@@ -40,6 +40,28 @@ export const createListing = (
       formData.append('newImages', file)
     );
 
+    const { location } = formValues;
+    formValues.location = {
+      coordinates: location.coordinates || [
+        //@ts-ignore
+        location.longitude!,
+        //@ts-ignore
+        location.latitude!,
+      ],
+      zip: location.zip,
+      city: location.city,
+      state: location.state,
+      country: 'United States',
+    };
+
+    formData.append('location', JSON.stringify(formValues.location));
+    delete formValues.location;
+
+    Object.keys(formValues).forEach(field =>
+      //@ts-ignore
+      formData.append(field, formValues[field])
+    );
+
     const { data } = await axios.post(ApiRoutes.Listings, formData);
 
     showAlert(AlertType.Success, 'Listing created successfully');
