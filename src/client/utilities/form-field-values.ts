@@ -34,13 +34,6 @@ export const formFieldValues = {
     placeholder: 'Current Password',
     label: 'Current Password',
   },
-  location: {
-    name: 'location',
-    type: 'text',
-    required: true,
-    placeholder: 'San Francisco, California',
-    label: 'Location',
-  },
   photo: {
     name: 'photo',
     type: 'file',
@@ -50,6 +43,32 @@ export const formFieldValues = {
     name: 'bio',
     placeholder: 'Tell us about yourself',
     label: 'Bio',
+    required: false,
+  },
+  title: {
+    name: 'title',
+    placeholder: 'What are you selling?',
+    label: 'Title',
+    required: true,
+  },
+  price: {
+    name: 'price',
+    placeholder: 'Set a competitive price',
+    label: 'Price',
+    type: 'number',
+    min: '0',
+    required: true,
+  },
+  description: {
+    name: 'description',
+    placeholder: 'Describe what you are selling, in detail',
+    label: 'Description',
+    required: false,
+  },
+  brand: {
+    name: 'brand',
+    placeholder: 'What is the brand of your item?',
+    label: 'Brand',
     required: false,
   },
 };
