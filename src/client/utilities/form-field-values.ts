@@ -57,6 +57,7 @@ export const formFieldValues = {
     label: 'Price',
     type: 'number',
     min: '0',
+    step: '.01',
     required: true,
   },
   description: {
