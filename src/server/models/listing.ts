@@ -13,7 +13,7 @@ export interface ListingAttrs extends ModelAttribute {
   title: string;
   photos: string[];
   price: number;
-  category: Categories;
+  category: string;
   subcategory: string;
   location: GeoLocation;
   owner: mongoose.Types.ObjectId;
@@ -26,7 +26,7 @@ export interface ListingDoc extends mongoose.Document {
   title: string;
   photos: string[];
   price: number;
-  category: Categories;
+  category: string;
   subcategory: string;
   location: GeoLocation;
   owner: UserDoc;
@@ -105,26 +105,22 @@ const listingSchema = new mongoose.Schema(
           ErrMsg.LocationCoorsLength,
         ],
       },
-      zip: String,
-      city: String,
-      state: String,
-      country: String,
-      // zip: {
-      //   type: String,
-      //   required: [true, ErrMsg.LocationZipRequired],
-      // },
-      // city: {
-      //   type: String,
-      //   required: [true, ErrMsg.LocationCityRequired],
-      // },
-      // state: {
-      //   type: String,
-      //   required: [true, ErrMsg.LocationStateRequired],
-      // },
-      // country: {
-      //   type: String,
-      //   required: [true, ErrMsg.LocationCountryRequired],
-      // },
+      zip: {
+        type: String,
+        required: [true, ErrMsg.LocationZipRequired],
+      },
+      city: {
+        type: String,
+        required: [true, ErrMsg.LocationCityRequired],
+      },
+      state: {
+        type: String,
+        required: [true, ErrMsg.LocationStateRequired],
+      },
+      country: {
+        type: String,
+        required: [true, ErrMsg.LocationCountryRequired],
+      },
     },
     owner: {
       type: mongoose.Types.ObjectId,

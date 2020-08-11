@@ -23,7 +23,7 @@ const title = 'Portable bench';
 const price = 40;
 const photos = ['itemPhoto.png'];
 const category = Categories.SportsAndOutdoors;
-const subcategory = Subcategories[category]['Camping Gear'];
+const subcategory = Subcategories[category]['Camping Gear']!;
 const location = DEFAULT_LOCATION;
 
 const createListing = async (attrs: ListingAttrs) => {

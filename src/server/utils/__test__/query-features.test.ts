@@ -7,7 +7,7 @@ import { Categories, GeoLocation, DEFAULT_LOCATION } from '../../../common';
 
 const createListing = async (
   price: number,
-  category: Categories,
+  category: string,
   subcategory: string,
   location: GeoLocation
 ) => {
