@@ -8,6 +8,8 @@ import {
   FunctionalAction,
   ListingImagesParams,
   FetchListingAction,
+  processCombinedLocationToGeoLocation,
+  processFormValuesToFormData,
 } from '../utilities';
 import { ListingAttrs } from '../../server/models';
 import { ApiRoutes } from '../../common';
@@ -40,27 +42,8 @@ export const createListing = (
       formData.append('newImages', file)
     );
 
-    const { location } = formValues;
-    formValues.location = {
-      coordinates: location.coordinates || [
-        //@ts-ignore
-        location.longitude!,
-        //@ts-ignore
-        location.latitude!,
-      ],
-      zip: location.zip,
-      city: location.city,
-      state: location.state,
-      country: 'United States',
-    };
-
-    formData.append('location', JSON.stringify(formValues.location));
-    delete formValues.location;
-
-    Object.keys(formValues).forEach(field =>
-      //@ts-ignore
-      formData.append(field, formValues[field])
-    );
+    processCombinedLocationToGeoLocation(formValues);
+    processFormValuesToFormData(formValues, formData);
 
     const { data } = await axios.post(ApiRoutes.Listings, formData);
 

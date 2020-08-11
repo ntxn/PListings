@@ -1,4 +1,5 @@
 import { BaseLocation } from '../../common';
+import { CombinedLocation } from './interfaces';
 
 /**
  * Create a string representation of a location object
@@ -14,3 +15,23 @@ export const isSameLocation = (
   value: string,
   location: BaseLocation
 ): boolean => value === getLocationStr(location);
+
+/**
+ *
+ */
+export const processCombinedLocationToGeoLocation = (formValues: {
+  location: CombinedLocation;
+}): void => {
+  const { location } = formValues;
+
+  formValues.location = {
+    coordinates: location.coordinates || [
+      location.longitude!,
+      location.latitude!,
+    ],
+    zip: location.zip,
+    city: location.city,
+    state: location.state,
+    country: 'United States',
+  };
+};

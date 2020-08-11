@@ -121,7 +121,7 @@ const parseStrData: MiddlewareHandler = (req, res, next) => {
   if (req.body.deletedImages) {
     const deletedImages = JSON.parse(req.body.deletedImages) as string[];
     deletedImages.forEach(filename =>
-      fs.unlink(path.join('public/img/users', filename), err => {
+      fs.unlink(path.join('public/img/listings', filename), err => {
         console.log(`Issue with deleting old listing photos from db`, err);
       })
     );
