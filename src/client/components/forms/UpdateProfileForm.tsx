@@ -199,7 +199,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       isSameLocation(this.props.locationValue, this.state.selectedLocation);
 
     return (
-      <form onSubmit={handleSubmit(this.onSubmit)} className="form">
+      <form onSubmit={handleSubmit(this.onSubmit)}>
         <input type="submit" disabled style={{ display: 'none' }} />
 
         {[name, email].map(field => (
