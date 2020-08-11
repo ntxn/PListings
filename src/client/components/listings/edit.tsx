@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+
 import { StoreState, ListingImagesParams } from '../../utilities';
 import { fetchListing, editListing } from '../../actions';
 import { ListingDoc, UserDoc, ListingAttrs } from '../../../server/models';
@@ -29,6 +30,8 @@ const _EditListing = (props: EditListingProps): JSX.Element => {
     return (
       <ListingForm
         sendRequest={props.editListing}
+        submitBtnText="Save"
+        formTitle="Edit listing"
         images={props.listing.photos}
       />
     );

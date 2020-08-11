@@ -9,7 +9,7 @@ import { Footer } from './Footer';
 import { NotFound } from './NotFound';
 import { SignUp, LogIn } from './auth';
 import { AccountSettings } from './user';
-import { NewListing, Listings, Listing, EditListing } from './listings';
+import { NewListing, EditListing, Listings, Listing } from './listings';
 
 interface AppProps {
   fetchCurrentUser(): Promise<void>;

@@ -17,7 +17,13 @@ interface NewListingProps {
 
 const _NewListing = (props: NewListingProps): JSX.Element => {
   const renderCreateListingForm = (): JSX.Element => {
-    return <ListingForm sendRequest={props.createListing} />;
+    return (
+      <ListingForm
+        sendRequest={props.createListing}
+        submitBtnText="Create"
+        formTitle="Create listing"
+      />
+    );
   };
 
   return (
@@ -35,6 +41,6 @@ const mapStateToProps = (state: StoreState) => {
   return { user: state.user };
 };
 
-export const NewListing = connect(mapStateToProps, { createListing })(
-  _NewListing
-);
+export const NewListing = connect(mapStateToProps, {
+  createListing,
+})(_NewListing);
