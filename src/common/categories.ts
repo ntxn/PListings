@@ -1,17 +1,17 @@
-export enum Categories {
-  Vehicles = 'Vehicles',
-  PropertyRentals = 'Property Rentals',
-  HomeAndAppliances = 'Home & Appliances',
-  Tools = 'Tools',
-  Garden = 'Garden',
-  Entertainment = 'Entertainment',
-  SportsAndOutdoors = 'Sports & Outdoors',
-  Electronics = 'Electronics',
-  BabyAndKids = 'Baby & Kids',
-  JobsAndServices = 'Jobs & Services',
-  FashionAndAccessories = 'Fashion & Accessories',
-  Other = 'Other',
-}
+export const Categories = {
+  Vehicles: 'Vehicles',
+  PropertyRentals: 'Property Rentals',
+  HomeAndAppliances: 'Home & Appliances',
+  Tools: 'Tools',
+  Garden: 'Garden',
+  Entertainment: 'Entertainment',
+  SportsAndOutdoors: 'Sports & Outdoors',
+  Electronics: 'Electronics',
+  BabyAndKids: 'Baby & Kids',
+  JobsAndServices: 'Jobs & Services',
+  FashionAndAccessories: 'Fashion & Accessories',
+  Other: 'Other',
+};
 
 export const Subcategories = {
   [Categories.Vehicles]: {
