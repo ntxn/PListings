@@ -269,9 +269,9 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       (this.props.initialValues.photos &&
         this.props.initialValues.photos.length !==
           this.state.deletedImageIndexes.length);
+    const isLocationAnObject = typeof formValues.location === 'object';
 
-    if (typeof formValues.location === 'object' && hasImages)
-      return Promise.resolve(formValues);
+    if (isLocationAnObject && hasImages) return Promise.resolve(formValues);
 
     const errors = {
       location: ErrMsg.LocationDropdownListSelection,
@@ -279,7 +279,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     };
 
     if (hasImages) delete errors.photos;
-    if (typeof formValues.location === 'object') delete errors.location;
+    if (isLocationAnObject) delete errors.location;
     else if (getState!().searchedLocations.length === 0)
       errors.location = ErrMsg.LocationInvalid;
 
