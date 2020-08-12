@@ -10,6 +10,7 @@ import {
   getAll,
   createOne,
   deleteOne,
+  updateOne,
 } from '../middlewares';
 import { Base, Routes, UserRole, ErrMsg, RequestStatus } from '../../common';
 import {
@@ -61,9 +62,9 @@ const prepListingReqBody = (...allowedProps: string[]): MiddlewareHandler => {
   return (req: CustomRequest, res, next) => {
     const body: { [field: string]: any } = {};
     allowedProps.forEach(field => {
-      if (field === 'location' && req.body.coordinates)
-        body.location = { coordinates: req.body.coordinates };
-      else if (field === 'owner') body.owner = req.user!.id;
+      // if (field === 'location' && req.body.coordinates)
+      //   body.location = { coordinates: req.body.coordinates };
+      if (field === 'owner') body.owner = req.user!.id;
       else if (req.body[field]) body[field] = req.body[field];
     });
 
@@ -118,7 +119,9 @@ const parseStrData: MiddlewareHandler = (req, res, next) => {
       ? JSON.parse(req.body.photos)
       : [];
 
+  console.log(req.body.photos);
   if (req.body.deletedImages) {
+    console.log(req.body.deletedImages);
     const deletedImages = JSON.parse(req.body.deletedImages) as string[];
     deletedImages.forEach(filename =>
       fs.unlink(path.join('public/img/listings', filename), err => {
@@ -190,7 +193,11 @@ class ListingController {
   /**
    * User can edit their own listing
    */
+  @use(updateOne(Listing))
+  @use(resizeListingPhotos)
+  @use(parseStrData)
   @use(prepListingReqBody(...listingProps))
+  @use(multerUpload.array('newImages'))
   @use(listingOwnerChecker)
   @use(authenticationChecker)
   @PATCH(Routes.Listing)
