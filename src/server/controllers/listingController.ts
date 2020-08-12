@@ -10,7 +10,6 @@ import {
   getAll,
   createOne,
   deleteOne,
-  updateOne,
 } from '../middlewares';
 import { Base, Routes, UserRole, ErrMsg, RequestStatus } from '../../common';
 import {
@@ -100,7 +99,7 @@ const resizeListingPhotos = catchAsync(
     if (!req.files) return next();
 
     (req.files as Express.Multer.File[]).forEach(async (file, i) => {
-      req.body.photos.push(`listing-${req.user!.id}-${Date.now()}.jpeg`);
+      req.body.photos.push(`listing-${req.user!.id}-${Date.now() + i}.jpeg`);
       await resizeImage(file.buffer, 600, 600, 'listings', req.body.photos[i]);
     });
     next();
@@ -119,13 +118,13 @@ const parseStrData: MiddlewareHandler = (req, res, next) => {
       ? JSON.parse(req.body.photos)
       : [];
 
-  console.log(req.body.photos);
   if (req.body.deletedImages) {
-    console.log(req.body.deletedImages);
     const deletedImages = JSON.parse(req.body.deletedImages) as string[];
+
     deletedImages.forEach(filename =>
       fs.unlink(path.join('public/img/listings', filename), err => {
-        console.log(`Issue with deleting old listing photos from db`, err);
+        if (err)
+          console.log(`Issue with deleting old listing photos from db`, err);
       })
     );
     delete req.body.deletedImages;
@@ -193,10 +192,9 @@ class ListingController {
   /**
    * User can edit their own listing
    */
-  @use(updateOne(Listing))
   @use(resizeListingPhotos)
   @use(parseStrData)
-  @use(prepListingReqBody(...listingProps))
+  @use(prepListingReqBody(...listingProps, 'deletedImages'))
   @use(multerUpload.array('newImages'))
   @use(listingOwnerChecker)
   @use(authenticationChecker)
@@ -210,8 +208,7 @@ class ListingController {
         // @ts-ignore
         field => (listing[field] = req.body[field])
       );
-      await listing!.save();
-
+      await listing.save();
       res.status(200).json({ status: RequestStatus.Success, data: listing });
     })(req, res, next);
   }

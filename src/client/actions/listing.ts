@@ -59,16 +59,18 @@ export const createListing = (
 
 export const editListing = (
   formValues: ListingAttrs,
-  imagesParams: ListingImagesParams
+  imagesParams: ListingImagesParams,
+  listingId: string
 ): FunctionalAction<EditListingAction> =>
   catchSubmissionError(async dispatch => {
+    const url = `${ApiRoutes.Listings}/${listingId}`;
     const { newImages, existingImages, deletedImages } = imagesParams;
     processCombinedLocationToGeoLocation(formValues);
 
     let response;
 
     if (!newImages)
-      response = await axios.post(ApiRoutes.Listings, {
+      response = await axios.post(url, {
         ...formValues,
         photos: existingImages,
         deletedImages,
@@ -84,7 +86,7 @@ export const editListing = (
         formData.append('deletedImages', JSON.stringify(deletedImages));
 
       processFormValuesToFormData(formValues, formData);
-      response = await axios.post(ApiRoutes.Listings, formData);
+      response = await axios.patch(url, formData);
     }
 
     showAlert(AlertType.Success, 'Listing updated successfully');

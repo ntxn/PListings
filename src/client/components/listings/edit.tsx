@@ -12,7 +12,8 @@ interface EditListingProps {
   user: UserDoc | null;
   editListing(
     formValues: ListingAttrs,
-    imagesParams: ListingImagesParams
+    imagesParams: ListingImagesParams,
+    listingId: string
   ): void;
   listing: ListingDoc;
   fetchListing(id: string): void;
@@ -35,6 +36,7 @@ const _EditListing = (props: EditListingProps): JSX.Element => {
         formTitle="Edit listing"
         //@ts-ignore
         initialValues={props.listing}
+        listingId={props.listing.id}
       />
     );
   };

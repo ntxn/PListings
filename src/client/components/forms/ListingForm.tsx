@@ -12,7 +12,7 @@ import {
 } from 'redux-form';
 import { MdAddToPhotos } from 'react-icons/md';
 
-import { ListingAttrs, UserDoc, ListingDoc } from '../../../server/models';
+import { ListingAttrs, UserDoc } from '../../../server/models';
 import {
   ListingImagesParams,
   renderTextInput,
@@ -37,6 +37,7 @@ interface DropdownFieldProps {
 interface PhotoUploadFieldProps {
   hasExistingImages: boolean;
   hasNewImages: boolean;
+  existingImages: JSX.Element[];
 }
 
 interface StateProps {
@@ -58,8 +59,10 @@ type FormProps = {
   formTitle: string;
   sendRequest(
     formValues: ListingAttrs,
-    imagesParams: ListingImagesParams
+    imagesParams: ListingImagesParams,
+    listingId?: string
   ): void;
+  listingId?: string;
 } & StateProps &
   DispatchProps;
 
@@ -88,9 +91,14 @@ class Form extends React.Component<ReduxFormProps, FormState> {
   }
 
   deleteExistingImage = (index: number): void => {
-    this.setState(prevState => {
-      return { deletedImageIndexes: prevState.deletedImageIndexes.add(index) };
-    });
+    this.setState(
+      prevState => {
+        return {
+          deletedImageIndexes: prevState.deletedImageIndexes.add(index),
+        };
+      },
+      () => this.props.change('photos', [])
+    );
   };
 
   deleteNewImage = (index: number): void => {
@@ -119,26 +127,6 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     });
   };
 
-  renderExistingImages = (): JSX.Element => {
-    const { deletedImageIndexes } = this.state;
-    const { photos } = this.props.initialValues;
-    const images = [];
-    for (let i = 0; i < photos!.length; i++) {
-      if (!deletedImageIndexes.has(i))
-        images.push(
-          <div
-            key={photos![i]}
-            className="form__listing-photo"
-            onClick={() => this.deleteExistingImage(i)}
-          >
-            <img src={`/img/listings/${photos![i]}`} />
-          </div>
-        );
-    }
-
-    return <>{images}</>;
-  };
-
   // Multiple images upload
   renderPhotoUpload: React.StatelessComponent<
     WrappedFieldProps & PhotoUploadFieldProps
@@ -147,6 +135,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     meta,
     hasExistingImages,
     hasNewImages,
+    existingImages,
   }): JSX.Element => {
     const err = meta.error && meta.touched;
 
@@ -184,7 +173,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
     return (
       <div className="form__group form__listing-photo-upload">
-        {hasExistingImages && this.renderExistingImages()}
+        {hasExistingImages && existingImages}
         <input
           {...inputProps}
           type="file"
@@ -301,8 +290,6 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     //@ts-ignore
     return dispatch(this.asyncValidatorDispatcher(formValues))
       .then((newValues: ListingAttrs) => {
-        // newValues.owner = this.props.user.id;
-
         const { deletedImageIndexes, newImages } = this.state;
         let existingImages = this.props.initialValues.photos;
         let deletedImages: string[] | undefined = undefined;
@@ -315,11 +302,15 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           });
         }
 
-        this.props.sendRequest(newValues, {
-          newImages,
-          existingImages,
-          deletedImages,
-        });
+        this.props.sendRequest(
+          newValues,
+          {
+            newImages,
+            existingImages,
+            deletedImages,
+          },
+          this.props.listingId
+        );
       })
       .catch((err: Record<string, string>) => {
         throw new SubmissionError(err);
@@ -333,6 +324,24 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       ? (Object.values(Subcategories[this.props.category]) as string[])
       : [];
     const { error } = this.props;
+
+    const existingImages = [];
+    const { photos } = this.props.initialValues;
+    if (photos) {
+      for (let i = 0; i < photos.length; i++) {
+        if (!this.state.deletedImageIndexes.has(i))
+          existingImages.push(
+            <div
+              id={`${i}`}
+              key={photos[i]}
+              className="form__listing-photo"
+              onClick={() => this.deleteExistingImage(i)}
+            >
+              <img src={`/img/listings/${photos[i]}`} />
+            </div>
+          );
+      }
+    }
 
     return (
       <div className="container__form">
@@ -351,6 +360,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
                 this.state.deletedImageIndexes.size
             }
             hasNewImages={Object.keys(this.state.newImages).length > 0}
+            existingImages={existingImages}
           />
 
           <Field
