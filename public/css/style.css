@@ -81,6 +81,12 @@
   height: 1px;
   border-width: 0; }
 
+.u-flex-item-full-width {
+  flex-basis: 100%; }
+
+.u-font-weight-300 {
+  font-weight: 300; }
+
 :root {
   --color-primary: #ff7851;
   --color-primary-light: #ffb7a1;

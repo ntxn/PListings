@@ -38,6 +38,7 @@ interface PhotoUploadFieldProps {
   hasExistingImages: boolean;
   hasNewImages: boolean;
   existingImages: JSX.Element[];
+  numImages: number;
 }
 
 interface StateProps {
@@ -72,6 +73,7 @@ interface FormState {
   newImages: Record<number, File>;
   newImagesNextIndex: number;
   selectedLocation: CombinedLocation;
+  numImages: number;
 }
 
 class Form extends React.Component<ReduxFormProps, FormState> {
@@ -83,6 +85,9 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       newImages: {},
       newImagesNextIndex: 0,
       selectedLocation: props.initialValues.location!,
+      numImages: props.initialValues.photos
+        ? props.initialValues.photos.length
+        : 0,
     };
   }
 
@@ -95,6 +100,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       prevState => {
         return {
           deletedImageIndexes: prevState.deletedImageIndexes.add(index),
+          numImages: prevState.numImages - 1,
         };
       },
       () => this.props.change('photos', [])
@@ -111,7 +117,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       const images = { ...prevState.newImages };
       delete images[index];
 
-      return { newImages: images };
+      return { newImages: images, numImages: prevState.numImages - 1 };
     });
   };
 
@@ -123,6 +129,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           [prevState.newImagesNextIndex]: file,
         },
         newImagesNextIndex: prevState.newImagesNextIndex + 1,
+        numImages: prevState.numImages + 1,
       };
     });
   };
@@ -136,6 +143,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     hasExistingImages,
     hasNewImages,
     existingImages,
+    numImages,
   }): JSX.Element => {
     const err = meta.error && meta.touched;
 
@@ -149,7 +157,13 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       let reader: FileReader;
       const addPhotosLabel = document.getElementById('form__label--add-photos');
 
-      for (let i = 0; i < event.target.files.length; i++) {
+      const numImagesLeft = 10 - numImages;
+      const maxNumImagesCanBeAdded =
+        numImagesLeft <= event.target.files.length
+          ? numImagesLeft
+          : event.target.files.length;
+
+      for (let i = 0; i < maxNumImagesCanBeAdded; i++) {
         const index = i + this.state.newImagesNextIndex;
 
         reader = new FileReader();
@@ -171,8 +185,23 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       }
     };
 
+    const uploadLabelClassName =
+      numImages >= 10
+        ? 'u-hide'
+        : `form__label--add-photos ${
+            hasExistingImages || hasNewImages
+              ? ''
+              : 'form__label--add-photos--full-width'
+          } ${err ? 'form__label--add-photos--error' : ''}`;
+
     return (
       <div className="form__group form__listing-photo-upload">
+        <label className="form__label u-flex-item-full-width">
+          <span>Photos · {numImages} / 10</span>
+          <span className="u-font-weight-300">
+            {'  '}- You can add up to 10 photos
+          </span>
+        </label>
         {hasExistingImages && existingImages}
         <input
           {...inputProps}
@@ -182,14 +211,11 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           accept="image/*"
           onChange={onChange}
           className="form__upload"
+          disabled={numImages >= 10}
         />
         <label
           htmlFor={inputProps.name}
-          className={`form__label--add-photos ${
-            hasExistingImages || hasNewImages
-              ? ''
-              : 'form__label--add-photos--full-width'
-          } ${err ? 'form__label--add-photos--error' : ''}`}
+          className={uploadLabelClassName}
           id="form__label--add-photos"
         >
           <MdAddToPhotos title="Add photos" />
@@ -361,6 +387,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
             }
             hasNewImages={Object.keys(this.state.newImages).length > 0}
             existingImages={existingImages}
+            numImages={this.state.numImages}
           />
 
           <Field
