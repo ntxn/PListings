@@ -22,6 +22,8 @@ const _NewListing = (props: NewListingProps): JSX.Element => {
         sendRequest={props.createListing}
         submitBtnText="Create"
         formTitle="Create listing"
+        //@ts-ignore
+        initialValues={{ location: props.user!.location }}
       />
     );
   };

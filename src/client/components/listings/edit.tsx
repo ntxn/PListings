@@ -5,6 +5,7 @@ import { StoreState, ListingImagesParams } from '../../utilities';
 import { fetchListing, editListing } from '../../actions';
 import { ListingDoc, UserDoc, ListingAttrs } from '../../../server/models';
 import { AuthRequired } from '../AuthRequired';
+import { Unauthorized } from '../Unauthorized';
 import { ListingForm } from '../forms';
 
 interface EditListingProps {
@@ -32,7 +33,8 @@ const _EditListing = (props: EditListingProps): JSX.Element => {
         sendRequest={props.editListing}
         submitBtnText="Save"
         formTitle="Edit listing"
-        images={props.listing.photos}
+        //@ts-ignore
+        initialValues={props.listing}
       />
     );
   };
@@ -40,7 +42,11 @@ const _EditListing = (props: EditListingProps): JSX.Element => {
   return (
     <>
       {props.user && props.listing ? (
-        renderEditListingForm()
+        props.user.id === props.listing.owner.id ? (
+          renderEditListingForm()
+        ) : (
+          <Unauthorized />
+        )
       ) : (
         <AuthRequired route="Edit your listings" />
       )}

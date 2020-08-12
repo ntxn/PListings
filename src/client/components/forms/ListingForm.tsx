@@ -12,7 +12,7 @@ import {
 } from 'redux-form';
 import { MdAddToPhotos } from 'react-icons/md';
 
-import { ListingAttrs, UserDoc } from '../../../server/models';
+import { ListingAttrs, UserDoc, ListingDoc } from '../../../server/models';
 import {
   ListingImagesParams,
   renderTextInput,
@@ -65,7 +65,7 @@ type FormProps = {
 
 type ReduxFormProps = InjectedFormProps<ListingAttrs, FormProps> & FormProps;
 interface FormState {
-  deletedImageIndexes: number[];
+  deletedImageIndexes: Set<number>;
   newImages: Record<number, File>;
   newImagesNextIndex: number;
   selectedLocation: CombinedLocation;
@@ -76,18 +76,20 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     super(props);
 
     this.state = {
-      deletedImageIndexes: [],
+      deletedImageIndexes: new Set(),
       newImages: {},
       newImagesNextIndex: 0,
       selectedLocation: props.initialValues.location!,
     };
   }
 
+  componentDidMount() {
+    this.props.initialize(this.props.initialValues);
+  }
+
   deleteExistingImage = (index: number): void => {
     this.setState(prevState => {
-      return {
-        deletedImageIndexes: [...prevState.deletedImageIndexes, index],
-      };
+      return { deletedImageIndexes: prevState.deletedImageIndexes.add(index) };
     });
   };
 
@@ -119,24 +121,22 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
   renderExistingImages = (): JSX.Element => {
     const { deletedImageIndexes } = this.state;
-    const images =
-      deletedImageIndexes.length === 0
-        ? this.props.initialValues.photos
-        : this.props.initialValues.photos!.filter(
-            (img, index) => !deletedImageIndexes.includes(index)
-          );
+    const { photos } = this.props.initialValues;
+    const images = [];
+    for (let i = 0; i < photos!.length; i++) {
+      if (!deletedImageIndexes.has(i))
+        images.push(
+          <div
+            key={photos![i]}
+            className="form__listing-photo"
+            onClick={() => this.deleteExistingImage(i)}
+          >
+            <img src={`/img/listings/${photos![i]}`} />
+          </div>
+        );
+    }
 
-    return (
-      <>
-        {images!.map(filename => {
-          return (
-            <div key={filename} className="form__listing-photo">
-              <img src={`/img/listings/${filename}`} />
-            </div>
-          );
-        })}
-      </>
-    );
+    return <>{images}</>;
   };
 
   // Multiple images upload
@@ -276,7 +276,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       Object.keys(this.state.newImages).length > 0 ||
       (this.props.initialValues.photos &&
         this.props.initialValues.photos.length !==
-          this.state.deletedImageIndexes.length);
+          this.state.deletedImageIndexes.size);
     const isLocationAnObject = typeof formValues.location === 'object';
 
     if (isLocationAnObject && hasImages) return Promise.resolve(formValues);
@@ -301,16 +301,16 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     //@ts-ignore
     return dispatch(this.asyncValidatorDispatcher(formValues))
       .then((newValues: ListingAttrs) => {
-        newValues.owner = this.props.user.id;
+        // newValues.owner = this.props.user.id;
 
         const { deletedImageIndexes, newImages } = this.state;
         let existingImages = this.props.initialValues.photos;
         let deletedImages: string[] | undefined = undefined;
-        if (deletedImageIndexes.length > 0) {
+        if (deletedImageIndexes.size > 0) {
           existingImages = [];
           deletedImages = [];
           this.props.initialValues.photos!.forEach((img, index) => {
-            if (deletedImageIndexes.includes(index)) deletedImages!.push(img);
+            if (deletedImageIndexes.has(index)) deletedImages!.push(img);
             else existingImages!.push(img);
           });
         }
@@ -348,7 +348,7 @@ class Form extends React.Component<ReduxFormProps, FormState> {
             hasExistingImages={
               this.props.initialValues.photos &&
               this.props.initialValues.photos.length !==
-                this.state.deletedImageIndexes.length
+                this.state.deletedImageIndexes.size
             }
             hasNewImages={Object.keys(this.state.newImages).length > 0}
           />
@@ -437,9 +437,6 @@ const mapStateToProps = (state: StoreState) => {
   const category = selector(state, 'category');
   const subcategory = selector(state, 'subcategory');
   const locationValue = selector(state, 'location');
-  const initialValues = state.listing
-    ? state.listing
-    : { location: state.user!.location };
 
   return {
     user: state.user!,
@@ -448,7 +445,6 @@ const mapStateToProps = (state: StoreState) => {
     category,
     subcategory,
     locationValue,
-    initialValues,
   };
 };
 
