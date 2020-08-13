@@ -103,3 +103,44 @@
     }
   }
 }
+
+.arrow {
+  width: 3rem;
+  height: 3rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: none;
+  outline: 0;
+  background-color: transparent;
+
+  &--round {
+    width: 4rem;
+    height: 4rem;
+    background-color: rgba($color: #fff, $alpha: 0.8);
+    border-radius: var(--border-raidus-large);
+  }
+
+  svg {
+    width: 3rem;
+    height: 3rem;
+    color: var(--color-grey-light-4);
+
+    &:hover {
+      color: var(--color-grey-dark-1);
+    }
+  }
+
+  &--forward {
+    right: 0;
+  }
+
+  &--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
