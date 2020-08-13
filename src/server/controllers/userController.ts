@@ -69,7 +69,12 @@ const resizeUserPhoto = catchAsync(async (req: CustomRequest, res, next) => {
   req.body.location = JSON.parse(req.body.location);
 
   req.body.photo = `user-${req.user!.id}-${Date.now()}.jpeg`;
-  await resizeImage(req.file.buffer, 300, 300, 'users', req.body.photo);
+  await resizeImage(
+    req.file.buffer,
+    { width: 300, height: 300 },
+    'users',
+    req.body.photo
+  );
 
   fs.unlink(path.join('public/img/users', req.user!.photo!), err => {
     console.log(`Issue with deleting user's previous photo`, err);

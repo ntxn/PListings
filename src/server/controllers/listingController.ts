@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { Request, Response, NextFunction } from 'express';
+import sharp from 'sharp';
+
 import { Listing } from '../models';
 import { controller, GET, POST, PATCH, DELETE, use } from '../decorators';
 import {
@@ -98,9 +100,15 @@ const resizeListingPhotos = catchAsync(
   async (req: CustomRequest, res, next) => {
     if (!req.files) return next();
 
+    const prevLength = req.body.photos.length;
     (req.files as Express.Multer.File[]).forEach(async (file, i) => {
       req.body.photos.push(`listing-${req.user!.id}-${Date.now() + i}.jpeg`);
-      await resizeImage(file.buffer, 600, 600, 'listings', req.body.photos[i]);
+      await resizeImage(
+        file.buffer,
+        { fit: sharp.fit.contain, height: 600 },
+        'listings',
+        req.body.photos[i + prevLength]
+      );
     });
     next();
   }
