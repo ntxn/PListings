@@ -70,7 +70,7 @@ export const editListing = (
     let response;
 
     if (!newImages)
-      response = await axios.post(url, {
+      response = await axios.patch(url, {
         ...formValues,
         photos: existingImages,
         deletedImages,

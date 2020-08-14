@@ -331,7 +331,9 @@ class Form extends React.Component<ReduxFormProps, FormState> {
         this.props.sendRequest(
           newValues,
           {
-            newImages,
+            //@ts-ignore
+            newImages:
+              Object.keys(newImages).length === 0 ? undefined : newImages,
             existingImages,
             deletedImages,
           },
