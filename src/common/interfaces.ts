@@ -5,6 +5,6 @@ export interface BaseLocation {
 }
 
 export interface GeoLocation extends BaseLocation {
-  coordinates: number[];
+  coordinates: [number, number];
   country: string;
 }

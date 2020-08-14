@@ -65,6 +65,7 @@ describe('LISTING MODEL', () => {
 
       listing = Listing.build({
         ...attrs,
+        //@ts-ignore
         location: { ...location, coordinates: [] },
       });
       await expect(listing.save()).rejects.toThrowError(
@@ -81,6 +82,7 @@ describe('LISTING MODEL', () => {
 
       listing = Listing.build({
         ...attrs,
+        //@ts-ignore
         location: { ...location, coordinates: [1, 2, 3] },
       });
       await expect(listing.save()).rejects.toThrowError(

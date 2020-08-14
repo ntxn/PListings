@@ -4,11 +4,12 @@ import { connect } from 'react-redux';
 import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
 
-import { StoreState, UserAvatar } from '../../utilities';
+import { StoreState, listingMapSmall } from '../../utilities';
 import { fetchListing } from '../../actions';
 import { ListingDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { ArrowBtn } from '../ArrowBtn';
+import { UserAvatar } from '../UserAvatar';
 
 interface ListingProps {
   listing: ListingDoc;
@@ -35,10 +36,18 @@ const _Listing = (props: ListingProps): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (props.listing)
+    if (props.listing) {
       setThumbnailsFullWidth(
         props.listing.photos.length * THUMBNAIL_SIZE - 0.5
       ); // last thumbnail doesn't have right margin
+
+      const map = document.getElementById('listing-map-small');
+      if (map)
+        listingMapSmall(
+          process.env.MAPBOX_KEY!,
+          props.listing.location.coordinates
+        );
+    }
   }, [props.listing]);
 
   const getTimePosted = (): string => {
@@ -213,7 +222,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
 
           {/******** Listing's Seller info (avatar, name, rating) ********/}
           <hr className="u-divider u-margin-top-small" />
-          <div className="listing__info__owner u-margin-top-small">
+          <div className="listing__info__owner u-margin-top-medium">
             <Link to={`/user/${props.listing.owner.id}`}>
               <UserAvatar user={props.listing.owner} className="icon" />
             </Link>
@@ -225,6 +234,15 @@ const _Listing = (props: ListingProps): JSX.Element => {
           </div>
 
           {/******** Listing Location on Map ********/}
+          <div
+            id="listing-map-small"
+            className="listing__info__map--small u-margin-top-small"
+            onClick={() => alert('dsfd')}
+          ></div>
+
+          <div className="listing__info__location paragraph-small-font-size">
+            {`${props.listing.location.city}, ${props.listing.location.state} ${props.listing.location.zip}`}
+          </div>
 
           {/******** Mini chat box ********/}
         </div>

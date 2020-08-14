@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaBell } from 'react-icons/fa';
 import { UserDoc } from '../../server/models';
-import { StoreState, UserAvatar } from '../utilities';
+import { StoreState } from '../utilities';
 import { logOut } from '../actions';
 import { UserMenuModal } from './Modal';
+import { UserAvatar } from './UserAvatar';
 
 interface HeaderProps {
   user: UserDoc | null;

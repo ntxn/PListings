@@ -7,7 +7,7 @@ import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { IoIosArrowForward } from 'react-icons/io';
 
 import { UserDoc } from '../../server/models';
-import { UserAvatar } from '../utilities';
+import { UserAvatar } from './UserAvatar';
 
 interface ModalProps {
   onDismiss(): void;
