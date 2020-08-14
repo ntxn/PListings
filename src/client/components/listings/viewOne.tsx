@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { FaHeart } from 'react-icons/fa';
+import { AiFillEye } from 'react-icons/ai';
 import { StoreState } from '../../utilities';
 import { fetchListing } from '../../actions';
 import { ListingDoc } from '../../../server/models';
@@ -36,6 +38,25 @@ const _Listing = (props: ListingProps): JSX.Element => {
         props.listing.photos.length * THUMBNAIL_SIZE - 0.5
       ); // last thumbnail doesn't have right margin
   }, [props.listing]);
+
+  const getTimePosted = (): string => {
+    const listingTime = new Date(props.listing.createdAt).getTime();
+    const now = new Date().getTime();
+    let diff = Math.round((now - listingTime) / (1000 * 60)); // minutes
+    if (diff < 60) return `${diff}m`;
+
+    diff = Math.round(diff / 60); // hours
+    if (diff < 24) return `${diff}h`;
+
+    diff = Math.round(diff / 24); // days
+    if (diff < 7) return `${diff} days`;
+
+    diff = Math.round(diff / 7); // weeks
+    if (diff < 4) return `${diff} weeks`;
+
+    diff = Math.round(diff / 4); // months
+    return `${diff} months`;
+  };
 
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [thumbnailsLeftPosition, setThumbnailsLeftPosition] = useState(0);
@@ -127,7 +148,71 @@ const _Listing = (props: ListingProps): JSX.Element => {
             )}
           </div>
         </div>
-        <div className="listing__info">Info</div>
+        <div className="listing__info">
+          {/******** Listing Title, Price & stats ********/}
+
+          <p className="sub-heading-quaternary u-margin-bottom-xsmall">
+            {props.listing.category} › {props.listing.subcategory}
+          </p>
+          <div className="listing__info__title-heart">
+            <h1
+              className="heading-primary"
+              style={{ fontWeight: 700, lineHeight: 1.2 }}
+            >
+              {props.listing.title}
+            </h1>
+            <div className="listing__info__heart listing__info__heart--gray">
+              <FaHeart />
+            </div>
+          </div>
+
+          <h2 className="heading-secondary u-margin-bottom-xsmall">
+            {props.listing.price > 0 ? '$' + props.listing.price : 'Free'}
+          </h2>
+
+          <div className="listing__info__stats sub-heading-quaternary">
+            <div className="listing__info__stats--time">{getTimePosted()}</div>
+            <div className="listing__info__stats--seens-likes">
+              <div>
+                <AiFillEye /> {props.listing.visits}
+              </div>
+              <div>
+                <FaHeart /> {props.listing.favorites}
+              </div>
+            </div>
+          </div>
+
+          {/******** Listing Details ********/}
+
+          {(props.listing.condition ||
+            props.listing.brand ||
+            props.listing.description) && (
+            <div className="listing__info__details">
+              <h3 className="heading-tertiary u-margin-top-small u-margin-bottom-small">
+                Details
+              </h3>
+              {props.listing.brand && (
+                <div className="paragraph-small-font-size">
+                  <div>Brand</div> {props.listing.brand}
+                </div>
+              )}
+              {props.listing.condition && (
+                <div className="paragraph-small-font-size">
+                  <div>Condition</div> {props.listing.condition}
+                </div>
+              )}
+              {props.listing.description && (
+                <p className="paragraph-small-font-size u-margin-top-xxsmall">
+                  {props.listing.description}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/******** Listing's Seller info (avatar, name, rating) & Item Location on Map ********/}
+
+          {/******** Mini chat box ********/}
+        </div>
       </div>
     );
   };

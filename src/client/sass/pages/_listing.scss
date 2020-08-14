@@ -74,5 +74,69 @@
   &__info {
     width: 35%;
     margin-left: 0.7rem;
+
+    &__title-heart {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      svg {
+        width: 2.8rem;
+        height: 2.8rem;
+      }
+    }
+
+    &__heart {
+      cursor: pointer;
+
+      &--gray {
+        color: var(--color-grey-dark-1);
+      }
+
+      &--red,
+      &:hover {
+        color: var(--color-red);
+      }
+    }
+
+    &__stats {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      &--seens-likes {
+        display: flex;
+        flex-direction: row;
+
+        div {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          svg {
+            margin-right: 0.5rem;
+          }
+
+          &:not(:last-child) {
+            margin-right: 1.5rem;
+          }
+        }
+      }
+    }
+
+    &__details {
+      div {
+        display: flex;
+        flex-direction: row;
+        div {
+          font-weight: 700;
+          width: 9rem;
+        }
+      }
+
+      p {
+        white-space: pre-wrap;
+      }
+    }
   }
 }
