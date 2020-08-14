@@ -13,13 +13,12 @@ export const multerUpload = multer({
 
 export const resizeImage = async (
   file: Buffer,
-  width: number,
-  height: number,
+  options: Record<string, string | number>,
   collection: string,
   filename: string
 ): Promise<void> => {
   await sharp(file)
-    .resize(width, height)
+    .resize(options)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/${collection}/${filename}`);

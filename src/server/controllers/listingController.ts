@@ -119,12 +119,12 @@ const resizeListingPhotos = catchAsync(
  * When array/object is passed in a FormData obj, it has to be stringified
  */
 const parseStrData: MiddlewareHandler = (req, res, next) => {
-  req.body.location = JSON.parse(req.body.location);
+  if (typeof req.body.location === 'string')
+    req.body.location = JSON.parse(req.body.location);
 
-  req.body.photos =
-    req.body.photos && req.body.photos.length > 0
-      ? JSON.parse(req.body.photos)
-      : [];
+  if (req.body.photos && typeof req.body.photos === 'string')
+    req.body.photos =
+      req.body.photos.length > 0 ? JSON.parse(req.body.photos) : [];
 
   if (req.body.deletedImages) {
     const deletedImages = JSON.parse(req.body.deletedImages) as string[];
