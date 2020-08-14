@@ -511,6 +511,9 @@ body {
     width: 6rem;
     height: 6rem;
     border-radius: var(--border-raidus-large); }
+    .user-menu__option__avatar svg {
+      width: 6rem;
+      height: 6rem; }
   .user-menu__option__icon {
     margin-right: 1rem;
     width: 20%; }
@@ -735,4 +738,15 @@ main {
         width: 9rem; }
     .listing__info__details p {
       white-space: pre-wrap; }
+    .listing__info__owner {
+      display: flex;
+      flex-direction: row; }
+      .listing__info__owner__info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-left: 1rem; }
+        .listing__info__owner__info--name {
+          font-size: 1.5rem;
+          font-weight: 700; }
 

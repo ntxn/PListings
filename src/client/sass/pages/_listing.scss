@@ -138,5 +138,22 @@
         white-space: pre-wrap;
       }
     }
+
+    &__owner {
+      display: flex;
+      flex-direction: row;
+
+      &__info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-left: 1rem;
+
+        &--name {
+          font-size: 1.5rem;
+          font-weight: 700;
+        }
+      }
+    }
   }
 }
