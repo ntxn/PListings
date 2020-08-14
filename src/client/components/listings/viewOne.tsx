@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
-import { StoreState } from '../../utilities';
+
+import { StoreState, UserAvatar } from '../../utilities';
 import { fetchListing } from '../../actions';
 import { ListingDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
@@ -187,8 +189,8 @@ const _Listing = (props: ListingProps): JSX.Element => {
           {(props.listing.condition ||
             props.listing.brand ||
             props.listing.description) && (
-            <div className="listing__info__details">
-              <h3 className="heading-tertiary u-margin-top-small u-margin-bottom-small">
+            <div className="listing__info__details u-margin-top-small">
+              <h3 className="heading-tertiary u-margin-bottom-small">
                 Details
               </h3>
               {props.listing.brand && (
@@ -209,7 +211,14 @@ const _Listing = (props: ListingProps): JSX.Element => {
             </div>
           )}
 
-          {/******** Listing's Seller info (avatar, name, rating) & Item Location on Map ********/}
+          {/******** Listing's Seller info (avatar, name, rating) ********/}
+          <div className="listing__info__owner">
+            <Link to={`/user/${props.listing.owner.id}`}>
+              <UserAvatar user={props.listing.owner} className="icon" />
+            </Link>
+          </div>
+
+          {/******** Listing Location on Map ********/}
 
           {/******** Mini chat box ********/}
         </div>

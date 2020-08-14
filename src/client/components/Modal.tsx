@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
-import { BsPersonFill, BsListNested } from 'react-icons/bs';
+import { BsListNested } from 'react-icons/bs';
 import { AiFillSetting } from 'react-icons/ai';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { IoIosArrowForward } from 'react-icons/io';
+
 import { UserDoc } from '../../server/models';
+import { UserAvatar } from '../utilities';
 
 interface ModalProps {
   onDismiss(): void;
@@ -106,18 +108,10 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
             className="user-menu__option__hover"
             onClick={props.closeUserMenu}
           >
-            {props.user.photo ? (
-              <img
-                src={`/img/users/${props.user.photo}`}
-                alt={`${props.user.name} photo`}
-                className="user-menu__option__avatar"
-              />
-            ) : (
-              <BsPersonFill
-                title="Default Avatar"
-                className="user-menu__option__avatar"
-              />
-            )}
+            <UserAvatar
+              user={props.user}
+              className="user-menu__option__avatar"
+            />
             <div className="user-menu__brief-info">
               <span className="heading-tertiary">{props.user.name}</span>
               <span className="sub-heading-tertiary">

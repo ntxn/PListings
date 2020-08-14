@@ -64,6 +64,11 @@
       width: 6rem;
       height: 6rem;
       border-radius: var(--border-raidus-large);
+
+      svg {
+        width: 6rem;
+        height: 6rem;
+      }
     }
 
     &__icon {

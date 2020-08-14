@@ -5,3 +5,4 @@ export * from './form-field-values';
 export * from './location';
 export * from './render-form-element';
 export * from './process-formValues-to-FormData';
+export * from './user-avatar';

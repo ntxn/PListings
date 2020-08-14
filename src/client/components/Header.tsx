@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaBell } from 'react-icons/fa';
-import { BsPersonFill } from 'react-icons/bs';
 import { UserDoc } from '../../server/models';
-import { StoreState } from '../utilities';
+import { StoreState, UserAvatar } from '../utilities';
 import { logOut } from '../actions';
 import { UserMenuModal } from './Modal';
 
@@ -26,19 +25,11 @@ const renderNavigationAuthenticated = (
       <div className="icon">
         <FaBell title="Notifications" />
       </div>
-      <div onClick={() => setUserMenuModal(true)}>
-        {props.user!.photo ? (
-          <img
-            src={`/img/users/${props.user!.photo}`}
-            alt={`${props.user!.name} photo`}
-            className="icon"
-          />
-        ) : (
-          <div className="icon">
-            <BsPersonFill title="Default Avatar" />
-          </div>
-        )}
-      </div>
+      <UserAvatar
+        onClick={() => setUserMenuModal(true)}
+        user={props.user!}
+        className="icon"
+      />
       {userMenuModal && (
         <UserMenuModal
           user={props.user!}
