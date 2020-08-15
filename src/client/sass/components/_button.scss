@@ -144,3 +144,32 @@
     cursor: not-allowed;
   }
 }
+
+.icon-close-btn {
+  width: 4rem;
+  height: 4rem;
+
+  background-color: rgba($color: #fff, $alpha: 0.8);
+  border-radius: var(--border-radius-medium);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &:hover {
+    background-color: rgba($color: #fff, $alpha: 1);
+    transition: background-color 0.2s;
+  }
+}

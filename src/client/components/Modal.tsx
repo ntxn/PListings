@@ -5,6 +5,7 @@ import { BsListNested } from 'react-icons/bs';
 import { AiFillSetting } from 'react-icons/ai';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { IoIosArrowForward } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
 
 import { UserDoc } from '../../server/models';
 import { UserAvatar } from './UserAvatar';
@@ -165,6 +166,25 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
             <div className="heading-quaternary">Log Out</div>
           </div>
         </div>
+      </div>
+    </div>,
+    document.querySelector('#modal')!
+  );
+};
+
+interface MapModalProps {
+  close(): void;
+}
+
+/***
+ * A modal to display a map with the listing's location
+ */
+export const MapModal = (props: MapModalProps): React.ReactPortal => {
+  return ReactDOM.createPortal(
+    <div className="listing__info__map--large">
+      <div id="listing-map-large"></div>
+      <div className="icon-close-btn" onClick={props.close}>
+        <MdClose />
       </div>
     </div>,
     document.querySelector('#modal')!

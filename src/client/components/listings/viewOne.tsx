@@ -4,12 +4,13 @@ import { connect } from 'react-redux';
 import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
 
-import { StoreState, listingMapSmall } from '../../utilities';
+import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
 import { fetchListing } from '../../actions';
 import { ListingDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { ArrowBtn } from '../ArrowBtn';
 import { UserAvatar } from '../UserAvatar';
+import { MapModal } from '../Modal';
 
 interface ListingProps {
   listing: ListingDoc;
@@ -73,6 +74,8 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const [thumbnailsLeftPosition, setThumbnailsLeftPosition] = useState(0);
   const [thumbnailsPartialWidth, setThumbnailsPartialWidth] = useState(0);
   const [thumbnailsFullWidth, setThumbnailsFullWidth] = useState(0);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   const renderListing = (): JSX.Element => {
     return (
@@ -237,12 +240,41 @@ const _Listing = (props: ListingProps): JSX.Element => {
           <div
             id="listing-map-small"
             className="listing__info__map--small u-margin-top-small"
-            onClick={() => alert('dsfd')}
+            onClick={() => {
+              setShowMapModal(true);
+
+              setShowLoader(true);
+
+              setTimeout(() => {
+                setShowLoader(false);
+                const header = document.querySelector(
+                  '.container__center-content-horizontally'
+                );
+                header!.classList.remove('u-position-sticky-top-0');
+
+                listingMapLarge(
+                  process.env.MAPBOX_KEY!,
+                  props.listing.location.coordinates
+                );
+              }, 200);
+            }}
           ></div>
 
           <div className="listing__info__location paragraph-small-font-size">
             {`${props.listing.location.city}, ${props.listing.location.state} ${props.listing.location.zip}`}
           </div>
+          {showLoader && <BtnLoader />}
+          {showMapModal && (
+            <MapModal
+              close={() => {
+                setShowMapModal(false);
+                const header = document.querySelector(
+                  '.container__center-content-horizontally'
+                );
+                header!.classList.add('u-position-sticky-top-0');
+              }}
+            />
+          )}
 
           {/******** Mini chat box ********/}
         </div>

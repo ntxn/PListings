@@ -59,7 +59,7 @@ const _Header = (props: HeaderProps): JSX.Element => {
   const [userMenuModal, setUserMenuModal] = useState(false);
 
   return (
-    <header className="container__center-content-horizontally">
+    <header className="container__center-content-horizontally u-position-sticky-top-0">
       <div className="header">
         <div className="header__logo">
           <Link to="/">
