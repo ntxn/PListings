@@ -40,14 +40,37 @@ export const listingMapLarge = (
   // Add zoom and rotation controls to the map.
   map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
-  // Add a circle to show estimate location of the listing
-  const markerElement = document.createElement('div');
-  markerElement.className = 'listing__info__map--marker';
+  map.on('load', function () {
+    map.addSource('itemLocation', {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates,
+        },
+        properties: {},
+      },
+    });
 
-  new mapboxgl.Marker({
-    element: markerElement,
-    anchor: 'center',
-  })
-    .setLngLat(coordinates)
-    .addTo(map);
+    map.addLayer({
+      id: 'itemLocation-circle',
+      type: 'circle',
+      source: 'itemLocation',
+      paint: {
+        'circle-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          // zoom is 12 (or less) -> circle radius will be 25px
+          12,
+          25,
+          // zoom is 20 (or greater) -> circle radius will be 300px
+          20,
+          300,
+        ],
+        'circle-opacity': 0.4,
+      },
+    });
+  });
 };

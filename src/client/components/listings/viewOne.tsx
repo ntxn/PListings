@@ -251,12 +251,13 @@ const _Listing = (props: ListingProps): JSX.Element => {
                   '.container__center-content-horizontally'
                 );
                 header!.classList.remove('u-position-sticky-top-0');
+                header!.classList.add('u-z-index-0');
 
                 listingMapLarge(
                   process.env.MAPBOX_KEY!,
                   props.listing.location.coordinates
                 );
-              }, 200);
+              }, 50);
             }}
           ></div>
 
@@ -272,6 +273,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
                   '.container__center-content-horizontally'
                 );
                 header!.classList.add('u-position-sticky-top-0');
+                header!.classList.remove('u-z-index-0');
               }}
             />
           )}

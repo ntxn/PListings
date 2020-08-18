@@ -96,6 +96,9 @@
   position: sticky;
   top: 0; }
 
+.u-z-index-0 {
+  z-index: 0; }
+
 :root {
   --color-primary: #ff7851;
   --color-primary-light: #ffb7a1;
@@ -520,13 +523,13 @@ body {
 .user-menu {
   width: 100vw;
   height: 100vh;
-  position: absolute;
+  position: fixed;
   top: 0; }
   .user-menu__container {
     background-color: var(--color-white);
     width: 25rem;
     padding: 1rem;
-    position: absolute;
+    position: fixed;
     right: 2rem;
     top: var(--header-height);
     border-radius: var(--border-radius-xsmall);
