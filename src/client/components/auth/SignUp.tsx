@@ -49,7 +49,7 @@ const _SignUp = (props: SignUpProps): JSX.Element => {
             </Link>
           </div>
           <div className="u-center-text u-margin-bottom-medium">
-            <Link to="/auth/signup" className="btn-text btn-text--orange">
+            <Link to="/auth/login" className="btn-text btn-text--orange">
               Already have an account?
             </Link>
           </div>
