@@ -70,13 +70,13 @@ const _Listing = (props: ListingProps): JSX.Element => {
     if (diff < 24) return `${diff}h`;
 
     diff = Math.round(diff / 24); // days
-    if (diff < 7) return `${diff} days`;
+    if (diff < 7) return `${diff} day${diff === 1 ? '' : 's'}`;
 
     diff = Math.round(diff / 7); // weeks
-    if (diff < 4) return `${diff} weeks`;
+    if (diff < 4) return `${diff} week${diff === 1 ? '' : 's'}`;
 
     diff = Math.round(diff / 4); // months
-    return `${diff} months`;
+    return `${diff} month${diff === 1 ? '' : 's'}`;
   };
 
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
