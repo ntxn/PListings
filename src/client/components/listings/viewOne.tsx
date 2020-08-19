@@ -25,12 +25,6 @@ const _Listing = (props: ListingProps): JSX.Element => {
     const fetchData = async () => {
       //@ts-ignore
       await props.fetchListing(props.match.params.id);
-      const thumbnailsPartial = document.querySelector(
-        '.listing__photos__thumbnails--partial'
-      );
-      setThumbnailsPartialWidth(
-        thumbnailsPartial!.getBoundingClientRect().width / 10
-      );
     };
 
     fetchData();
@@ -38,9 +32,24 @@ const _Listing = (props: ListingProps): JSX.Element => {
 
   useEffect(() => {
     if (props.listing) {
-      setThumbnailsFullWidth(
-        props.listing.photos.length * THUMBNAIL_SIZE - 0.5
-      ); // last thumbnail doesn't have right margin
+      const thumbnailsPartial = document.querySelector(
+        '.listing__photos__thumbnails--partial'
+      );
+
+      const partialWidth =
+        thumbnailsPartial!.getBoundingClientRect().width / 10;
+      setThumbnailsPartialWidth(partialWidth);
+
+      // last thumbnail doesn't have right margin
+      const fullWidth = props.listing.photos.length * THUMBNAIL_SIZE - 0.5;
+      setThumbnailsFullWidth(fullWidth);
+
+      if (partialWidth < fullWidth) {
+        const leftPosition = (fullWidth - partialWidth) / 2;
+        setThumbnailsLeftPosition(leftPosition);
+        setThumbnailsLeftBound(leftPosition);
+        setThumbnailsRightBound(-leftPosition);
+      }
 
       const map = document.getElementById('listing-map-small');
       if (map)
@@ -71,11 +80,13 @@ const _Listing = (props: ListingProps): JSX.Element => {
   };
 
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [thumbnailsLeftPosition, setThumbnailsLeftPosition] = useState(0);
   const [thumbnailsPartialWidth, setThumbnailsPartialWidth] = useState(0);
   const [thumbnailsFullWidth, setThumbnailsFullWidth] = useState(0);
   const [showMapModal, setShowMapModal] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const [thumbnailsLeftPosition, setThumbnailsLeftPosition] = useState(0);
+  const [thumbnailsLeftBound, setThumbnailsLeftBound] = useState(0);
+  const [thumbnailsRightBound, setThumbnailsRightBound] = useState(0);
 
   const renderListing = (): JSX.Element => {
     return (
@@ -131,32 +142,28 @@ const _Listing = (props: ListingProps): JSX.Element => {
                 <ArrowBtn
                   direction="back"
                   onClick={() => {
-                    const offset =
-                      thumbnailsLeftPosition + MAX_OFFSET <= 0
-                        ? MAX_OFFSET
-                        : -thumbnailsLeftPosition;
+                    const newLeftPosition =
+                      thumbnailsLeftPosition + MAX_OFFSET <= thumbnailsLeftBound
+                        ? thumbnailsLeftPosition + MAX_OFFSET
+                        : thumbnailsLeftBound;
 
-                    setThumbnailsLeftPosition(thumbnailsLeftPosition + offset);
+                    setThumbnailsLeftPosition(newLeftPosition);
                   }}
                   topPosition="2.5rem"
-                  disabled={thumbnailsLeftPosition === 0}
+                  disabled={thumbnailsLeftPosition === thumbnailsLeftBound}
                 />
                 <ArrowBtn
                   direction="forward"
                   onClick={() => {
-                    const width = thumbnailsFullWidth + thumbnailsLeftPosition;
-                    const offset =
-                      width - MAX_OFFSET > thumbnailsPartialWidth
-                        ? MAX_OFFSET
-                        : width - thumbnailsPartialWidth;
-
-                    setThumbnailsLeftPosition(thumbnailsLeftPosition - offset);
+                    const newLeftPosition =
+                      thumbnailsLeftPosition - MAX_OFFSET >=
+                      thumbnailsRightBound
+                        ? thumbnailsLeftPosition - MAX_OFFSET
+                        : thumbnailsRightBound;
+                    setThumbnailsLeftPosition(newLeftPosition);
                   }}
                   topPosition="2.5rem"
-                  disabled={
-                    thumbnailsLeftPosition ===
-                    thumbnailsPartialWidth - thumbnailsFullWidth
-                  }
+                  disabled={thumbnailsLeftPosition === thumbnailsRightBound}
                 />
               </>
             )}
