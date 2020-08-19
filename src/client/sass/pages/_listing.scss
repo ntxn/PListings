@@ -43,6 +43,8 @@
       &--full {
         display: flex;
         flex-direction: row;
+        justify-content: center;
+
         position: relative;
         transition: all ease-out 0.2s;
       }
