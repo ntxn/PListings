@@ -66,4 +66,9 @@ export enum ErrMsg {
 
   // Image
   ImageInvalid = 'Not an image. Please upload only image',
+
+  // Favorite
+  UserIdRequired = 'Please provide a user ID',
+  ListingIdRequired = 'Please provide a listing ID',
+  OwnerCannotFavoriteOwnListing = 'The owner cannot favorite/save their own listing',
 }
