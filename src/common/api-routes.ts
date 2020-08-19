@@ -30,6 +30,9 @@ export enum Routes {
 
   // Admin only
   ListingProtected = '/admin/:id',
+
+  // ------------------- FAVORITE ---------------------
+  Favorites = '/',
 }
 
 // base route for each resource
@@ -38,6 +41,7 @@ export enum Base {
   Auth = '/api/v1/auth',
 
   Listings = '/api/v1/listings',
+  Favorites = '/api/v1/favorites',
 }
 
 /** These routes are used for making API calls */
@@ -61,4 +65,7 @@ export enum ApiRoutes {
   // Listings
   Listings = '/api/v1/listings',
   ListingProtected = '/api/v1/listings/admin',
+
+  // Favorites
+  Favorites = '/api/v1/favorites',
 }
