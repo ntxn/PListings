@@ -42,8 +42,10 @@ export const Modal = (props: ModalProps): React.ReactPortal => {
         onClick={event => event.stopPropagation()}
         className="modal__container u-center-text"
       >
-        <div className="heading-secondary">{props.title}</div>
-        <div className="modal__content u-margin-bottom-small">
+        <div className="heading-secondary u-margin-bottom-small">
+          {props.title}
+        </div>
+        <div className="modal__content u-margin-bottom-medium">
           {props.content}
         </div>
         <div className="modal__actions">{props.actions}</div>

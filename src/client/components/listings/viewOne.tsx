@@ -11,7 +11,8 @@ import { ListingDoc, UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { ArrowBtn } from '../ArrowBtn';
 import { UserAvatar } from '../UserAvatar';
-import { MapModal } from '../Modal';
+import { MapModal, ConfirmationModal } from '../Modal';
+import { history } from '../../history';
 
 interface ListingProps {
   listing: ListingDoc;
@@ -85,6 +86,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const [thumbnailsPartialWidth, setThumbnailsPartialWidth] = useState(0);
   const [thumbnailsFullWidth, setThumbnailsFullWidth] = useState(0);
   const [showMapModal, setShowMapModal] = useState(false);
+  const [showLogInModal, setShowLogInModal] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [thumbnailsLeftPosition, setThumbnailsLeftPosition] = useState(0);
   const [thumbnailsLeftBound, setThumbnailsLeftBound] = useState(0);
@@ -192,10 +194,28 @@ const _Listing = (props: ListingProps): JSX.Element => {
                 <FiEdit />
               </Link>
             ) : (
-              <div className="listing__info__heart listing__info__heart--gray">
+              <div
+                className="listing__info__heart listing__info__heart--gray"
+                onClick={() => {
+                  if (props.user) console.log('dfsdf');
+                  else setShowLogInModal(true);
+                }}
+              >
                 <FaHeart />
               </div>
             )}
+            {
+              /* If user is not logged in, prompt them to log in in order to save a listing */
+              showLogInModal && (
+                <ConfirmationModal
+                  title="Save listing"
+                  content="Please log in to your account or sign up for a new account to save a listing"
+                  confirmBtnText="Proceed To Log In"
+                  action={() => history.push('/auth/login')}
+                  closeModal={() => setShowLogInModal(false)}
+                />
+              )
+            }
           </div>
 
           <h2 className="heading-secondary u-margin-bottom-xsmall">
