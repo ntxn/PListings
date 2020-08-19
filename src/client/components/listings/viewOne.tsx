@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
+import { FiEdit } from 'react-icons/fi';
 
 import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
 import { fetchListing } from '../../actions';
-import { ListingDoc } from '../../../server/models';
+import { ListingDoc, UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { ArrowBtn } from '../ArrowBtn';
 import { UserAvatar } from '../UserAvatar';
@@ -14,6 +15,7 @@ import { MapModal } from '../Modal';
 
 interface ListingProps {
   listing: ListingDoc;
+  user: UserDoc | null;
   fetchListing(id: string): void;
 }
 
@@ -175,16 +177,25 @@ const _Listing = (props: ListingProps): JSX.Element => {
           <p className="sub-heading-quaternary u-margin-bottom-xsmall">
             {props.listing.category} › {props.listing.subcategory}
           </p>
-          <div className="listing__info__title-heart">
+          <div className="listing__info__title">
             <h1
               className="heading-primary"
               style={{ fontWeight: 700, lineHeight: 1.2 }}
             >
               {props.listing.title}
             </h1>
-            <div className="listing__info__heart listing__info__heart--gray">
-              <FaHeart />
-            </div>
+            {props.user && props.user.id === props.listing.owner.id ? (
+              <Link
+                to={`/listings/edit/${props.listing.id}`}
+                className="listing__info__edit"
+              >
+                <FiEdit />
+              </Link>
+            ) : (
+              <div className="listing__info__heart listing__info__heart--gray">
+                <FaHeart />
+              </div>
+            )}
           </div>
 
           <h2 className="heading-secondary u-margin-bottom-xsmall">
@@ -295,7 +306,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { listing: state.listing };
+  return { listing: state.listing, user: state.user };
 };
 
 //@ts-ignore

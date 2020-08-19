@@ -77,7 +77,7 @@
     width: 35%;
     margin-left: 1rem;
 
-    &__title-heart {
+    &__title {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -85,6 +85,17 @@
       svg {
         width: 2.8rem;
         height: 2.8rem;
+      }
+    }
+
+    &__edit {
+      &:link,
+      &:visited {
+        color: var(--color-grey-dark-1);
+      }
+
+      &:hover {
+        color: var(--color-secondary-light);
       }
     }
 
