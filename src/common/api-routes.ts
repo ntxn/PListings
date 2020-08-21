@@ -33,6 +33,7 @@ export enum Routes {
 
   // ------------------- FAVORITE ---------------------
   Favorites = '/',
+  Favorite = '/:id',
 }
 
 // base route for each resource
@@ -68,4 +69,5 @@ export enum ApiRoutes {
 
   // Favorites
   Favorites = '/api/v1/favorites',
+  Favorite = '/api/v1/favorites/:id',
 }

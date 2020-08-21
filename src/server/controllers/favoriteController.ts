@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 
-import { controller, use, POST, DELETE } from '../decorators';
+import { controller, use, POST, DELETE, GET } from '../decorators';
 import { authenticationChecker } from '../middlewares';
 import { Base, ErrMsg, Routes, RequestStatus } from '../../common';
 import {
@@ -13,6 +13,28 @@ import { Listing, Favorite } from '../models';
 
 @controller(Base.Favorites)
 class FavoriteController {
+  /**
+   * Check if the current user saves a listing
+   */
+  @use(authenticationChecker)
+  @GET(Routes.Favorite)
+  DidUserSaveListing(
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ): void {
+    catchAsync(async (req: CustomRequest, res, next) => {
+      const favorite = await Favorite.findOne({
+        listing: req.params.id,
+        user: req.user!.id,
+      });
+
+      res
+        .status(200)
+        .json({ status: RequestStatus.Success, data: favorite ? true : false });
+    })(req, res, next);
+  }
+
   /**
    * Create a Favorite document that contains the listing id (from req.body.listingId)
    * and user id (from req.user).
@@ -52,15 +74,15 @@ class FavoriteController {
    * TODO: write unit test
    */
   @use(authenticationChecker)
-  @DELETE(Routes.Favorites)
+  @DELETE(Routes.Favorite)
   unsaveListing(req: CustomRequest, res: Response, next: NextFunction): void {
     catchAsync(async (req: CustomRequest, res, next) => {
-      const listing = await Listing.findById(req.body.listingId);
+      const listing = await Listing.findById(req.params.id);
       if (!listing) return next(new NotFoundError(ErrMsg.NoDocWithId));
 
       const favorite = await Favorite.findOneAndDelete({
         user: req.user!.id,
-        listing: req.body.listingId,
+        listing: req.params.id,
       });
 
       if (favorite) {
