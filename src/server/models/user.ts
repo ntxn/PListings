@@ -32,7 +32,7 @@ export interface UserDoc extends mongoose.Document {
   tokens: { token: string }[];
   passwordResetToken?: string;
   passwordResetExpires?: number;
-  listings?: ListingDoc[];
+  listings: ListingDoc[];
   correctPassword(password: string): Promise<boolean>;
   removeExpiredTokens(): void;
 }
@@ -204,7 +204,7 @@ userSchema.statics.findOneByIdAndToken = async (
   await User.findOne({
     _id: id,
     'tokens.token': token,
-  });
+  }).populate('listings');
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
