@@ -6,7 +6,7 @@ import { AiFillEye } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
 import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
-import { fetchListing } from '../../actions';
+import { fetchListing, saveListing, unsaveListing } from '../../actions';
 import { ListingDoc, UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { ArrowBtn } from '../ArrowBtn';
@@ -17,7 +17,10 @@ import { history } from '../../history';
 interface ListingProps {
   listing: ListingDoc;
   user: UserDoc | null;
+  listingSaved: boolean;
   fetchListing(id: string): void;
+  saveListing(listingId: string): void;
+  unsaveListing(listingId: string): void;
 }
 
 const THUMBNAIL_SIZE = 5.5; // width & height is 5rem + right margin 0.5rem
@@ -195,10 +198,15 @@ const _Listing = (props: ListingProps): JSX.Element => {
               </Link>
             ) : (
               <div
-                className="listing__info__heart listing__info__heart--gray"
+                className={`listing__info__heart listing__info__heart--${
+                  props.listingSaved ? 'red' : 'gray'
+                }`}
                 onClick={() => {
-                  if (props.user) console.log('dfsdf');
-                  else setShowLogInModal(true);
+                  if (props.user) {
+                    if (props.listingSaved)
+                      props.unsaveListing(props.listing.id);
+                    else props.saveListing(props.listing.id);
+                  } else setShowLogInModal(true);
                 }}
               >
                 <FaHeart />
@@ -326,8 +334,18 @@ const _Listing = (props: ListingProps): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { listing: state.listing, user: state.user };
+  return {
+    listing: state.listing,
+    user: state.user,
+    listingSaved: state.listingSaved,
+  };
 };
 
-//@ts-ignore
-export const Listing = connect(mapStateToProps, { fetchListing })(_Listing);
+export const Listing = connect(mapStateToProps, {
+  fetchListing,
+  saveListing,
+  unsaveListing,
+})(
+  //@ts-ignore
+  _Listing
+);

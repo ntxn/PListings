@@ -12,6 +12,21 @@ export const listingReducer = (
       return action.payload;
     case ActionTypes.editListing:
       return action.payload;
+    case ActionTypes.saveListing:
+      return action.payload;
+    case ActionTypes.unsaveListing:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const listingSavedReducer = (state = false, action: Action): boolean => {
+  switch (action.type) {
+    case ActionTypes.saveListing:
+      return true;
+    case ActionTypes.unsaveListing:
+      return false;
     default:
       return state;
   }

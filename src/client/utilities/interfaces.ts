@@ -77,6 +77,16 @@ export interface EditListingAction {
   payload: ListingDoc;
 }
 
+export interface SaveListingAction {
+  type: ActionTypes.saveListing;
+  payload: ListingDoc;
+}
+
+export interface UnsaveListingAction {
+  type: ActionTypes.unsaveListing;
+  payload: ListingDoc;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -90,12 +100,15 @@ export type Action =
   | SetBtnLoaderAction
   | CreateListingAction
   | FetchListingAction
-  | EditListingAction;
+  | EditListingAction
+  | SaveListingAction
+  | UnsaveListingAction;
 
 // Store State
 export interface StoreState {
   user: UserDoc | null;
   listing: ListingDoc | null;
+  listingSaved: boolean;
   form: FormStateMap;
   currentLocation: GeoLocation;
   searchedLocations: SearchedLocation[];

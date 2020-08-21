@@ -10,6 +10,8 @@ import {
   FetchListingAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
+  SaveListingAction,
+  UnsaveListingAction,
 } from '../utilities';
 import { ListingAttrs } from '../../server/models';
 import { ApiRoutes } from '../../common';
@@ -22,6 +24,15 @@ export const fetchListing = (
     const { data } = await axios.get(`${ApiRoutes.Listings}/${id}`);
     dispatch({
       type: ActionTypes.fetchListing,
+      payload: data.data,
+    });
+
+    const response = await axios.get(`${ApiRoutes.Favorites}/${id}`);
+    dispatch({
+      //@ts-ignore
+      type: response.data.data
+        ? ActionTypes.saveListing
+        : ActionTypes.unsaveListing,
       payload: data.data,
     });
   } catch (err) {
@@ -98,3 +109,34 @@ export const editListing = (
 
     history.replace(`/listings/edit/${response.data.data.id}`);
   });
+
+export const saveListing = (
+  listingId: string
+): FunctionalAction<SaveListingAction> => async dispatch => {
+  try {
+    const { data } = await axios.post(ApiRoutes.Favorites, { listingId });
+    dispatch({
+      type: ActionTypes.saveListing,
+      payload: data.data,
+    });
+
+    showAlert(AlertType.Success, 'Listing saved successfully');
+  } catch (err) {
+    showAlert(AlertType.Error, err.message);
+  }
+};
+
+export const unsaveListing = (
+  listingId: string
+): FunctionalAction<UnsaveListingAction> => async dispatch => {
+  try {
+    const { data } = await axios.delete(`${ApiRoutes.Favorites}/${listingId}`);
+    dispatch({
+      type: ActionTypes.unsaveListing,
+      payload: data.data,
+    });
+    showAlert(AlertType.Success, 'Listing unsaved successfully');
+  } catch (err) {
+    showAlert(AlertType.Error, err.message);
+  }
+};

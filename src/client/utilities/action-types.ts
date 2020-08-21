@@ -21,4 +21,6 @@ export enum ActionTypes {
   createListing,
   fetchListing,
   editListing,
+  saveListing,
+  unsaveListing,
 }
