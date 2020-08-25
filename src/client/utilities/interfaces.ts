@@ -187,11 +187,12 @@ export interface ListingImagesParams {
 
 export interface FilterAttrs {
   location: CombinedLocation;
-  distance: number;
-  minPrice?: number;
-  maxPrice?: number;
+  distance: string;
   sort: string;
+  postedWithin: string;
+  minPrice?: string;
+  maxPrice?: string;
   category?: string;
   subcategory?: string;
-  postedWithin: string;
+  searchTerm?: string;
 }
