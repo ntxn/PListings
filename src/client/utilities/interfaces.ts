@@ -184,3 +184,14 @@ export interface ListingImagesParams {
   existingImages?: string[];
   deletedImages?: string[];
 }
+
+export interface FilterAttrs {
+  location: CombinedLocation;
+  distance: number;
+  minPrice?: number;
+  maxPrice?: number;
+  sort: string;
+  category?: string;
+  subcategory?: string;
+  postedWithin: string;
+}
