@@ -72,4 +72,26 @@ export const formFieldValues = {
     label: 'Brand',
     required: false,
   },
+  minPrice: {
+    name: 'minPrice',
+    placeholder: '$5',
+    label: 'Min Price',
+    type: 'number',
+    min: '0',
+  },
+  maxPrice: {
+    name: 'maxPrice',
+    placeholder: '$10',
+    label: 'Max Price',
+    type: 'number',
+    min: '0',
+  },
+  distance: {
+    name: 'distance',
+    label: 'Distance · in miles',
+    placeholder: '10',
+    type: 'number',
+    min: '5',
+    max: '50',
+  },
 };
