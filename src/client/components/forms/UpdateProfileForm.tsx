@@ -14,12 +14,12 @@ import {
 import { searchLocation, updateProfile, setBtnLoader } from '../../actions';
 import { ErrMsg, GeoLocation } from '../../../common';
 import {
+  asyncValidatorDispatcher,
   UpdateProfileAttrs as Attrs,
   formFieldValues,
   SearchedLocation,
   StoreState,
   CombinedLocation,
-  isSameLocation,
   renderTextInput,
   renderTextarea,
   FieldProps,
@@ -129,54 +129,21 @@ class Form extends React.Component<ReduxFormProps, FormState> {
   };
 
   /**
-   * An async validator to check if the location input is valid.
-   * Location input validator has to be asynchorous because we don't
-   * query for locations on every keystroke, but waiting for the
-   * user to stop typing before running a query.
-   */
-  asyncValidatorDispatcher = (
-    formValues: Attrs
-  ): ((dispatch: Dispatch, getState: () => StoreState) => Promise<Attrs>) => (
-    dispatch,
-    getState
-  ) => {
-    // If the location input value is a string representation of the currently
-    // chosen location object (which is store in this class state object),
-    // then restore the location value to be that object because we submit an
-    // object to the db, not a string.
-    if (
-      typeof formValues.location === 'string' &&
-      isSameLocation(formValues.location, this.state.selectedLocation)
-    )
-      formValues.location = this.state.selectedLocation;
-
-    if (typeof formValues.location === 'object')
-      return Promise.resolve(formValues);
-
-    const error = { location: ErrMsg.LocationDropdownListSelection };
-
-    if (getState!().searchedLocations.length === 0)
-      error.location = ErrMsg.LocationInvalid;
-
-    return Promise.reject(error);
-  };
-
-  /**
    * Handle form submission.
    * Before calling updateProfile, check if the location input value is valid
    */
   onSubmit = (formValues: Attrs, dispatch: Dispatch): void => {
     this.props.setBtnLoader(true);
 
-    return (
+    return dispatch(
       //@ts-ignore
-      dispatch(this.asyncValidatorDispatcher(formValues))
-        .then((newValues: Attrs) => this.props.updateProfile(newValues))
-        .catch((err: Record<string, string>) => {
-          throw new SubmissionError(err);
-        })
-        .finally(() => this.props.setBtnLoader(false))
-    );
+      asyncValidatorDispatcher(formValues, this.state.selectedLocation)
+    )
+      .then((newValues: Attrs) => this.props.updateProfile(newValues))
+      .catch((err: Record<string, string>) => {
+        throw new SubmissionError(err);
+      })
+      .finally(() => this.props.setBtnLoader(false));
   };
 
   resetForm = (): void => {

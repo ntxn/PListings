@@ -6,3 +6,4 @@ export * from './location';
 export * from './render-form-element';
 export * from './process-formValues-to-FormData';
 export * from './mapbox';
+export * from './redux-form-check-location-value-presubmission';
