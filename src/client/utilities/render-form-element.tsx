@@ -107,3 +107,57 @@ export const renderBtns = (
     </div>
   );
 };
+
+interface DropdownFieldProps {
+  fieldName: string;
+  options: string[];
+  onChange?: () => void;
+  emptyOptionAllowed?: boolean;
+}
+
+/**
+ * Render dropdown list like category or subcategory
+ */
+export const renderDropdown: React.StatelessComponent<
+  WrappedFieldProps & DropdownFieldProps
+> = ({
+  input,
+  meta,
+  fieldName,
+  options,
+  onChange,
+  emptyOptionAllowed,
+}): JSX.Element => {
+  const err = meta.error && meta.touched;
+  const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
+
+  const change = onChange
+    ? () => {
+        onChange();
+        return input.onChange;
+      }
+    : input.onChange;
+
+  return (
+    <div className="form__group">
+      <label htmlFor={fieldName} className="form__label">
+        {`${fieldName[0].toUpperCase()}${fieldName.substring(1)}`}
+      </label>
+      <select
+        {...input}
+        name={fieldName}
+        id={fieldName}
+        onChange={change}
+        className={inputClassName}
+      >
+        {emptyOptionAllowed && <option></option>}
+        {options.map((value, index) => (
+          <option value={value} key={index}>
+            {value}
+          </option>
+        ))}
+      </select>
+      <div className="form__error">{err ? meta.error : null}</div>
+    </div>
+  );
+};

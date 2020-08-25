@@ -17,6 +17,7 @@ import {
   ListingImagesParams,
   renderTextInput,
   renderTextarea,
+  renderDropdown,
   formFieldValues,
   CombinedLocation,
   SearchedLocation,
@@ -27,12 +28,6 @@ import {
 import { Categories, Subcategories, Conditions, ErrMsg } from '../../../common';
 import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
 import { searchLocation, setBtnLoader } from '../../actions';
-
-interface DropdownFieldProps {
-  fieldName: string;
-  options: string[];
-  onChange?: () => void;
-}
 
 interface PhotoUploadFieldProps {
   hasExistingImages: boolean;
@@ -226,44 +221,6 @@ class Form extends React.Component<ReduxFormProps, FormState> {
     );
   };
 
-  // dropdown list
-  renderDropdown: React.StatelessComponent<
-    WrappedFieldProps & DropdownFieldProps
-  > = ({ input, meta, fieldName, options, onChange }): JSX.Element => {
-    const err = meta.error && meta.touched;
-    const inputClassName = `form__input ${err ? 'form__input--error' : ''}`;
-
-    const change = onChange
-      ? () => {
-          onChange();
-          return input.onChange;
-        }
-      : input.onChange;
-
-    return (
-      <div className="form__group">
-        <label htmlFor={fieldName} className="form__label">
-          {`${fieldName[0].toUpperCase()}${fieldName.substring(1)}`}
-        </label>
-        <select
-          {...input}
-          name={fieldName}
-          id={fieldName}
-          onChange={change}
-          className={inputClassName}
-        >
-          <option></option>
-          {options.map((value, index) => (
-            <option value={value} key={index}>
-              {value}
-            </option>
-          ))}
-        </select>
-        <div className="form__error">{err ? meta.error : null}</div>
-      </div>
-    );
-  };
-
   /**
    * An async validator to check if the location input is valid.
    * Location input validator has to be asynchorous because we don't
@@ -394,17 +351,19 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
           <Field
             name="category"
-            component={this.renderDropdown}
+            component={renderDropdown}
             fieldName="category"
             options={Object.values(Categories)}
             onChange={() => this.props.change('subcategory', undefined)}
+            emptyOptionAllowed={true}
           />
 
           <Field
             name="subcategory"
-            component={this.renderDropdown}
+            component={renderDropdown}
             fieldName="subcategory"
             options={subcategories}
+            emptyOptionAllowed={true}
           />
 
           <Field component={renderTextInput} {...title} />
@@ -412,9 +371,10 @@ class Form extends React.Component<ReduxFormProps, FormState> {
 
           <Field
             name="condition"
-            component={this.renderDropdown}
+            component={renderDropdown}
             fieldName="condition"
             options={Object.values(Conditions)}
+            emptyOptionAllowed={true}
           />
 
           <Field component={renderTextInput} {...brand} />
