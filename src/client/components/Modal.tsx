@@ -1,25 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import { BsListNested } from 'react-icons/bs';
 import { AiFillSetting } from 'react-icons/ai';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
-import { IoIosArrowForward } from 'react-icons/io';
+import { IoIosArrowForward, IoIosClose } from 'react-icons/io';
 import { MdClose } from 'react-icons/md';
 
 import { UserDoc } from '../../server/models';
 import { UserAvatar } from './UserAvatar';
+import { FiltersForm } from './forms';
+import { FilterAttrs } from '../utilities';
 
 interface ModalProps {
   onDismiss(): void;
   title: string;
-  content: string;
+  content: string | JSX.Element;
   actions: JSX.Element;
 }
 
 interface ConfirmationModalProps {
   title: string;
-  content: string;
+  content: string | JSX.Element;
   confirmBtnText: string;
   action(): void;
   closeModal(): void;
@@ -187,6 +189,49 @@ export const MapModal = (props: MapModalProps): React.ReactPortal => {
       <div id="listing-map-large"></div>
       <div className="icon-close-btn" onClick={props.close}>
         <MdClose />
+      </div>
+    </div>,
+    document.querySelector('#modal')!
+  );
+};
+
+interface FiltersModalProps {
+  close(): void;
+  applyFilters(filters: FilterAttrs): void;
+  updateInitialValues(filters: FilterAttrs): void;
+  initialValues: Partial<FilterAttrs>;
+}
+
+/**
+ * A modal to display filter options as a form
+ */
+export const FiltersModal = (props: FiltersModalProps): React.ReactPortal => {
+  return ReactDOM.createPortal(
+    <div className="modal" onClick={props.close}>
+      <div
+        onClick={event => event.stopPropagation()}
+        className="modal__container"
+      >
+        <div className="heading-secondary u-margin-bottom-small u-center-text">
+          Filters & Sort
+        </div>
+
+        <IoIosClose
+          title="Close filters"
+          onClick={props.close}
+          className="modal__container__close-btn"
+        />
+
+        <FiltersForm
+          onSubmit={(filters: FilterAttrs) => {
+            props.applyFilters(filters);
+            props.close();
+          }}
+          updateInitialValues={(filters: FilterAttrs) =>
+            props.updateInitialValues(filters)
+          }
+          initialValues={props.initialValues}
+        />
       </div>
     </div>,
     document.querySelector('#modal')!
