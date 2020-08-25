@@ -37,19 +37,29 @@ const listingProps = [
 ];
 
 /**
- * A middleware to set default filtering and sorting options if there's no query provided
+ * A middleware to prep queries to:
+ * - filter out expired or sold listings
+ * - filter out listings not in the distance of the provided location.
+ *
+ * This prepQuery will be saved to req.filter and will be passed as a
+ * parameter to Listing.find() before processing other query. This limits
+ * the number of results that has to be filtered and sort later on.
  */
-const defaultFilterAndSort: MiddlewareHandler = (req, res, next) => {
-  if (!req.query) req.query = { sort: '-createdAt' };
-  else if (!req.query.sort) req.query.sort = '-createdAt';
-  next();
-};
+const prepQueries: MiddlewareHandler = (req, res, next) => {
+  const { location, distance } = req.query;
+  const radius = parseFloat(distance as string) / 3963.2; // distance is in miles
+  const lnglat = (location as string).split(',').map(str => parseFloat(str));
 
-/**
- * A middleware to get only active listings in addition to the request query requirements
- */
-const filterOutInactiveListings: MiddlewareHandler = (req, res, next) => {
-  req.query = { ...req.query, active: 'true' };
+  delete req.query.location;
+  delete req.query.distance;
+
+  // @ts-ignore
+  req.filter = {
+    active: 'true',
+    sold: 'false',
+    location: { $geoWithin: { $centerSphere: [lnglat, radius] } },
+  };
+
   next();
 };
 
@@ -159,8 +169,7 @@ class ListingController {
    * Get all active listings in db
    */
   @use(getAll(Listing))
-  @use(filterOutInactiveListings)
-  @use(defaultFilterAndSort)
+  @use(prepQueries)
   @GET(Routes.Listings)
   getAllListing(req: Request, res: Response): void {}
 
