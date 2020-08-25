@@ -8,3 +8,4 @@ export * from './categories';
 export * from './listing-conditions';
 export * from './interfaces';
 export * from './default-values';
+export * from './filter-and-sort-options';
