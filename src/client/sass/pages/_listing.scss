@@ -167,6 +167,14 @@
           font-weight: 700;
         }
       }
+
+      a {
+        &:link,
+        &:visited,
+        &:active {
+          color: var(--color-grey-dark-3);
+        }
+      }
     }
 
     &__map {
