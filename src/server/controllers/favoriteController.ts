@@ -16,7 +16,6 @@ class FavoriteController {
   /**
    * Check if the current user saves a listing
    */
-  @use(authenticationChecker)
   @GET(Routes.Favorite)
   DidUserSaveListing(
     req: CustomRequest,
@@ -24,10 +23,12 @@ class FavoriteController {
     next: NextFunction
   ): void {
     catchAsync(async (req: CustomRequest, res, next) => {
-      const favorite = await Favorite.findOne({
-        listing: req.params.id,
-        user: req.user!.id,
-      });
+      const favorite = req.user
+        ? await Favorite.findOne({
+            listing: req.params.id,
+            user: req.user.id,
+          })
+        : null;
 
       res
         .status(200)
