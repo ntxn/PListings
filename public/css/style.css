@@ -92,10 +92,6 @@
 .u-font-weight-300 {
   font-weight: 300; }
 
-.u-position-sticky-top-0 {
-  position: sticky;
-  top: 0; }
-
 .u-z-index-0 {
   z-index: 0; }
 
@@ -493,9 +489,8 @@ body {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.7);
-  position: absolute;
+  position: fixed;
   top: 0;
-  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
@@ -506,7 +501,19 @@ body {
     margin: 2rem;
     background-color: var(--color-white);
     border-radius: var(--border-radius-xsmall);
-    font-size: var(--default-font-size); }
+    font-size: var(--default-font-size);
+    overflow: scroll;
+    position: relative; }
+    .modal__container__close-btn {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      cursor: pointer;
+      width: 4rem;
+      height: 4rem;
+      color: var(--color-grey-dark-1); }
+      .modal__container__close-btn:hover {
+        color: var(--color-grey-dark-3); }
   .modal__content {
     color: var(--color-grey-dark-1);
     font-weight: 300;
@@ -574,6 +581,47 @@ body {
     display: flex;
     flex-direction: column; }
 
+.search-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 4rem; }
+  .search-input__search {
+    position: relative;
+    height: 100%;
+    width: 30rem; }
+    .search-input__search--input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 1.5rem;
+      padding-right: 4rem;
+      font-size: var(--default-font-size);
+      border-radius: var(--border-radius-small);
+      color: var(--color-grey-dark-3); }
+      .search-input__search--input:focus {
+        outline: none;
+        box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }
+      .search-input__search--input::placeholder {
+        color: var(--color-grey-light-4); }
+    .search-input__search--btn {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      cursor: pointer;
+      color: var(--color-grey-dark-1);
+      width: 2rem;
+      height: 2rem; }
+      .search-input__search--btn:hover {
+        color: var(--color-grey-dark-3); }
+  .search-input__filters {
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-left: 1rem; }
+    .search-input__filters:hover {
+      color: var(--color-secondary-dark); }
+
 .container {
   /*  
     When the main content is empty, with this container,
@@ -617,7 +665,9 @@ header {
   padding: var(--padding-body);
   background-color: var(--color-grey-light-1);
   height: var(--header-height);
-  z-index: 1; }
+  z-index: 1;
+  position: sticky;
+  top: 0; }
   header .header {
     width: var(--content-max-width);
     display: flex;
