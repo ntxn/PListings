@@ -296,7 +296,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
                 const header = document.querySelector(
                   '.container__center-content-horizontally'
                 );
-                header!.classList.remove('u-position-sticky-top-0');
+
                 header!.classList.add('u-z-index-0');
 
                 listingMapLarge(
@@ -318,7 +318,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
                 const header = document.querySelector(
                   '.container__center-content-horizontally'
                 );
-                header!.classList.add('u-position-sticky-top-0');
+
                 header!.classList.remove('u-z-index-0');
               }}
             />

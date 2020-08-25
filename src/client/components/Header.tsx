@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaBell } from 'react-icons/fa';
+
 import { UserDoc } from '../../server/models';
 import { StoreState } from '../utilities';
 import { logOut } from '../actions';
 import { UserMenuModal } from './Modal';
 import { UserAvatar } from './UserAvatar';
+import { SearchInput } from './SearchInput';
 
 interface HeaderProps {
   user: UserDoc | null;
@@ -59,7 +61,7 @@ const _Header = (props: HeaderProps): JSX.Element => {
   const [userMenuModal, setUserMenuModal] = useState(false);
 
   return (
-    <header className="container__center-content-horizontally u-position-sticky-top-0">
+    <header className="container__center-content-horizontally">
       <div className="header">
         <div className="header__logo">
           <Link to="/">
@@ -69,7 +71,9 @@ const _Header = (props: HeaderProps): JSX.Element => {
             />
           </Link>
         </div>
-        <div className="header__search-bar">Search bar</div>
+        <div className="header__search-input">
+          <SearchInput />
+        </div>
         <div className="header__nav">
           {props.user
             ? renderNavigationAuthenticated(
