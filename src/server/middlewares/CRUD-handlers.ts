@@ -65,7 +65,9 @@ export const updateOne: CRUD_handler = Model =>
 export const getAll: CRUD_handler = Model =>
   catchAsync(async (req, res, next) => {
     // Add features to the query if there's any
-    const filter = {};
+    // @ts-ignore
+    const filter = req.filter ? req.filter : {};
+
     const queryWithFeatures = new QueryFeatures(Model.find(filter), req.query)
       .filter()
       .sort()
