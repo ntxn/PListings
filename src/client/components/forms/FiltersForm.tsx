@@ -71,8 +71,8 @@ class Form extends React.Component<ReduxFormProps, FormState> {
       asyncValidatorDispatcher(formValues, this.state.selectedLocation)
     )
       .then((newValues: FilterAttrs) => {
+        this.props.updateInitialValues({ ...newValues });
         this.props.onSubmit(newValues);
-        this.props.updateInitialValues(newValues);
       })
       .catch((err: Record<string, string>) => {
         throw new SubmissionError(err);

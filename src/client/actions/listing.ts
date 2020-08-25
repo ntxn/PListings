@@ -58,14 +58,15 @@ export const createListing = (
 
     const { data } = await axios.post(ApiRoutes.Listings, formData);
 
-    showAlert(AlertType.Success, 'Listing created successfully');
-
     dispatch({
       type: ActionTypes.createListing,
       payload: data.data,
     });
 
-    history.push(`/listings/${data.data.id}`);
+    setTimeout(() => {
+      showAlert(AlertType.Success, 'Listing created successfully');
+      history.push(`/listings/${data.data.id}`);
+    }, 500);
   });
 
 export const editListing = (

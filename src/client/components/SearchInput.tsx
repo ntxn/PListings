@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { FiSearch } from 'react-icons/fi';
 import { IoIosOptions } from 'react-icons/io';
@@ -7,7 +7,13 @@ import { FiltersModal } from './Modal';
 import { history } from '../history';
 import { FilterAttrs, StoreState } from '../utilities';
 import { UserDoc } from '../../server/models';
-import { GeoLocation, SortBy, PostedWithin } from '../../common';
+import {
+  GeoLocation,
+  SortBy,
+  SortOptions,
+  PostedWithin,
+  PostedWithinOption,
+} from '../../common';
 
 interface SearchInputProps {
   user: UserDoc | undefined;
@@ -15,36 +21,79 @@ interface SearchInputProps {
 }
 
 const _SearchInput = (props: SearchInputProps): JSX.Element => {
-  const DEFAULT_FILTERS: Partial<FilterAttrs> = {
+  const DEFAULT_FILTERS: FilterAttrs = {
     sort: SortBy.NewestFirst,
     postedWithin: PostedWithin.AllListings,
-    distance: 20,
+    distance: '20',
     location: props.user ? props.user.location : props.currentLocation,
   };
 
+  // PROBLEM: not updating the right location when user's logged in
+  useEffect(() => {
+    DEFAULT_FILTERS.location = props.user
+      ? props.user.location
+      : props.currentLocation;
+    setInitialValues(DEFAULT_FILTERS);
+  }, props.currentLocation.coordinates);
+
   const [initialValues, setInitialValues] = useState(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const currentUrlParams = new URLSearchParams(window.location.search);
 
-  const renderFilterOptions = (): JSX.Element => {
-    return <div>jhj</div>;
+  const applyFilters = (filters: FilterAttrs) => {
+    // distance, sort, category, subcategory
+    const { distance, category, subcategory, sort, postedWithin } = filters;
+    currentUrlParams.set('distance', distance);
+    currentUrlParams.set('sort', SortOptions[sort]);
+    if (category) currentUrlParams.set('category', category);
+    if (subcategory) currentUrlParams.set('subcategory', subcategory);
+
+    // TODO: process searchTerm
+
+    // prep location
+    let lng = filters.location.longitude,
+      lat = filters.location.latitude;
+    const { coordinates } = filters.location;
+    if (coordinates) [lng, lat] = coordinates;
+    currentUrlParams.set('location', `${lng},${lat}`);
+
+    // Posted Within
+    if (postedWithin !== PostedWithin.AllListings) {
+      const date = new Date();
+      date.setDate(date.getDate() - PostedWithinOption[postedWithin]);
+      currentUrlParams.set('createdAt[gte]', date.toISOString());
+    }
+
+    // Price
+    const { minPrice, maxPrice } = filters;
+    if (minPrice) currentUrlParams.set('price[gte]', minPrice);
+    if (maxPrice) currentUrlParams.set('price[lte]', maxPrice);
+
+    history.push(window.location.pathname + '?' + currentUrlParams.toString());
   };
 
   return (
     <div className="search-input">
       <div
         className="search-input__search"
-        onKeyPress={() => console.log('Search')}
+        onKeyDown={event => {
+          if (event.keyCode === 13)
+            applyFilters({ ...initialValues, searchTerm });
+        }}
       >
         <input
           type="text"
           className="search-input__search--input"
           placeholder="Search plistings"
+          value={searchTerm}
+          onChange={event => setSearchTerm(event.target.value)}
         />
+
         <FiSearch
           title="Click to search"
-          onClick={() => console.log(window.location)}
+          onClick={() => applyFilters({ ...initialValues, searchTerm })}
           className="search-input__search--btn"
         />
       </div>
@@ -70,16 +119,7 @@ const _SearchInput = (props: SearchInputProps): JSX.Element => {
 
             header!.classList.remove('u-z-index-0');
           }}
-          applyFilters={(filters: FilterAttrs) => {
-            //TODO: process raw filters to match query string of backend
-            Object.keys(filters).forEach(key =>
-              //@ts-ignore
-              currentUrlParams.set(key, filters[key])
-            );
-            history.push(
-              window.location.pathname + '?' + currentUrlParams.toString()
-            );
-          }}
+          applyFilters={applyFilters}
           updateInitialValues={(filters: FilterAttrs) =>
             setInitialValues(filters)
           }

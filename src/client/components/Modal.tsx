@@ -224,7 +224,7 @@ export const FiltersModal = (props: FiltersModalProps): React.ReactPortal => {
 
         <FiltersForm
           onSubmit={(filters: FilterAttrs) => {
-            props.applyFilters(filters);
+            if (window.location.hash === '#/') props.applyFilters(filters);
             props.close();
           }}
           updateInitialValues={(filters: FilterAttrs) =>
