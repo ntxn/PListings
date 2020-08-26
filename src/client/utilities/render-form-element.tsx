@@ -1,7 +1,7 @@
 import React from 'react';
-import { WrappedFieldProps } from 'redux-form';
+import { WrappedFieldProps, InitializeAction } from 'redux-form';
 
-import { FieldProps, CombinedLocation } from './interfaces';
+import { FieldProps, CombinedLocation, FilterAttrs } from './interfaces';
 import { isSameLocation } from './location';
 import { BtnLoader } from '../components/Loader';
 
@@ -61,7 +61,8 @@ export const renderBtns = (
     searchLocation(term?: string): void;
   },
   submitBtnText: string,
-  selectedLocation: CombinedLocation
+  selectedLocation: CombinedLocation,
+  resetToDefaultValues?: () => void
 ): JSX.Element => {
   const { invalid, submitting, pristine, locationValue } = props;
 
@@ -77,10 +78,15 @@ export const renderBtns = (
     <div className="form__btn form__btn--right">
       <button
         type="button"
-        disabled={pristine || submitting || isInitialLocation}
+        disabled={
+          resetToDefaultValues
+            ? false
+            : pristine || submitting || isInitialLocation
+        }
         className="btn btn--outline"
         onClick={() => {
-          props.reset();
+          if (resetToDefaultValues) resetToDefaultValues();
+          else props.reset();
           props.searchLocation();
         }}
       >

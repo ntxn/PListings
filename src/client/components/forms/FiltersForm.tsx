@@ -9,7 +9,6 @@ import {
   SubmissionError,
 } from 'redux-form';
 
-import { UserDoc } from '../../../server/models';
 import {
   renderTextInput,
   renderDropdown,
@@ -35,9 +34,9 @@ interface StateProps {
   searchedLocations: SearchedLocation[];
   category: string;
   subcategory: string;
-  user?: UserDoc;
   locationValue: string;
   btnLoading: boolean;
+  defaultFilters: FilterAttrs;
 }
 
 interface DispatchProps {
@@ -145,7 +144,10 @@ class Form extends React.Component<ReduxFormProps, FormState> {
             {error ? error : null}
           </div>
 
-          {renderBtns(this.props, 'Apply', this.state.selectedLocation)}
+          {renderBtns(this.props, 'Apply', this.state.selectedLocation, () => {
+            //@ts-ignore
+            this.props.initialize(this.props.defaultFilters, true); // keepDirty to true
+          })}
         </form>
       </div>
     );
@@ -173,9 +175,8 @@ const mapStateToProps = (state: StoreState) => {
   const locationValue = selector(state, 'location');
 
   return {
-    user: state.user,
-    currentLocation: state.currentLocation,
     searchedLocations: state.searchedLocations,
+    defaultFilters: state.defaultFilters,
     btnLoading: state.btnLoading,
     category,
     subcategory,
