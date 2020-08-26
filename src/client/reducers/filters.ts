@@ -4,7 +4,7 @@ import { SortBy, PostedWithin, DEFAULT_LOCATION } from '../../common';
 const DEFAULT_FILTERS: FilterAttrs = {
   sort: SortBy.NewestFirst,
   postedWithin: PostedWithin.AllListings,
-  distance: '20',
+  distance: '10',
   location: DEFAULT_LOCATION,
 };
 

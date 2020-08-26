@@ -5,8 +5,11 @@ import { IoIosOptions } from 'react-icons/io';
 
 import { FiltersModal } from './Modal';
 import { history } from '../history';
-import { FilterAttrs, StoreState } from '../utilities';
-import { SortOptions, PostedWithin, PostedWithinOption } from '../../common';
+import {
+  FilterAttrs,
+  StoreState,
+  processFiltersToQueryString,
+} from '../utilities';
 
 interface SearchInputProps {
   defaultFilters: FilterAttrs;
@@ -21,38 +24,9 @@ const _SearchInput = (props: SearchInputProps): JSX.Element => {
     setInitialValues(props.defaultFilters);
   }, props.defaultFilters.location.coordinates);
 
-  const currentUrlParams = new URLSearchParams(window.location.search);
-
   const applyFilters = (filters: FilterAttrs) => {
-    // distance, sort, category, subcategory
-    const { distance, category, subcategory, sort, postedWithin } = filters;
-    currentUrlParams.set('distance', distance);
-    currentUrlParams.set('sort', SortOptions[sort]);
-    if (category) currentUrlParams.set('category', category);
-    if (subcategory) currentUrlParams.set('subcategory', subcategory);
-
-    // TODO: process searchTerm
-
-    // prep location
-    let lng = filters.location.longitude,
-      lat = filters.location.latitude;
-    const { coordinates } = filters.location;
-    if (coordinates) [lng, lat] = coordinates;
-    currentUrlParams.set('location', `${lng},${lat}`);
-
-    // Posted Within
-    if (postedWithin !== PostedWithin.AllListings) {
-      const date = new Date();
-      date.setDate(date.getDate() - PostedWithinOption[postedWithin]);
-      currentUrlParams.set('createdAt[gte]', date.toISOString());
-    }
-
-    // Price
-    const { minPrice, maxPrice } = filters;
-    if (minPrice) currentUrlParams.set('price[gte]', minPrice);
-    if (maxPrice) currentUrlParams.set('price[lte]', maxPrice);
-
-    history.push(window.location.pathname + '?' + currentUrlParams.toString());
+    const queryStr = processFiltersToQueryString(filters);
+    history.push(window.location.pathname + '?' + queryStr);
   };
 
   return (
