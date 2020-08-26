@@ -7,6 +7,8 @@ import {
   GetLocationByIPAction,
   SearchLocationAction,
   SearchedLocation,
+  StoreState,
+  SetDefaultFiltersAction,
 } from '../utilities';
 
 export const getLocationWithPermission = (): GetLocationWithPermissionAction => {
@@ -30,23 +32,32 @@ export const getLocationWithPermission = (): GetLocationWithPermissionAction => 
 };
 
 export const getLocationByIP = () => {
-  return async (dispatch: Dispatch): Promise<void> => {
+  return async (
+    dispatch: Dispatch,
+    getState: () => StoreState
+  ): Promise<void> => {
     const { data } = await axios.get(
       `https://geolocation-db.com/json/${process.env.GEOLOCATION_DB_KEY}`
     );
 
-    const { longitude, latitude, postal, city, state, country_name } = data;
+    const location: GeoLocation = {
+      coordinates: [data.longitude, data.latitude], // [longitude, latitude]
+      zip: data.postal,
+      city: data.city,
+      state: data.state.slice(0, 2).toUpperCase(),
+      country: data.country_name,
+    };
 
     dispatch<GetLocationByIPAction>({
       type: ActionTypes.getLocationByIP,
-      payload: {
-        coordinates: [longitude, latitude], // [longitude, latitude]
-        zip: postal,
-        city,
-        state: state.slice(0, 2).toUpperCase(),
-        country: country_name,
-      },
+      payload: location,
     });
+
+    if (!getState().user)
+      dispatch<SetDefaultFiltersAction>({
+        type: ActionTypes.setDefaultFilters,
+        payload: location,
+      });
   };
 };
 

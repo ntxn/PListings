@@ -63,12 +63,19 @@ export const logIn = (formValue: {
   });
 
 export const logOut = (nextRoute = '/'): FunctionalAction<LogOutAction> => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     await axios.get(ApiRoutes.LogOut);
 
     dispatch({
       type: ActionTypes.logOut,
       payload: null,
+    });
+
+    dispatch({
+      //@ts-ignore
+      type: ActionTypes.setDefaultFilters,
+      //@ts-ignore
+      payload: getState!().currentLocation,
     });
 
     history.push(nextRoute);
