@@ -21,6 +21,18 @@ export const listingReducer = (
   }
 };
 
+export const listingsReducer = (
+  state: ListingDoc[] = [],
+  action: Action
+): ListingDoc[] => {
+  switch (action.type) {
+    case ActionTypes.fetchListings:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 export const listingSavedReducer = (state = false, action: Action): boolean => {
   switch (action.type) {
     case ActionTypes.saveListing:

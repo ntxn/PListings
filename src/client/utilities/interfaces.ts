@@ -72,6 +72,11 @@ export interface FetchListingAction {
   payload: ListingDoc;
 }
 
+export interface FetchListingsAction {
+  type: ActionTypes.fetchListings;
+  payload: ListingDoc[];
+}
+
 export interface EditListingAction {
   type: ActionTypes.editListing;
   payload: ListingDoc;
@@ -105,6 +110,7 @@ export type Action =
   | SetBtnLoaderAction
   | CreateListingAction
   | FetchListingAction
+  | FetchListingsAction
   | EditListingAction
   | SaveListingAction
   | UnsaveListingAction
@@ -114,6 +120,7 @@ export type Action =
 export interface StoreState {
   user: UserDoc | null;
   listing: ListingDoc | null;
+  listings: ListingDoc[];
   listingSaved: boolean;
   form: FormStateMap;
   currentLocation: GeoLocation;

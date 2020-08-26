@@ -3,7 +3,11 @@ import { reducer as formReducer } from 'redux-form';
 import { authReducer } from './auth';
 import { currentLocationReducer, searchLocationReducer } from './location';
 import { btnLoaderReducer } from './loader';
-import { listingReducer, listingSavedReducer } from './listing';
+import {
+  listingReducer,
+  listingsReducer,
+  listingSavedReducer,
+} from './listing';
 import { filtersReducer } from './filters';
 import { StoreState } from '../utilities';
 
@@ -14,6 +18,7 @@ export const reducers = combineReducers<StoreState>({
   searchedLocations: searchLocationReducer,
   btnLoading: btnLoaderReducer,
   listing: listingReducer,
+  listings: listingsReducer,
   listingSaved: listingSavedReducer,
   defaultFilters: filtersReducer,
 });

@@ -8,6 +8,7 @@ import {
   FunctionalAction,
   ListingImagesParams,
   FetchListingAction,
+  FetchListingsAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
   SaveListingAction,
@@ -38,6 +39,21 @@ export const fetchListing = (
   } catch (err) {
     console.log(err);
     showAlert(AlertType.Error, 'Cannot load listing with this id');
+  }
+};
+
+export const fetchListings = (
+  queryStr: string
+): FunctionalAction<FetchListingsAction> => async dispatch => {
+  try {
+    const { data } = await axios.get(`${ApiRoutes.Listings}/?${queryStr}`);
+    dispatch({
+      type: ActionTypes.fetchListings,
+      payload: data.data,
+    });
+  } catch (err) {
+    console.log(err);
+    showAlert(AlertType.Error, `There's an issue loading listings`);
   }
 };
 
