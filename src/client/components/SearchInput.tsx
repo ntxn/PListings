@@ -6,39 +6,20 @@ import { IoIosOptions } from 'react-icons/io';
 import { FiltersModal } from './Modal';
 import { history } from '../history';
 import { FilterAttrs, StoreState } from '../utilities';
-import { UserDoc } from '../../server/models';
-import {
-  GeoLocation,
-  SortBy,
-  SortOptions,
-  PostedWithin,
-  PostedWithinOption,
-} from '../../common';
+import { SortOptions, PostedWithin, PostedWithinOption } from '../../common';
 
 interface SearchInputProps {
-  user: UserDoc | undefined;
-  currentLocation: GeoLocation;
+  defaultFilters: FilterAttrs;
 }
 
 const _SearchInput = (props: SearchInputProps): JSX.Element => {
-  const DEFAULT_FILTERS: FilterAttrs = {
-    sort: SortBy.NewestFirst,
-    postedWithin: PostedWithin.AllListings,
-    distance: '20',
-    location: props.user ? props.user.location : props.currentLocation,
-  };
-
-  // PROBLEM: not updating the right location when user's logged in
-  useEffect(() => {
-    DEFAULT_FILTERS.location = props.user
-      ? props.user.location
-      : props.currentLocation;
-    setInitialValues(DEFAULT_FILTERS);
-  }, props.currentLocation.coordinates);
-
-  const [initialValues, setInitialValues] = useState(DEFAULT_FILTERS);
+  const [initialValues, setInitialValues] = useState(props.defaultFilters);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    setInitialValues(props.defaultFilters);
+  }, props.defaultFilters.location.coordinates);
 
   const currentUrlParams = new URLSearchParams(window.location.search);
 
@@ -131,7 +112,7 @@ const _SearchInput = (props: SearchInputProps): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { user: state.user, currentLocation: state.currentLocation };
+  return { defaultFilters: state.defaultFilters };
 };
 
 //@ts-ignore

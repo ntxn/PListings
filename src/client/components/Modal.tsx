@@ -199,7 +199,7 @@ interface FiltersModalProps {
   close(): void;
   applyFilters(filters: FilterAttrs): void;
   updateInitialValues(filters: FilterAttrs): void;
-  initialValues: Partial<FilterAttrs>;
+  initialValues: FilterAttrs;
 }
 
 /**
