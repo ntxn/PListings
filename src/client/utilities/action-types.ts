@@ -23,4 +23,7 @@ export enum ActionTypes {
   editListing,
   saveListing,
   unsaveListing,
+
+  // listings filters
+  setDefaultFilters,
 }

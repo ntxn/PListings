@@ -87,6 +87,11 @@ export interface UnsaveListingAction {
   payload: ListingDoc;
 }
 
+export interface SetDefaultFiltersAction {
+  type: ActionTypes.setDefaultFilters;
+  payload: CombinedLocation;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -102,7 +107,8 @@ export type Action =
   | FetchListingAction
   | EditListingAction
   | SaveListingAction
-  | UnsaveListingAction;
+  | UnsaveListingAction
+  | SetDefaultFiltersAction;
 
 // Store State
 export interface StoreState {
@@ -113,6 +119,7 @@ export interface StoreState {
   currentLocation: GeoLocation;
   searchedLocations: SearchedLocation[];
   btnLoading: boolean;
+  defaultFilters: FilterAttrs;
 }
 
 export interface SearchedLocation {
