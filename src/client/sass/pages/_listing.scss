@@ -25,6 +25,10 @@
 
       &--container {
         position: relative;
+
+        &:hover > .arrow {
+          display: flex;
+        }
       }
     }
 

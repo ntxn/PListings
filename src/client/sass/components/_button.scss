@@ -105,12 +105,11 @@
 }
 
 .arrow {
+  display: none;
   width: 3rem;
   height: 3rem;
-
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   position: absolute;
   transform: translateY(-50%);
   cursor: pointer;
@@ -118,20 +117,27 @@
   outline: 0;
   background-color: transparent;
 
-  &--round {
-    width: 4rem;
-    height: 4rem;
-    background-color: rgba($color: #fff, $alpha: 0.8);
-    border-radius: var(--border-raidus-large);
-  }
-
   svg {
-    width: 3rem;
-    height: 3rem;
-    color: var(--color-grey-light-4);
+    width: 2.8rem;
+    height: 2.8rem;
+    color: var(--color-grey-dark-1);
 
     &:hover {
-      color: var(--color-grey-dark-1);
+      color: var(--color-grey-dark-3);
+    }
+  }
+
+  &--round {
+    background-color: rgba($color: #000, $alpha: 0.4);
+    border-radius: var(--border-raidus-large);
+
+    svg,
+    svg:hover {
+      color: var(--color-white);
+    }
+
+    &:hover {
+      background-color: rgba($color: #000, $alpha: 0.7);
     }
   }
 
