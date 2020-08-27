@@ -1,0 +1,42 @@
+.listing-card {
+  width: 20rem;
+  margin: 2.5rem;
+
+  &__photos {
+    width: 100%;
+    height: 20rem;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--border-radius-xsmall);
+    }
+  }
+
+  &__info {
+    &__city {
+      font-size: 1.3rem;
+      font-weight: 300;
+      line-height: 1.3rem;
+      color: var(--color-grey-dark-2);
+    }
+
+    &__title {
+      color: var(--var-grey-dark-3);
+
+      &:link,
+      &:active,
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    &__price {
+      line-height: 2rem;
+    }
+  }
+
+  &__save-btn {
+  }
+}
