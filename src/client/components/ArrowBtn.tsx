@@ -8,6 +8,7 @@ interface ArrowBtnProps {
   topPosition: string;
   disabled: boolean;
   margin?: string;
+  hide?: boolean;
 }
 
 export const ArrowBtn = ({
@@ -17,10 +18,11 @@ export const ArrowBtn = ({
   topPosition,
   margin = '0',
   isRound = false,
+  hide = false,
 }: ArrowBtnProps): JSX.Element => {
   const className = `arrow ${direction === 'forward' ? 'arrow--forward' : ''} ${
     disabled ? 'arrow--disabled' : ''
-  } ${isRound ? 'arrow--round' : ''}`;
+  } ${isRound ? 'arrow--round' : ''} ${hide ? 'u-hide' : ''}`;
 
   const extraStyling = { top: topPosition, margin };
 
