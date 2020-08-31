@@ -9,7 +9,7 @@ import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
 import { fetchListing, saveListing, unsaveListing } from '../../actions';
 import { ListingDoc, UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
-import { ArrowBtn } from '../ArrowBtn';
+import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, ConfirmationModal } from '../Modal';
 import { history } from '../../history';
@@ -23,9 +23,6 @@ interface ListingProps {
   unsaveListing(listingId: string): void;
 }
 
-const THUMBNAIL_SIZE = 5.5; // width & height is 5rem + right margin 0.5rem
-const MAX_OFFSET = THUMBNAIL_SIZE * 2;
-
 const _Listing = (props: ListingProps): JSX.Element => {
   useEffect(() => {
     const fetchData = async () => {
@@ -38,24 +35,22 @@ const _Listing = (props: ListingProps): JSX.Element => {
 
   useEffect(() => {
     if (props.listing) {
-      const thumbnailsPartial = document.querySelector(
-        '.listing__photos__thumbnails--partial'
-      );
+      // Use MutationObserver to listen to the changes in the DOM to wait for listing__photos to be rendered
+      const photosElement = document.querySelector('.listing__photos');
+      const observer = new MutationObserver((mutations, observer) => {
+        if (document.contains(photosElement)) {
+          setShowImageSlider(true);
+          observer.disconnect();
+        }
+      });
+      const options = {
+        attributes: false,
+        childList: true,
+        characterData: false,
+        subtree: true,
+      };
 
-      const partialWidth =
-        thumbnailsPartial!.getBoundingClientRect().width / 10;
-      setThumbnailsPartialWidth(partialWidth);
-
-      // last thumbnail doesn't have right margin
-      const fullWidth = props.listing.photos.length * THUMBNAIL_SIZE - 0.5;
-      setThumbnailsFullWidth(fullWidth);
-
-      if (partialWidth < fullWidth) {
-        const leftPosition = (fullWidth - partialWidth) / 2;
-        setThumbnailsLeftPosition(leftPosition);
-        setThumbnailsLeftBound(leftPosition);
-        setThumbnailsRightBound(-leftPosition);
-      }
+      observer.observe(document.body, options);
 
       const map = document.getElementById('listing-map-small');
       if (map)
@@ -66,6 +61,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
     }
   }, [props.listing]);
 
+  // Calculate when the listing was posted
   const getTimePosted = (): string => {
     const listingTime = new Date(props.listing.createdAt).getTime();
     const now = new Date().getTime();
@@ -85,96 +81,24 @@ const _Listing = (props: ListingProps): JSX.Element => {
     return `${diff} month${diff === 1 ? '' : 's'}`;
   };
 
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [thumbnailsPartialWidth, setThumbnailsPartialWidth] = useState(0);
-  const [thumbnailsFullWidth, setThumbnailsFullWidth] = useState(0);
   const [showMapModal, setShowMapModal] = useState(false);
   const [showLogInModal, setShowLogInModal] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
-  const [thumbnailsLeftPosition, setThumbnailsLeftPosition] = useState(0);
-  const [thumbnailsLeftBound, setThumbnailsLeftBound] = useState(0);
-  const [thumbnailsRightBound, setThumbnailsRightBound] = useState(0);
+  const [showImageSlider, setShowImageSlider] = useState(false);
 
   const renderListing = (): JSX.Element => {
     return (
       <div className="listing">
         <div className="listing__photos">
-          <div className="listing__photos__selected--container">
-            <div className="listing__photos__selected--image">
-              <img
-                src={`/img/listings/${props.listing.photos[currentPhotoIndex]}`}
-              />
-            </div>
-            <ArrowBtn
-              direction="back"
-              onClick={() => setCurrentPhotoIndex(currentPhotoIndex - 1)}
-              topPosition="25rem"
-              margin="1rem"
-              disabled={currentPhotoIndex === 0}
-              isRound={true}
+          {showImageSlider && (
+            <ImageSlider
+              images={props.listing.photos}
+              containerClassName="listing__photos"
+              arrowDisabled
+              pagination
+              thumbnails
             />
-            <ArrowBtn
-              direction="forward"
-              onClick={() => setCurrentPhotoIndex(currentPhotoIndex + 1)}
-              topPosition="25rem"
-              margin="1rem"
-              disabled={currentPhotoIndex === props.listing.photos.length - 1}
-              isRound={true}
-            />
-          </div>
-          <div className="listing__photos__thumbnails--container">
-            <div className="listing__photos__thumbnails--partial">
-              <div
-                className="listing__photos__thumbnails--full"
-                style={{
-                  transform: `translateX(${thumbnailsLeftPosition}rem)`,
-                }}
-              >
-                {props.listing.photos.map((filename, i) => (
-                  <img
-                    key={i}
-                    src={`/img/listings/${filename}`}
-                    onClick={() => setCurrentPhotoIndex(i)}
-                    className={`listing__photos__thumbnail ${
-                      i === currentPhotoIndex
-                        ? 'listing__photos__thumbnail--selected'
-                        : ''
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-            {thumbnailsPartialWidth < thumbnailsFullWidth && (
-              <>
-                <ArrowBtn
-                  direction="back"
-                  onClick={() => {
-                    const newLeftPosition =
-                      thumbnailsLeftPosition + MAX_OFFSET <= thumbnailsLeftBound
-                        ? thumbnailsLeftPosition + MAX_OFFSET
-                        : thumbnailsLeftBound;
-
-                    setThumbnailsLeftPosition(newLeftPosition);
-                  }}
-                  topPosition="2.5rem"
-                  disabled={thumbnailsLeftPosition === thumbnailsLeftBound}
-                />
-                <ArrowBtn
-                  direction="forward"
-                  onClick={() => {
-                    const newLeftPosition =
-                      thumbnailsLeftPosition - MAX_OFFSET >=
-                      thumbnailsRightBound
-                        ? thumbnailsLeftPosition - MAX_OFFSET
-                        : thumbnailsRightBound;
-                    setThumbnailsLeftPosition(newLeftPosition);
-                  }}
-                  topPosition="2.5rem"
-                  disabled={thumbnailsLeftPosition === thumbnailsRightBound}
-                />
-              </>
-            )}
-          </div>
+          )}
         </div>
         <div className="listing__info">
           {/******** Listing Title, Price & stats ********/}
