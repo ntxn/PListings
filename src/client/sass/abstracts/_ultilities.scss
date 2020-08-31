@@ -54,6 +54,12 @@
   display: none;
 }
 
+.u-show-arrow-on-hover {
+  &:hover > .arrow {
+    display: flex;
+  }
+}
+
 .u-divider {
   background-color: var(--color-grey-light-2);
   color: var(--color-grey-light-2);

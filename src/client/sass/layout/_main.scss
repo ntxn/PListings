@@ -3,6 +3,7 @@ main {
   flex: 1;
 
   .main {
-    width: var(--content-max-width);
+    width: 100%;
+    max-width: var(--content-max-width);
   }
 }
