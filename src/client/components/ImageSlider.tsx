@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { ArrowBtn } from './ArrowBtn';
 
@@ -8,6 +8,8 @@ interface ImageSliderProps {
   arrowDisabled?: boolean;
   pagination?: boolean;
   thumbnails?: boolean;
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
 }
 
 const MAX_THUMBNAIL_SIZE = 5; // width & height is 5rem
@@ -50,64 +52,6 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   });
 
   const [thumbnails, setThumbnails] = useState(INITIAL_THUMBNAILS_ATTR);
-
-  useEffect(() => {
-    if (props.thumbnails) {
-      // Get the thumbnail's height
-      const thumbnailsHeight = getContainerMeasurement().height * 0.1;
-      const thumbnailSize =
-        thumbnailsHeight > MAX_THUMBNAIL_SIZE
-          ? MAX_THUMBNAIL_SIZE
-          : thumbnailsHeight;
-
-      // Get thumbnails' other attributes
-      const thumbnailsPartial = document.querySelector(
-        '.image-slider__thumbnails--partial'
-      );
-
-      // Use Mutation Observer to wait for the DIV thumbnails--partail to be mounted to
-      // decide if we need to display arrows
-      const observer = new MutationObserver((mutations, observer) => {
-        if (document.contains(thumbnailsPartial)) {
-          const partialWidth =
-            thumbnailsPartial!.getBoundingClientRect().width / 10;
-
-          // last thumbnail doesn't have right margin
-          const fullWidth =
-            images.length * (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) -
-            THUMBNAIL_MARGIN_RIGHT;
-
-          if (partialWidth < fullWidth) {
-            const leftPosition = (fullWidth - partialWidth) / 2;
-
-            setThumbnails({
-              height: thumbnailSize,
-              maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
-              arrowTopPosition: thumbnailSize / 2,
-              showArrows: true,
-              leftPosition,
-              leftBound: leftPosition,
-              rightBound: -leftPosition,
-            });
-          } else
-            setThumbnails({
-              ...INITIAL_THUMBNAILS_ATTR,
-              height: thumbnailSize,
-              maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
-              arrowTopPosition: thumbnailSize / 2,
-            });
-          observer.disconnect();
-        }
-      });
-      const options = {
-        attributes: false,
-        childList: true,
-        characterData: false,
-        subtree: true,
-      };
-      observer.observe(document.body, options);
-    }
-  }, [images]);
 
   const { activeSlide, translate, transition, slides } = state;
 
@@ -172,6 +116,82 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
         ),
       });
   };
+
+  const autoPlayRef = useRef<() => void>(nextSlide);
+
+  useEffect(() => {
+    if (props.thumbnails) {
+      // Get the thumbnail's height
+      const thumbnailsHeight = getContainerMeasurement().height * 0.1;
+      const thumbnailSize =
+        thumbnailsHeight > MAX_THUMBNAIL_SIZE
+          ? MAX_THUMBNAIL_SIZE
+          : thumbnailsHeight;
+
+      // Get thumbnails' other attributes
+      const thumbnailsPartial = document.querySelector(
+        '.image-slider__thumbnails--partial'
+      );
+
+      // Use Mutation Observer to wait for the DIV thumbnails--partail to be mounted to
+      // decide if we need to display arrows
+      const observer = new MutationObserver((mutations, observer) => {
+        if (document.contains(thumbnailsPartial)) {
+          const partialWidth =
+            thumbnailsPartial!.getBoundingClientRect().width / 10;
+
+          // last thumbnail doesn't have right margin
+          const fullWidth =
+            images.length * (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) -
+            THUMBNAIL_MARGIN_RIGHT;
+
+          if (partialWidth < fullWidth) {
+            const leftPosition = (fullWidth - partialWidth) / 2;
+
+            setThumbnails({
+              height: thumbnailSize,
+              maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
+              arrowTopPosition: thumbnailSize / 2,
+              showArrows: true,
+              leftPosition,
+              leftBound: leftPosition,
+              rightBound: -leftPosition,
+            });
+          } else
+            setThumbnails({
+              ...INITIAL_THUMBNAILS_ATTR,
+              height: thumbnailSize,
+              maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
+              arrowTopPosition: thumbnailSize / 2,
+            });
+          observer.disconnect();
+        }
+      });
+      const options = {
+        attributes: false,
+        childList: true,
+        characterData: false,
+        subtree: true,
+      };
+      observer.observe(document.body, options);
+    }
+  }, [images]);
+
+  useEffect(() => {
+    autoPlayRef.current = nextSlide;
+  });
+
+  useEffect(() => {
+    if (props.autoPlay) {
+      const play = () => autoPlayRef.current();
+      const interval = setInterval(
+        play,
+        (props.autoPlayInterval ? props.autoPlayInterval : 3) * 1000
+      );
+
+      return () => clearInterval(interval);
+    }
+  }, []);
 
   return (
     <div
