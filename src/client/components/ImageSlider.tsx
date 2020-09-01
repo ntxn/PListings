@@ -73,7 +73,12 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   };
 
   const nextSlide = () => {
-    if (activeSlide === images.length - 1) return setNextSlide(0);
+    if (activeSlide === images.length - 1) {
+      if (props.thumbnails)
+        setThumbnails({ ...thumbnails, leftPosition: thumbnails.leftBound });
+      return setNextSlide(0);
+    }
+
     setNextSlide(activeSlide + 1);
 
     if (props.thumbnails)
@@ -87,7 +92,12 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   };
 
   const prevSlide = () => {
-    if (activeSlide === 0) return setNextSlide(images.length - 1);
+    if (activeSlide === 0) {
+      if (props.thumbnails)
+        setThumbnails({ ...thumbnails, leftPosition: thumbnails.rightBound });
+      return setNextSlide(images.length - 1);
+    }
+
     setNextSlide(activeSlide - 1);
 
     if (props.thumbnails)
