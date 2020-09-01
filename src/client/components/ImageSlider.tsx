@@ -12,6 +12,7 @@ interface ImageSliderProps {
   autoPlay?: boolean;
   autoPlayInterval?: number;
   linkTo?: string;
+  backgroundSize?: string;
 }
 
 const MAX_THUMBNAIL_SIZE = 5; // width & height is 5rem
@@ -232,6 +233,7 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
           const extraStyles = {
             width: `${getContainerMeasurement().width}rem`,
             backgroundImage: `url('/img/listings/${slide}')`,
+            backgroundSize: props.backgroundSize,
           };
           return (
             <div className="image-slider__slide" style={extraStyles} key={i} />

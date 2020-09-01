@@ -27,6 +27,7 @@ export const ListingCard = (props: ListingCardProps): JSX.Element => {
             containerClassName="listing-card__photos"
             pagination
             linkTo={listingPage}
+            backgroundSize="cover"
           />
         )}
       </div>
