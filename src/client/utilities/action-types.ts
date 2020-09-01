@@ -19,6 +19,7 @@ export enum ActionTypes {
 
   // listings
   fetchListing,
+  clearListing,
   fetchListings,
   createListing,
   editListing,

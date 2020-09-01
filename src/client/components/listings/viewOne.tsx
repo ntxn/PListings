@@ -6,7 +6,12 @@ import { AiFillEye } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
 import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
-import { fetchListing, saveListing, unsaveListing } from '../../actions';
+import {
+  fetchListing,
+  clearListing,
+  saveListing,
+  unsaveListing,
+} from '../../actions';
 import { ListingDoc, UserDoc } from '../../../server/models';
 import { BtnLoader } from '../Loader';
 import { ImageSlider } from '../ImageSlider';
@@ -19,6 +24,7 @@ interface ListingProps {
   user: UserDoc | null;
   listingSaved: boolean;
   fetchListing(id: string): void;
+  clearListing(): void;
   saveListing(listingId: string): void;
   unsaveListing(listingId: string): void;
 }
@@ -97,6 +103,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
               arrowDisabled
               pagination
               thumbnails
+              clearListing={props.clearListing}
             />
           )}
         </div>
@@ -267,6 +274,7 @@ const mapStateToProps = (state: StoreState) => {
 
 export const Listing = connect(mapStateToProps, {
   fetchListing,
+  clearListing,
   saveListing,
   unsaveListing,
 })(

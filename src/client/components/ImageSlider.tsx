@@ -13,6 +13,7 @@ interface ImageSliderProps {
   autoPlayInterval?: number;
   linkTo?: string;
   backgroundSize?: string;
+  clearListing?(): void;
 }
 
 const MAX_THUMBNAIL_SIZE = 5; // width & height is 5rem
@@ -27,9 +28,22 @@ const INITIAL_THUMBNAILS_ATTR = {
   maxOffset: (MAX_THUMBNAIL_SIZE + THUMBNAIL_MARGIN_RIGHT) * 2,
 };
 
-//TODO: don't allow ImageSlider to load props from the prev render
-
-// Slider - main component
+/**
+ * Component to display 1 or more images.
+ * There are 2 required props:
+ * @prop images (string[]) - images' filenames in the db
+ * @prop containerClassName (string) - css classname of the div element that will hold this image slider. The image slider will use the container's width and height to display images within this container
+ *
+ * Other optional props:
+ * @prop autoPlay (boolean) - let the images to be changed automatically
+ * @prop autoPlayInterval (number) - how many seconds to display 1 image before changing. Default value is 3s
+ * @prop pagination (boolean) - option to show pagination dots, default is false (not display)
+ * @prop thumbnails (boolean) - option to show thumbnails at the bottom of the slide, default is false
+ * @prop arrowDisabled (boolean) - Default is false. Set to true if you want the prev arrow to be disabled at slide #0, and the next arrow to be disabled at the last slide
+ * @prop clearListing (function) - an action creator to clear the listing prop from Redux store when ImageSlider unmounted. We need to pass this action creator if the listing passed in ImageSlider is from redux store. Otherwise, it will display the prev listing before loading the current chosen listing
+ * @prop linkTo (string) - a relative url to be used with Link component from react-router-dom. Provide this url if we want to redirect somewhere when clicking on the image slider
+ * @prop backgroundSize (string) - same options as CSS backgroundSize (ie contain, cover, inherit, etc). Default option is contain.
+ */
 export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const { images, containerClassName } = props;
 
@@ -113,6 +127,9 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
       });
   };
 
+  /**
+   * Calculate thumbnails values such as its height, width based on the browser size
+   */
   const calcThumbnailsValues = () => {
     // Get the thumbnail's height
     const thumbnailsHeight = getContainerMeasurement().height * 0.1;
@@ -217,6 +234,10 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
       };
       observer.observe(document.body, options);
     }
+
+    return () => {
+      if (props.clearListing) props.clearListing();
+    };
   }, [images]);
 
   const renderImageSliderContent = (): JSX.Element => {
@@ -254,6 +275,10 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
         }`}
         style={{ height: props.thumbnails ? '90%' : '100%' }}
       >
+        {/********************** IMAGES **********************
+         * If there is a link to be redirected, wrap the slider content in a Link component,
+         * otherwise, render the content by itself
+         */}
         {props.linkTo ? (
           <Link to={props.linkTo}>{renderImageSliderContent()}</Link>
         ) : (
@@ -281,6 +306,7 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
           hide={true}
         />
 
+        {/********************** PAGINATION **********************/}
         {props.pagination && images.length > 1 && (
           <div className="image-slider__pagination">
             {images.map((image, i) => (
@@ -297,6 +323,7 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
         )}
       </div>
 
+      {/********************* THUMBNAILS *********************/}
       {props.thumbnails && (
         <div className="image-slider__thumbnails">
           <div className="image-slider__thumbnails--partial">

@@ -72,6 +72,10 @@ export interface FetchListingAction {
   payload: ListingDoc;
 }
 
+export interface ClearListingAction {
+  type: ActionTypes.clearListing;
+}
+
 export interface FetchListingsAction {
   type: ActionTypes.fetchListings;
   payload: ListingDoc[];
@@ -110,6 +114,7 @@ export type Action =
   | SetBtnLoaderAction
   | CreateListingAction
   | FetchListingAction
+  | ClearListingAction
   | FetchListingsAction
   | EditListingAction
   | SaveListingAction

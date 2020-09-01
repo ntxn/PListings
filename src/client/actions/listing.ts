@@ -8,6 +8,7 @@ import {
   FunctionalAction,
   ListingImagesParams,
   FetchListingAction,
+  ClearListingAction,
   FetchListingsAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
@@ -40,6 +41,10 @@ export const fetchListing = (
     console.log(err);
     showAlert(AlertType.Error, 'Cannot load listing with this id');
   }
+};
+
+export const clearListing = (): ClearListingAction => {
+  return { type: ActionTypes.clearListing };
 };
 
 export const fetchListings = (

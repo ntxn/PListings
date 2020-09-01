@@ -10,6 +10,8 @@ export const listingReducer = (
       return action.payload;
     case ActionTypes.fetchListing:
       return action.payload;
+    case ActionTypes.clearListing:
+      return null;
     case ActionTypes.editListing:
       return action.payload;
     case ActionTypes.saveListing:
