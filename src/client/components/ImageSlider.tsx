@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 import { ArrowBtn } from './ArrowBtn';
 
@@ -10,6 +11,7 @@ interface ImageSliderProps {
   thumbnails?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
+  linkTo?: string;
 }
 
 const MAX_THUMBNAIL_SIZE = 5; // width & height is 5rem
@@ -216,6 +218,29 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
     }
   }, [images]);
 
+  const renderImageSliderContent = (): JSX.Element => {
+    return (
+      <div
+        className="image-slider__content"
+        style={{
+          transform: `translateX(-${translate}rem)`,
+          transition: `transform ease-out ${transition}s`,
+          width: `${getContainerMeasurement().width * images.length}rem`,
+        }}
+      >
+        {images.map((slide, i) => {
+          const extraStyles = {
+            width: `${getContainerMeasurement().width}rem`,
+            backgroundImage: `url('/img/listings/${slide}')`,
+          };
+          return (
+            <div className="image-slider__slide" style={extraStyles} key={i} />
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div
       className="image-slider"
@@ -227,28 +252,11 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
         }`}
         style={{ height: props.thumbnails ? '90%' : '100%' }}
       >
-        <div
-          className="image-slider__content"
-          style={{
-            transform: `translateX(-${translate}rem)`,
-            transition: `transform ease-out ${transition}s`,
-            width: `${getContainerMeasurement().width * images.length}rem`,
-          }}
-        >
-          {images.map((slide, i) => {
-            const extraStyles = {
-              width: `${getContainerMeasurement().width}rem`,
-              backgroundImage: `url('/img/listings/${slide}')`,
-            };
-            return (
-              <div
-                className="image-slider__slide"
-                style={extraStyles}
-                key={i}
-              />
-            );
-          })}
-        </div>
+        {props.linkTo ? (
+          <Link to={props.linkTo}>{renderImageSliderContent()}</Link>
+        ) : (
+          renderImageSliderContent()
+        )}
 
         <ArrowBtn
           direction="back"

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import { ListingDoc } from '../../../server/models';
-import { Link } from 'react-router-dom';
+import { ImageSlider } from '../ImageSlider';
 
 interface ListingCardProps {
   listing: ListingDoc;
@@ -10,14 +11,25 @@ interface ListingCardProps {
 
 export const ListingCard = (props: ListingCardProps): JSX.Element => {
   const listingPage = `/listings/${props.listing.id}`;
+  const [showImageSlider, setShowImageSlider] = useState(false);
+
+  useEffect(() => {
+    const imageSliderTimeout = setTimeout(() => setShowImageSlider(true), 500);
+    return () => clearTimeout(imageSliderTimeout);
+  }, []);
 
   return (
     <div className="listing-card">
-      <Link to={listingPage}>
-        <div className="listing-card__photos u-margin-bottom-xsmall">
-          <img src={`/img/listings/${props.listing.photos[0]}`} />
-        </div>
-      </Link>
+      <div className="listing-card__photos u-margin-bottom-xsmall">
+        {showImageSlider && (
+          <ImageSlider
+            images={props.listing.photos}
+            containerClassName="listing-card__photos"
+            pagination
+            linkTo={listingPage}
+          />
+        )}
+      </div>
 
       <div className="listing-card__info">
         <p className="listing-card__info__city">{`${
