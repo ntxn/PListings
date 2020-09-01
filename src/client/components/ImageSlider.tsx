@@ -29,9 +29,6 @@ const INITIAL_THUMBNAILS_ATTR = {
 // Slider - main component
 export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const { images, containerClassName } = props;
-  const firstSlide = images[0];
-  const secondSlide = images[1];
-  const lastSlide = images[images.length - 1];
 
   // Get container's width & height
   const getContainerMeasurement = (): { width: number; height: number } => {
@@ -42,32 +39,18 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
     return { width: width / 10, height: height / 10 };
   };
 
+  const getArrowTopPosition = () =>
+    (getContainerMeasurement().height * (props.thumbnails ? 0.9 : 1) - 1) / 2;
+
+  const [thumbnails, setThumbnails] = useState(INITIAL_THUMBNAILS_ATTR);
   const [state, setState] = useState({
     activeSlide: 0,
     translate: 0,
     transition: 0.45,
-    arrowTopPosition:
-      (getContainerMeasurement().height * (props.thumbnails ? 0.9 : 1) - 1) / 2,
-    slides: [lastSlide, firstSlide, secondSlide],
+    arrowTopPosition: getArrowTopPosition(),
   });
 
-  const [thumbnails, setThumbnails] = useState(INITIAL_THUMBNAILS_ATTR);
-
-  const { activeSlide, translate, transition, slides } = state;
-
-  // const nextSlide = () =>
-  //   setState({
-  //     ...state,
-  //     translate: translate + getContainerMeasurement().width,
-  //     activeSlide: activeSlide === images.length - 1 ? 0 : activeSlide + 1,
-  //   });
-
-  // const prevSlide = () =>
-  //   setState({
-  //     ...state,
-  //     translate: 0,
-  //     activeSlide: activeSlide === 0 ? images.length - 1 : activeSlide - 1,
-  //   });
+  const { activeSlide, translate, transition } = state;
 
   const getThumbnailsNextLeftPosition = (
     direction: string,
@@ -117,56 +100,102 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
       });
   };
 
+  const calcThumbnailsValues = () => {
+    // Get the thumbnail's height
+    const thumbnailsHeight = getContainerMeasurement().height * 0.1;
+    const thumbnailSize =
+      thumbnailsHeight > MAX_THUMBNAIL_SIZE
+        ? MAX_THUMBNAIL_SIZE
+        : thumbnailsHeight;
+
+    // Get thumbnails' other attributes
+    const thumbnailsPartial = document.querySelector(
+      '.image-slider__thumbnails--partial'
+    );
+
+    if (document.contains(thumbnailsPartial)) {
+      const partialWidth =
+        thumbnailsPartial!.getBoundingClientRect().width / 10;
+
+      // last thumbnail doesn't have right margin
+      const fullWidth =
+        images.length * (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) -
+        THUMBNAIL_MARGIN_RIGHT;
+
+      if (partialWidth < fullWidth) {
+        const leftPosition = (fullWidth - partialWidth) / 2;
+
+        setThumbnails({
+          height: thumbnailSize,
+          maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
+          arrowTopPosition: thumbnailSize / 2,
+          showArrows: true,
+          leftPosition,
+          leftBound: leftPosition,
+          rightBound: -leftPosition,
+        });
+      } else
+        setThumbnails({
+          ...INITIAL_THUMBNAILS_ATTR,
+          height: thumbnailSize,
+          maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
+          arrowTopPosition: thumbnailSize / 2,
+        });
+    }
+  };
+
+  const handleResize = () => {
+    setState({
+      ...state,
+      transition: 0,
+      translate: getContainerMeasurement().width,
+      arrowTopPosition: getArrowTopPosition(),
+    });
+
+    calcThumbnailsValues();
+  };
+
   const autoPlayRef = useRef<() => void>(nextSlide);
+  const resizeRef = useRef<() => void>(handleResize);
+
+  useEffect(() => {
+    autoPlayRef.current = nextSlide;
+    resizeRef.current = handleResize;
+  });
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (images.length > 1 && props.autoPlay) {
+      const play = () => autoPlayRef.current();
+      interval = setInterval(
+        play,
+        (props.autoPlayInterval ? props.autoPlayInterval : 3) * 1000
+      );
+    }
+
+    const resize = () => resizeRef.current();
+    const onResize = window.addEventListener('resize', resize);
+
+    return () => {
+      if (props.autoPlay) clearInterval(interval);
+      // @ts-ignore
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (transition === 0) setState({ ...state, transition: 0.45 });
+  }, [transition]);
 
   useEffect(() => {
     if (props.thumbnails) {
-      // Get the thumbnail's height
-      const thumbnailsHeight = getContainerMeasurement().height * 0.1;
-      const thumbnailSize =
-        thumbnailsHeight > MAX_THUMBNAIL_SIZE
-          ? MAX_THUMBNAIL_SIZE
-          : thumbnailsHeight;
-
-      // Get thumbnails' other attributes
-      const thumbnailsPartial = document.querySelector(
-        '.image-slider__thumbnails--partial'
-      );
-
       // Use Mutation Observer to wait for the DIV thumbnails--partail to be mounted to
       // decide if we need to display arrows
       const observer = new MutationObserver((mutations, observer) => {
-        if (document.contains(thumbnailsPartial)) {
-          const partialWidth =
-            thumbnailsPartial!.getBoundingClientRect().width / 10;
-
-          // last thumbnail doesn't have right margin
-          const fullWidth =
-            images.length * (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) -
-            THUMBNAIL_MARGIN_RIGHT;
-
-          if (partialWidth < fullWidth) {
-            const leftPosition = (fullWidth - partialWidth) / 2;
-
-            setThumbnails({
-              height: thumbnailSize,
-              maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
-              arrowTopPosition: thumbnailSize / 2,
-              showArrows: true,
-              leftPosition,
-              leftBound: leftPosition,
-              rightBound: -leftPosition,
-            });
-          } else
-            setThumbnails({
-              ...INITIAL_THUMBNAILS_ATTR,
-              height: thumbnailSize,
-              maxOffset: (thumbnailSize + THUMBNAIL_MARGIN_RIGHT) * 2,
-              arrowTopPosition: thumbnailSize / 2,
-            });
-          observer.disconnect();
-        }
+        calcThumbnailsValues();
+        observer.disconnect();
       });
+
       const options = {
         attributes: false,
         childList: true,
@@ -176,22 +205,6 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
       observer.observe(document.body, options);
     }
   }, [images]);
-
-  useEffect(() => {
-    autoPlayRef.current = nextSlide;
-  });
-
-  useEffect(() => {
-    if (props.autoPlay) {
-      const play = () => autoPlayRef.current();
-      const interval = setInterval(
-        play,
-        (props.autoPlayInterval ? props.autoPlayInterval : 3) * 1000
-      );
-
-      return () => clearInterval(interval);
-    }
-  }, []);
 
   return (
     <div
