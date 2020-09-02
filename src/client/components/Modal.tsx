@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import { BsListNested } from 'react-icons/bs';
@@ -6,11 +6,13 @@ import { AiFillSetting } from 'react-icons/ai';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { IoIosArrowForward, IoIosClose } from 'react-icons/io';
 import { MdClose } from 'react-icons/md';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 import { UserDoc } from '../../server/models';
 import { UserAvatar } from './UserAvatar';
 import { FiltersForm } from './forms';
 import { FilterAttrs } from '../utilities';
+import { history } from '../history';
 
 interface ModalProps {
   onDismiss(): void;
@@ -94,6 +96,28 @@ export const ConfirmationModal = (
       actions={renderActions()}
       onDismiss={props.closeModal}
     />
+  );
+};
+
+/**
+ * If user is not logged in, prompt them to log in in order to save a listing
+ */
+export const promptUserToLogInToSaveListing = (
+  show: boolean,
+  close: () => void
+): JSX.Element => {
+  return (
+    <>
+      {show && (
+        <ConfirmationModal
+          title="Save listing"
+          content="Please log in to your account to save a listing"
+          confirmBtnText="Proceed To Log In"
+          action={() => history.push('/auth/login')}
+          closeModal={close}
+        />
+      )}
+    </>
   );
 };
 
@@ -237,6 +261,18 @@ export const FiltersModal = (props: FiltersModalProps): React.ReactPortal => {
           initialValues={props.initialValues}
         />
       </div>
+    </div>,
+    document.querySelector('#modal')!
+  );
+};
+
+/**
+ * A modal to display loader
+ */
+export const Loader = (): React.ReactPortal => {
+  return ReactDOM.createPortal(
+    <div className="modal">
+      <ClipLoader size={50} color={'#ffb7a1'} />
     </div>,
     document.querySelector('#modal')!
   );

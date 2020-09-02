@@ -13,16 +13,14 @@ import {
   unsaveListing,
 } from '../../actions';
 import { ListingDoc, UserDoc } from '../../../server/models';
-import { BtnLoader } from '../Loader';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
-import { MapModal, ConfirmationModal } from '../Modal';
-import { history } from '../../history';
+import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
 
 interface ListingProps {
   listing: ListingDoc;
   user: UserDoc | null;
-  listingSaved: boolean;
+  savedListings: Record<string, string>;
   fetchListing(id: string): void;
   clearListing(): void;
   saveListing(listingId: string): void;
@@ -130,11 +128,11 @@ const _Listing = (props: ListingProps): JSX.Element => {
             ) : (
               <div
                 className={`listing__info__heart listing__info__heart--${
-                  props.listingSaved ? 'red' : 'gray'
+                  props.savedListings[props.listing.id] ? 'red' : 'gray'
                 }`}
                 onClick={() => {
                   if (props.user) {
-                    if (props.listingSaved)
+                    if (props.savedListings[props.listing.id])
                       props.unsaveListing(props.listing.id);
                     else props.saveListing(props.listing.id);
                   } else setShowLogInModal(true);
@@ -143,18 +141,9 @@ const _Listing = (props: ListingProps): JSX.Element => {
                 <FaHeart />
               </div>
             )}
-            {
-              /* If user is not logged in, prompt them to log in in order to save a listing */
-              showLogInModal && (
-                <ConfirmationModal
-                  title="Save listing"
-                  content="Please log in to your account or sign up for a new account to save a listing"
-                  confirmBtnText="Proceed To Log In"
-                  action={() => history.push('/auth/login')}
-                  closeModal={() => setShowLogInModal(false)}
-                />
-              )
-            }
+            {promptUserToLogInToSaveListing(showLogInModal, () =>
+              setShowLogInModal(false)
+            )}
           </div>
 
           <h2 className="heading-secondary u-margin-bottom-xsmall">
@@ -241,7 +230,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
           <div className="listing__info__location paragraph-small-font-size">
             {`${props.listing.location.city}, ${props.listing.location.state} ${props.listing.location.zip}`}
           </div>
-          {showLoader && <BtnLoader />}
+          {showLoader && <Loader />}
           {showMapModal && (
             <MapModal
               close={() => {
@@ -261,14 +250,14 @@ const _Listing = (props: ListingProps): JSX.Element => {
     );
   };
 
-  return <>{props.listing ? renderListing() : <BtnLoader />}</>;
+  return <>{props.listing ? renderListing() : <Loader />}</>;
 };
 
 const mapStateToProps = (state: StoreState) => {
   return {
     listing: state.listing,
     user: state.user,
-    listingSaved: state.listingSaved,
+    savedListings: state.savedListings,
   };
 };
 
