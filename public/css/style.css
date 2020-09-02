@@ -464,6 +464,8 @@ body {
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: var(--border-radius-small); }
+    .image-slider__container--bordered {
+      box-shadow: 0 0 0 1px var(--color-grey-light-2), 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 2px 3px 0 rgba(0, 0, 0, 0.05); }
   .image-slider__content {
     height: 100%;
     display: flex; }
@@ -515,15 +517,11 @@ body {
 
 .listing-card {
   width: 20rem;
-  margin: 2.5rem; }
+  margin: 2.5rem;
+  position: relative; }
   .listing-card__photos {
     width: 100%;
     height: 20rem; }
-    .listing-card__photos img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: var(--border-radius-xsmall); }
   .listing-card__info__city {
     font-size: 1.3rem;
     font-weight: 300;
@@ -535,6 +533,31 @@ body {
       text-decoration: none; }
   .listing-card__info__price {
     line-height: 2rem; }
+  .listing-card__save-btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--border-raidus-large);
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center; }
+    .listing-card__save-btn svg {
+      width: 1.8rem;
+      height: 1.8rem;
+      color: var(--color-white); }
+    .listing-card__save-btn:hover {
+      background-color: rgba(0, 0, 0, 0.4); }
+      .listing-card__save-btn:hover svg {
+        color: var(--color-grey-light-1); }
+    .listing-card__save-btn--saved svg {
+      color: var(--color-red-light); }
+    .listing-card__save-btn--saved:hover svg {
+      color: var(--color-red); }
 
 .btn-loader {
   width: 14rem;
@@ -892,7 +915,8 @@ main {
       width: 100vw;
       height: 100vh;
       position: fixed;
-      top: 0; }
+      top: 0;
+      z-index: 9999; }
       .listing__info__map--large #listing-map-large {
         width: 100%;
         height: 100%; }
@@ -911,4 +935,10 @@ main {
       display: flex;
       flex-direction: row;
       align-items: center; }
+
+.listings {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; }
 

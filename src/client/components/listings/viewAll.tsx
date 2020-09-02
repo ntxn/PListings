@@ -1,34 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
-import { fetchListings } from '../../actions';
+import { fetchListings, clearListings } from '../../actions';
 import { ListingCard } from './ListingCard';
+import { Loader } from '../Modal';
 import {
   StoreState,
   FilterAttrs,
   processFiltersToQueryString,
   calcDistanceBetweenTwoPoints,
 } from '../../utilities';
-import { ListingDoc } from '../../../server/models';
+import { ListingDoc, UserDoc } from '../../../server/models';
 
 interface StateProps {
   defaultFilters: FilterAttrs;
   listings: ListingDoc[];
+  user: UserDoc | null;
 }
 
 interface DispatchProps {
-  fetchListings(queryStr: string): void;
+  fetchListings(queryStr: string, user: UserDoc | null): void;
+  clearListings(): void;
 }
 type AllListingsProps = StateProps &
   DispatchProps & { location: { search: string } };
 
 const AllListings = (props: AllListingsProps): JSX.Element => {
   const [center, setCenter] = useState([0, 0]);
+  const [showLoader, setshowLoader] = useState(false);
   const [defaultFilterTimer, setDefaultFilterTimer] = useState(
     setTimeout(() => {}, 10000)
   );
 
   useEffect(() => {
+    setshowLoader(true);
+
     const { search } = props.location;
 
     if (search) {
@@ -39,7 +45,8 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
           .split(',')
           .map(value => parseFloat(value))
       );
-      props.fetchListings(search.substring(1));
+      props.fetchListings(search.substring(1), props.user);
+      setshowLoader(false);
     } else {
       clearTimeout(defaultFilterTimer);
       setDefaultFilterTimer(
@@ -52,37 +59,54 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
           setCenter(coordinates ? coordinates : [longitude!, latitude!]);
 
           const queryStr = processFiltersToQueryString(props.defaultFilters);
-          props.fetchListings(queryStr);
-        }, 500)
+          props.fetchListings(queryStr, props.user);
+          setshowLoader(false);
+        }, 1000)
       );
     }
+
+    return () => {
+      clearTimeout(defaultFilterTimer);
+      props.clearListings();
+    };
   }, [props.defaultFilters, props.location.search]);
 
   return (
-    <div>
-      {props.listings.map(listing => {
-        const [lng2, lat2] = listing.location.coordinates;
-        return (
-          <ListingCard
-            key={listing.id}
-            listing={listing}
-            distanceDiff={calcDistanceBetweenTwoPoints(
-              center[1],
-              center[0],
-              lat2,
-              lng2
-            )}
-          />
-        );
-      })}
-    </div>
+    <>
+      <div className="listings">
+        {props.listings.map(listing => {
+          const [lng2, lat2] = listing.location.coordinates;
+          return (
+            <ListingCard
+              key={listing.id}
+              listing={listing}
+              distanceDiff={calcDistanceBetweenTwoPoints(
+                center[1],
+                center[0],
+                lat2,
+                lng2
+              )}
+            />
+          );
+        })}
+      </div>
+      {showLoader && <Loader />}
+    </>
   );
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { defaultFilters: state.defaultFilters, listings: state.listings };
+  return {
+    defaultFilters: state.defaultFilters,
+    listings: state.listings,
+    user: state.user,
+  };
 };
 
-export const Listings = connect(mapStateToProps, { fetchListings })(
+export const Listings = connect(mapStateToProps, {
+  fetchListings,
+  clearListings,
+})(
+  //@ts-ignore
   AllListings
 );
