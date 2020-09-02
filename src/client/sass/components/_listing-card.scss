@@ -1,17 +1,11 @@
 .listing-card {
   width: 20rem;
   margin: 2.5rem;
+  position: relative;
 
   &__photos {
     width: 100%;
     height: 20rem;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: var(--border-radius-xsmall);
-    }
   }
 
   &__info {
@@ -38,5 +32,44 @@
   }
 
   &__save-btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--border-raidus-large);
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    cursor: pointer;
+
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 1.8rem;
+      height: 1.8rem;
+      color: var(--color-white);
+    }
+
+    &:hover {
+      background-color: rgba($color: #000000, $alpha: 0.4);
+      svg {
+        color: var(--color-grey-light-1);
+      }
+    }
+
+    &--saved {
+      svg {
+        color: var(--color-red-light);
+      }
+
+      &:hover {
+        svg {
+          color: var(--color-red);
+        }
+      }
+    }
   }
 }
