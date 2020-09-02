@@ -63,7 +63,7 @@ export const removeSendExpiredCookieToken = async (
   res: Response,
   statusCode: number
 ): Promise<void> => {
-  res.cookie('jwt', 'loggedOut', {
+  res.cookie('jwt', createToken(mongoose.Types.ObjectId(), '10000'), {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
