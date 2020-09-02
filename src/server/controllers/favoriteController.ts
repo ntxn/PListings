@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 
 import { controller, use, POST, DELETE, GET } from '../decorators';
 import { authenticationChecker } from '../middlewares';
@@ -8,16 +9,47 @@ import {
   CustomRequest,
   NotFoundError,
   BadRequestError,
+  MiddlewareHandler,
 } from '../utils';
 import { Listing, Favorite } from '../models';
 
 @controller(Base.Favorites)
 class FavoriteController {
+  /***
+   * From the listingIds in the req.body, filter out any ids saved by the current user
+   */
+  @use(authenticationChecker)
+  @POST(Routes.FilterListingsSavedByUser)
+  filterProvidedListingsSavedByUser(
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ): void {
+    catchAsync(async (req: CustomRequest, res, next) => {
+      const { listingIds } = req.body;
+      const savedListings: Record<string, string> = {};
+
+      await Promise.all(
+        (listingIds as string[]).map(async id => {
+          const favorite = await Favorite.findOne({
+            listing: id,
+            user: req.user!.id,
+          });
+          if (favorite) savedListings[id] = id;
+        })
+      );
+
+      res
+        .status(200)
+        .json({ status: RequestStatus.Success, data: savedListings });
+    })(req, res, next);
+  }
+
   /**
    * Check if the current user saves a listing
    */
   @GET(Routes.Favorite)
-  DidUserSaveListing(
+  didUserSaveListing(
     req: CustomRequest,
     res: Response,
     next: NextFunction

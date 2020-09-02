@@ -34,6 +34,8 @@ export enum Routes {
   // ------------------- FAVORITE ---------------------
   Favorites = '/',
   Favorite = '/:id',
+  FavoriteListingsByUser = '/user/:id',
+  FilterListingsSavedByUser = '/filter-listings-saved-by-user',
 }
 
 // base route for each resource
@@ -69,5 +71,7 @@ export enum ApiRoutes {
 
   // Favorites
   Favorites = '/api/v1/favorites',
+  FavoriteListingsByUser = '/api/v1/favorites/user/:id',
+  FilterListingsSavedByUser = '/api/v1/favorites/filter-listings-saved-by-user',
   Favorite = '/api/v1/favorites/:id',
 }
