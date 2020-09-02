@@ -81,6 +81,10 @@ export interface FetchListingsAction {
   payload: ListingDoc[];
 }
 
+export interface ClearListingsAction {
+  type: ActionTypes.clearListings;
+}
+
 export interface EditListingAction {
   type: ActionTypes.editListing;
   payload: ListingDoc;
@@ -94,6 +98,15 @@ export interface SaveListingAction {
 export interface UnsaveListingAction {
   type: ActionTypes.unsaveListing;
   payload: ListingDoc;
+}
+
+export interface FetchSavedListingsAction {
+  type: ActionTypes.fetchSavedListings;
+  payload: Record<string, string>;
+}
+
+export interface ClearSavedListingsAction {
+  type: ActionTypes.clearSavedListings;
 }
 
 export interface SetDefaultFiltersAction {
@@ -116,9 +129,12 @@ export type Action =
   | FetchListingAction
   | ClearListingAction
   | FetchListingsAction
+  | ClearListingsAction
   | EditListingAction
   | SaveListingAction
   | UnsaveListingAction
+  | FetchSavedListingsAction
+  | ClearSavedListingsAction
   | SetDefaultFiltersAction;
 
 // Store State
@@ -126,7 +142,7 @@ export interface StoreState {
   user: UserDoc | null;
   listing: ListingDoc | null;
   listings: ListingDoc[];
-  listingSaved: boolean;
+  savedListings: Record<string, string>;
   form: FormStateMap;
   currentLocation: GeoLocation;
   searchedLocations: SearchedLocation[];

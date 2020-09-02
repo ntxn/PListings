@@ -21,10 +21,13 @@ export enum ActionTypes {
   fetchListing,
   clearListing,
   fetchListings,
+  clearListings,
   createListing,
   editListing,
   saveListing,
   unsaveListing,
+  fetchSavedListings,
+  clearSavedListings,
 
   // listings filters
   setDefaultFilters,
