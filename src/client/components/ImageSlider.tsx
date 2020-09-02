@@ -14,6 +14,7 @@ interface ImageSliderProps {
   linkTo?: string;
   backgroundSize?: string;
   clearListing?(): void;
+  bordered?: boolean;
 }
 
 const MAX_THUMBNAIL_SIZE = 5; // width & height is 5rem
@@ -43,6 +44,7 @@ const INITIAL_THUMBNAILS_ATTR = {
  * @prop clearListing (function) - an action creator to clear the listing prop from Redux store when ImageSlider unmounted. We need to pass this action creator if the listing passed in ImageSlider is from redux store. Otherwise, it will display the prev listing before loading the current chosen listing
  * @prop linkTo (string) - a relative url to be used with Link component from react-router-dom. Provide this url if we want to redirect somewhere when clicking on the image slider
  * @prop backgroundSize (string) - same options as CSS backgroundSize (ie contain, cover, inherit, etc). Default option is contain.
+ * @prop bordered (boolean) - option to add border and shadow to the image slider
  */
 export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const { images, containerClassName } = props;
@@ -272,7 +274,7 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
       <div
         className={`image-slider__container ${
           images.length > 1 ? 'u-show-arrow-on-hover' : ''
-        }`}
+        } ${props.bordered ? 'image-slider__container--bordered' : ''}`}
         style={{ height: props.thumbnails ? '90%' : '100%' }}
       >
         {/********************** IMAGES **********************
