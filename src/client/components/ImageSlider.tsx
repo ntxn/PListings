@@ -13,7 +13,6 @@ interface ImageSliderProps {
   autoPlayInterval?: number;
   linkTo?: string;
   backgroundSize?: string;
-  clearListing?(): void;
   bordered?: boolean;
 }
 
@@ -41,7 +40,6 @@ const INITIAL_THUMBNAILS_ATTR = {
  * @prop pagination (boolean) - option to show pagination dots, default is false (not display)
  * @prop thumbnails (boolean) - option to show thumbnails at the bottom of the slide, default is false
  * @prop arrowDisabled (boolean) - Default is false. Set to true if you want the prev arrow to be disabled at slide #0, and the next arrow to be disabled at the last slide
- * @prop clearListing (function) - an action creator to clear the listing prop from Redux store when ImageSlider unmounted. We need to pass this action creator if the listing passed in ImageSlider is from redux store. Otherwise, it will display the prev listing before loading the current chosen listing
  * @prop linkTo (string) - a relative url to be used with Link component from react-router-dom. Provide this url if we want to redirect somewhere when clicking on the image slider
  * @prop backgroundSize (string) - same options as CSS backgroundSize (ie contain, cover, inherit, etc). Default option is contain.
  * @prop bordered (boolean) - option to add border and shadow to the image slider
@@ -236,10 +234,6 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
       };
       observer.observe(document.body, options);
     }
-
-    return () => {
-      if (props.clearListing) props.clearListing();
-    };
   }, [images]);
 
   const renderImageSliderContent = (): JSX.Element => {

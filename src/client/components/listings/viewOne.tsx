@@ -35,6 +35,8 @@ const _Listing = (props: ListingProps): JSX.Element => {
     };
 
     fetchData();
+
+    return () => props.clearListing();
   }, []);
 
   useEffect(() => {
@@ -101,7 +103,6 @@ const _Listing = (props: ListingProps): JSX.Element => {
               arrowDisabled
               pagination
               thumbnails
-              clearListing={props.clearListing}
             />
           )}
         </div>
