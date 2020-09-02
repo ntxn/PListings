@@ -30,17 +30,26 @@ export const listingsReducer = (
   switch (action.type) {
     case ActionTypes.fetchListings:
       return action.payload;
+    case ActionTypes.clearListings:
+      return [];
     default:
       return state;
   }
 };
 
-export const listingSavedReducer = (state = false, action: Action): boolean => {
+export const savedListingsReducer = (
+  state: Record<string, string> = {},
+  action: Action
+): Record<string, string> => {
   switch (action.type) {
     case ActionTypes.saveListing:
-      return true;
+      return { ...state, [action.payload.id]: action.payload.id };
     case ActionTypes.unsaveListing:
-      return false;
+      return { ...state, [action.payload.id]: undefined };
+    case ActionTypes.fetchSavedListings:
+      return { ...state, ...action.payload };
+    case ActionTypes.clearSavedListings:
+      return {};
     default:
       return state;
   }
