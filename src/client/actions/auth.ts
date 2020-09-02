@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Dispatch } from 'redux';
+
 import { history } from '../history';
 import {
   ActionTypes,
@@ -11,9 +13,13 @@ import {
   UpdateProfileAttrs,
   UpdatePasswordAction,
   UpdatePasswordAttrs,
+  SetDefaultFiltersAction,
+  ClearSavedListingsAction,
+  ClearListingsAction,
   FunctionalAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
+  StoreState,
 } from '../utilities';
 import { UserAttrs } from '../../server/models';
 import { ApiRoutes } from '../../common';
@@ -62,24 +68,26 @@ export const logIn = (formValue: {
     history.push('/');
   });
 
-export const logOut = (nextRoute = '/'): FunctionalAction<LogOutAction> => {
-  return async (dispatch, getState) => {
-    await axios.get(ApiRoutes.LogOut);
+export const logOut = (nextRoute = '/') => async (
+  dispatch: Dispatch,
+  getState: () => StoreState
+): Promise<void> => {
+  await axios.get(ApiRoutes.LogOut);
 
-    dispatch({
-      type: ActionTypes.logOut,
-      payload: null,
-    });
+  dispatch<LogOutAction>({
+    type: ActionTypes.logOut,
+    payload: null,
+  });
 
-    dispatch({
-      //@ts-ignore
-      type: ActionTypes.setDefaultFilters,
-      //@ts-ignore
-      payload: getState!().currentLocation,
-    });
+  dispatch<SetDefaultFiltersAction>({
+    type: ActionTypes.setDefaultFilters,
+    payload: getState!().currentLocation,
+  });
 
-    history.push(nextRoute);
-  };
+  dispatch<ClearSavedListingsAction>({ type: ActionTypes.clearSavedListings });
+  dispatch<ClearListingsAction>({ type: ActionTypes.clearListings });
+
+  history.push(nextRoute);
 };
 
 export const updatePassword = (
