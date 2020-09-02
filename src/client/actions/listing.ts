@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Dispatch } from 'redux';
+
 import { history } from '../history';
 import {
   ActionTypes,
@@ -10,12 +12,15 @@ import {
   FetchListingAction,
   ClearListingAction,
   FetchListingsAction,
+  ClearListingsAction,
+  FetchSavedListingsAction,
+  ClearSavedListingsAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
   SaveListingAction,
   UnsaveListingAction,
 } from '../utilities';
-import { ListingAttrs } from '../../server/models';
+import { ListingAttrs, UserDoc, ListingDoc } from '../../server/models';
 import { ApiRoutes } from '../../common';
 import { AlertType, showAlert } from '.././components/alert';
 
@@ -47,19 +52,35 @@ export const clearListing = (): ClearListingAction => {
   return { type: ActionTypes.clearListing };
 };
 
-export const fetchListings = (
-  queryStr: string
-): FunctionalAction<FetchListingsAction> => async dispatch => {
+export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
+  dispatch: Dispatch
+): Promise<void> => {
   try {
-    const { data } = await axios.get(`${ApiRoutes.Listings}/?${queryStr}`);
-    dispatch({
+    const response = await axios.get(`${ApiRoutes.Listings}/?${queryStr}`);
+    const listings = response.data.data as ListingDoc[];
+
+    dispatch<FetchListingsAction>({
       type: ActionTypes.fetchListings,
-      payload: data.data,
+      payload: listings,
     });
+
+    if (user) {
+      const { data } = await axios.post(ApiRoutes.FilterListingsSavedByUser, {
+        listingIds: listings.map(listing => listing.id),
+      });
+      dispatch<FetchSavedListingsAction>({
+        type: ActionTypes.fetchSavedListings,
+        payload: data.data,
+      });
+    }
   } catch (err) {
     console.log(err);
     showAlert(AlertType.Error, `There's an issue loading listings`);
   }
+};
+
+export const clearListings = (): ClearListingsAction => {
+  return { type: ActionTypes.clearListings };
 };
 
 export const createListing = (
@@ -161,4 +182,8 @@ export const unsaveListing = (
   } catch (err) {
     showAlert(AlertType.Error, err.message);
   }
+};
+
+export const clearSavedListings = (): ClearSavedListingsAction => {
+  return { type: ActionTypes.clearSavedListings };
 };
