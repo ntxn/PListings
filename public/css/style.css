@@ -559,9 +559,9 @@ body {
       .listing-card__save-btn:hover svg {
         color: var(--color-grey-light-1); }
     .listing-card__save-btn--saved svg {
-      color: var(--color-red-light); }
+      color: var(--color-primary); }
     .listing-card__save-btn--saved:hover svg {
-      color: var(--color-red); }
+      color: var(--color-primary-light); }
 
 .btn-loader {
   width: 14rem;
@@ -872,7 +872,7 @@ main {
       .listing__info__heart--gray {
         color: var(--color-grey-dark-1); }
       .listing__info__heart--red, .listing__info__heart:hover {
-        color: var(--color-red); }
+        color: var(--color-primary); }
     .listing__info__stats {
       display: flex;
       flex-direction: row;

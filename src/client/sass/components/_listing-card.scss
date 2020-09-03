@@ -65,12 +65,12 @@
 
     &--saved {
       svg {
-        color: var(--color-red-light);
+        color: var(--color-primary);
       }
 
       &:hover {
         svg {
-          color: var(--color-red);
+          color: var(--color-primary-light);
         }
       }
     }
