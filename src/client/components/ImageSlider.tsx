@@ -179,8 +179,6 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const handleResize = () => {
     setState({
       ...state,
-      transition: 0,
-      translate: getContainerMeasurement().width,
       arrowTopPosition: getArrowTopPosition(),
     });
 
