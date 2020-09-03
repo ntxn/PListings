@@ -35,7 +35,7 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
 
   return (
     <div className="listing-card">
-      <div className="listing-card__photos u-margin-bottom-xsmall">
+      <div className="listing-card__photos">
         {showImageSlider && (
           <ImageSlider
             images={props.listing.photos}
@@ -44,6 +44,7 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
             linkTo={listingPage}
             backgroundSize="cover"
             bordered
+            squared
           />
         )}
       </div>

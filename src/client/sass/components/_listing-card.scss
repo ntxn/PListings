@@ -1,14 +1,17 @@
 .listing-card {
-  width: 20rem;
-  margin: 2.5rem;
+  max-width: 26rem;
+  min-width: 19rem;
   position: relative;
 
   &__photos {
     width: 100%;
-    height: 20rem;
+    min-height: 19rem;
   }
 
   &__info {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
     &__city {
       font-size: 1.3rem;
       font-weight: 300;

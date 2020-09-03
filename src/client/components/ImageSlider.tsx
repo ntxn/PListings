@@ -14,6 +14,7 @@ interface ImageSliderProps {
   linkTo?: string;
   backgroundSize?: string;
   bordered?: boolean;
+  squared?: boolean;
 }
 
 const MAX_THUMBNAIL_SIZE = 5; // width & height is 5rem
@@ -43,6 +44,7 @@ const INITIAL_THUMBNAILS_ATTR = {
  * @prop linkTo (string) - a relative url to be used with Link component from react-router-dom. Provide this url if we want to redirect somewhere when clicking on the image slider
  * @prop backgroundSize (string) - same options as CSS backgroundSize (ie contain, cover, inherit, etc). Default option is contain.
  * @prop bordered (boolean) - option to add border and shadow to the image slider
+ * @prop square (boolean) - ImageSlider size is a square
  */
 export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   const { images, containerClassName } = props;
@@ -263,7 +265,13 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
   return (
     <div
       className="image-slider"
-      style={{ height: `${getContainerMeasurement().height}rem` }}
+      style={{
+        height: `${
+          props.squared
+            ? getContainerMeasurement().width
+            : getContainerMeasurement().height
+        }rem`,
+      }}
     >
       <div
         className={`image-slider__container ${
