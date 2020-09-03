@@ -145,8 +145,11 @@ class Form extends React.Component<ReduxFormProps, FormState> {
           </div>
 
           {renderBtns(this.props, 'Apply', this.state.selectedLocation, () => {
-            //@ts-ignore
-            this.props.initialize(this.props.defaultFilters, true); // keepDirty to true
+            const { defaultFilters } = this.props;
+            Object.keys(defaultFilters).forEach(field =>
+              // @ts-ignore
+              this.props.change(field, defaultFilters[field])
+            );
           })}
         </form>
       </div>

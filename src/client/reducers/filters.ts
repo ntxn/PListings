@@ -6,6 +6,10 @@ const DEFAULT_FILTERS: FilterAttrs = {
   postedWithin: PostedWithin.AllListings,
   distance: '10',
   location: DEFAULT_LOCATION,
+  maxPrice: undefined,
+  minPrice: undefined,
+  category: '',
+  subcategory: '',
 };
 
 export const filtersReducer = (
