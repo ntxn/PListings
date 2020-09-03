@@ -12,6 +12,8 @@ import {
 } from '../../utilities';
 import { ListingDoc, UserDoc } from '../../../server/models';
 
+// TODO: remove clearListings once it is sure there's no need for it
+
 interface StateProps {
   defaultFilters: FilterAttrs;
   listings: ListingDoc[];
@@ -61,13 +63,12 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
           const queryStr = processFiltersToQueryString(props.defaultFilters);
           props.fetchListings(queryStr, props.user);
           setshowLoader(false);
-        }, 1000)
+        }, 800)
       );
     }
 
     return () => {
       clearTimeout(defaultFilterTimer);
-      props.clearListings();
     };
   }, [props.defaultFilters, props.location.search]);
 

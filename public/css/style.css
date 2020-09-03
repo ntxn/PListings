@@ -460,6 +460,7 @@ body {
   .image-slider__container {
     position: relative;
     width: 100%;
+    height: 100%;
     margin: 0 auto 1rem auto;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.8);
@@ -516,23 +517,26 @@ body {
       margin-right: 0.5rem; }
 
 .listing-card {
-  width: 20rem;
-  margin: 2.5rem;
+  max-width: 26rem;
+  min-width: 19rem;
   position: relative; }
   .listing-card__photos {
     width: 100%;
-    height: 20rem; }
-  .listing-card__info__city {
-    font-size: 1.3rem;
-    font-weight: 300;
-    line-height: 1.3rem;
-    color: var(--color-grey-dark-2); }
-  .listing-card__info__title {
-    color: var(--var-grey-dark-3); }
-    .listing-card__info__title:link, .listing-card__info__title:active, .listing-card__info__title:hover {
-      text-decoration: none; }
-  .listing-card__info__price {
-    line-height: 2rem; }
+    min-height: 19rem; }
+  .listing-card__info {
+    padding-top: 1rem;
+    padding-bottom: 1rem; }
+    .listing-card__info__city {
+      font-size: 1.3rem;
+      font-weight: 300;
+      line-height: 1.3rem;
+      color: var(--color-grey-dark-2); }
+    .listing-card__info__title {
+      color: var(--var-grey-dark-3); }
+      .listing-card__info__title:link, .listing-card__info__title:active, .listing-card__info__title:hover {
+        text-decoration: none; }
+    .listing-card__info__price {
+      line-height: 2rem; }
   .listing-card__save-btn {
     width: 3rem;
     height: 3rem;
@@ -938,7 +942,7 @@ main {
 
 .listings {
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap; }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  grid-gap: 0.8rem; }
 

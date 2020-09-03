@@ -86,8 +86,6 @@ export const logOut = (nextRoute = '/') => async (
 
   dispatch<ClearSavedListingsAction>({ type: ActionTypes.clearSavedListings });
   dispatch<ClearListingsAction>({ type: ActionTypes.clearListings });
-
-  history.push(nextRoute);
 };
 
 export const updatePassword = (
