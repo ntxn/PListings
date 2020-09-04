@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaBell } from 'react-icons/fa';
+import { AiOutlineDollar } from 'react-icons/ai';
 
 import { UserDoc } from '../../server/models';
 import { StoreState } from '../utilities';
@@ -15,6 +16,15 @@ interface HeaderProps {
   logOut(): void;
 }
 
+const renderSellBtn = (linkto: string): JSX.Element => {
+  return (
+    <Link to={linkto} className="btn btn--filled btn--sell">
+      <AiOutlineDollar />
+      <span>Sell</span>
+    </Link>
+  );
+};
+
 const renderNavigationAuthenticated = (
   props: HeaderProps,
   userMenuModal: boolean,
@@ -22,14 +32,12 @@ const renderNavigationAuthenticated = (
 ) => {
   return (
     <>
-      <Link to="/listings/create" className="btn btn--filled">
-        Sell
-      </Link>
+      {renderSellBtn('/listings/create')}
       <div className="icon">
         <FaBell title="Notifications" />
       </div>
       <UserAvatar
-        onClick={() => setUserMenuModal(true)}
+        onClick={() => setUserMenuModal(!userMenuModal)}
         user={props.user!}
         className="icon"
       />
@@ -47,9 +55,7 @@ const renderNavigationAuthenticated = (
 const renderNavigationUnauthenticated = () => {
   return (
     <>
-      <Link to="/auth/login" className="btn btn--filled">
-        Sell
-      </Link>
+      {renderSellBtn('/auth/login')}
       <Link to="/auth/login" className="btn btn--outline">
         Log In
       </Link>

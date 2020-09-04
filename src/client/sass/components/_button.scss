@@ -4,7 +4,7 @@
   &:visited {
     font-size: var(--default-font-size);
     text-decoration: none;
-    border-radius: 1rem;
+    border-radius: 2rem;
     padding: 0.6rem 1.4rem;
     transition: all 0.2s;
     border: 1px solid var(--color-primary);
@@ -40,6 +40,19 @@
 
   &--full-width {
     width: 100%;
+  }
+
+  &--sell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-right: 0.5rem;
+    }
   }
 }
 
