@@ -3,12 +3,13 @@ import { connect } from 'react-redux';
 import { FiMenu } from 'react-icons/fi';
 import { MdPersonPin, MdNotifications } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
+
 import {
   StoreState,
   UpdatePasswordAttrs,
   formFieldValues,
 } from '../../utilities';
-import { UserDoc } from '../../../server/models';
+import { UserDoc } from '../../../common';
 import { AuthRequired } from '../AuthRequired';
 import { UpdatePasswordForm, UpdateProfileForm } from '../forms';
 import { updatePassword } from '../../actions';

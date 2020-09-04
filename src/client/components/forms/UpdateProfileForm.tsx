@@ -12,7 +12,7 @@ import {
 } from 'redux-form';
 
 import { searchLocation, updateProfile, setBtnLoader } from '../../actions';
-import { ErrMsg, GeoLocation } from '../../../common';
+import { ErrMsg, GeoLocation, UserDoc } from '../../../common';
 import {
   asyncValidatorDispatcher,
   UpdateProfileAttrs as Attrs,
@@ -25,7 +25,6 @@ import {
   FieldProps,
   renderBtns,
 } from '../../utilities';
-import { UserDoc } from '../../../server/models';
 import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
 
 interface StateProps {

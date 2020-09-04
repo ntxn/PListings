@@ -1,6 +1,7 @@
 import React from 'react';
 import { BsPersonFill } from 'react-icons/bs';
-import { UserDoc } from '../../server/models';
+
+import { UserDoc } from '../../common';
 
 interface UserAvatarProps {
   onClick?(): void;

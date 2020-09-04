@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { StoreState, ListingImagesParams } from '../../utilities';
-import { UserDoc, ListingAttrs } from '../../../server/models';
+import { UserDoc, ListingAttrs } from '../../../common';
 import { AuthRequired } from '../AuthRequired';
 import { ListingForm } from '../forms';
 import { createListing } from '../../actions';

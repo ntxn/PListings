@@ -12,7 +12,7 @@ import {
   saveListing,
   unsaveListing,
 } from '../../actions';
-import { ListingDoc, UserDoc } from '../../../server/models';
+import { ListingDoc, UserDoc } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
@@ -258,7 +258,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     listing: state.listing,
     user: state.user,
-    savedListings: state.savedListings,
+    savedListings: state.savedListingIds,
   };
 };
 

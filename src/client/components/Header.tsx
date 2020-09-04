@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FaBell } from 'react-icons/fa';
 import { AiOutlineDollar } from 'react-icons/ai';
 
-import { UserDoc } from '../../server/models';
+import { UserDoc } from '../../common';
 import { StoreState } from '../utilities';
 import { logOut } from '../actions';
 import { UserMenuModal } from './Modal';

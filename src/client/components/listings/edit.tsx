@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { StoreState, ListingImagesParams } from '../../utilities';
 import { fetchListing, editListing } from '../../actions';
-import { ListingDoc, UserDoc, ListingAttrs } from '../../../server/models';
+import { ListingDoc, UserDoc, ListingAttrs } from '../../../common';
 import { AuthRequired } from '../AuthRequired';
 import { Unauthorized } from '../Unauthorized';
 import { ListingForm } from '../forms';

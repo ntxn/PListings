@@ -8,7 +8,7 @@ import { IoIosArrowForward, IoIosClose } from 'react-icons/io';
 import { MdClose } from 'react-icons/md';
 import ClipLoader from 'react-spinners/ClipLoader';
 
-import { UserDoc } from '../../server/models';
+import { UserDoc } from '../../common';
 import { UserAvatar } from './UserAvatar';
 import { FiltersForm } from './forms';
 import { FilterAttrs } from '../utilities';

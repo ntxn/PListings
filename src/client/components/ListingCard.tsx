@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { FaHeart } from 'react-icons/fa';
 import { FiEdit } from 'react-icons/fi';
 
-import { ListingDoc, UserDoc } from '../../server/models';
+import { ListingDoc, UserDoc } from '../../common';
 import { ImageSlider } from './ImageSlider';
 import { promptUserToLogInToSaveListing } from './Modal';
 import { StoreState } from '../utilities';
@@ -109,7 +109,7 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { user: state.user, savedListings: state.savedListings };
+  return { user: state.user, savedListings: state.savedListingIds };
 };
 
 export const ListingCard = connect(mapStateToProps, {
@@ -173,7 +173,7 @@ export const ListingCardPrivate = (
           {props.listing.title}
         </Link>
         <p className="listing-card__info__city">{`${props.listing.visits} visits · ${props.listing.favorites} favorites`}</p>
-        <div className="u-center-text u-margin-bottom-medium">
+        <div className="u-center-text">
           <span className="btn-text btn-text--orange" onClick={props.btnAction}>
             {props.btnText}
           </span>

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+
 import { SignUpForm } from '../forms';
 import { signUp, logOut } from '../../actions';
 import { StoreState, SignUpAttrs, formFieldValues } from '../../utilities';
-import { UserDoc } from '../../../server/models';
+import { UserDoc } from '../../../common';
 import { Authenticated } from './Authenticated';
 
 interface StateProps {

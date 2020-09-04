@@ -10,7 +10,7 @@ import {
   processFiltersToQueryString,
   calcDistanceBetweenTwoPoints,
 } from '../../utilities';
-import { ListingDoc, UserDoc } from '../../../server/models';
+import { ListingDoc, UserDoc } from '../../../common';
 
 // TODO: remove clearListings once it is sure there's no need for it
 

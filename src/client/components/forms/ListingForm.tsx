@@ -12,7 +12,6 @@ import {
 } from 'redux-form';
 import { MdAddToPhotos } from 'react-icons/md';
 
-import { ListingAttrs, UserDoc } from '../../../server/models';
 import {
   ListingImagesParams,
   renderTextInput,
@@ -25,7 +24,14 @@ import {
   isSameLocation,
   renderBtns,
 } from '../../utilities';
-import { Categories, Subcategories, Conditions, ErrMsg } from '../../../common';
+import {
+  Categories,
+  Subcategories,
+  Conditions,
+  ErrMsg,
+  ListingAttrs,
+  UserDoc,
+} from '../../../common';
 import { LocationInputAutocomplete } from '../LocationInputAutocomplete';
 import { searchLocation, setBtnLoader } from '../../actions';
 
