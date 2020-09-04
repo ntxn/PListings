@@ -1,5 +1,5 @@
 import { Action, ActionTypes } from '../utilities';
-import { ListingDoc } from '../../server/models';
+import { ListingDoc } from '../../common';
 
 export const listingReducer = (
   state: ListingDoc | null = null,
@@ -37,7 +37,7 @@ export const listingsReducer = (
   }
 };
 
-export const savedListingsReducer = (
+export const savedListingIdsReducer = (
   state: Record<string, string> = {},
   action: Action
 ): Record<string, string> => {
@@ -46,9 +46,9 @@ export const savedListingsReducer = (
       return { ...state, [action.payload.id]: action.payload.id };
     case ActionTypes.unsaveListing:
       return { ...state, [action.payload.id]: undefined };
-    case ActionTypes.fetchSavedListings:
+    case ActionTypes.fetchSavedListingIds:
       return { ...state, ...action.payload };
-    case ActionTypes.clearSavedListings:
+    case ActionTypes.clearSavedListingIds:
       return {};
     default:
       return state;

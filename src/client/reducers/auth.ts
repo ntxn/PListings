@@ -1,5 +1,5 @@
 import { Action, ActionTypes } from '../utilities';
-import { UserDoc } from '../../server/models';
+import { UserDoc } from '../../common';
 
 export const authReducer = (
   state: UserDoc | null = null,

@@ -2,8 +2,7 @@ import { Dispatch, Action as ReduxAction } from 'redux';
 import { FormStateMap } from 'redux-form';
 
 import { ActionTypes } from './action-types';
-import { UserDoc, ListingDoc } from '../../server/models';
-import { GeoLocation, BaseLocation } from '../../common';
+import { GeoLocation, BaseLocation, UserDoc, ListingDoc } from '../../common';
 
 // ACTIONS
 
@@ -100,13 +99,13 @@ export interface UnsaveListingAction {
   payload: ListingDoc;
 }
 
-export interface FetchSavedListingsAction {
-  type: ActionTypes.fetchSavedListings;
+export interface FetchSavedListingIdsAction {
+  type: ActionTypes.fetchSavedListingIds;
   payload: Record<string, string>;
 }
 
-export interface ClearSavedListingsAction {
-  type: ActionTypes.clearSavedListings;
+export interface ClearSavedListingIdsAction {
+  type: ActionTypes.clearSavedListingIds;
 }
 
 export interface SetDefaultFiltersAction {
@@ -133,8 +132,8 @@ export type Action =
   | EditListingAction
   | SaveListingAction
   | UnsaveListingAction
-  | FetchSavedListingsAction
-  | ClearSavedListingsAction
+  | FetchSavedListingIdsAction
+  | ClearSavedListingIdsAction
   | SetDefaultFiltersAction;
 
 // Store State
@@ -142,7 +141,7 @@ export interface StoreState {
   user: UserDoc | null;
   listing: ListingDoc | null;
   listings: ListingDoc[];
-  savedListings: Record<string, string>;
+  savedListingIds: Record<string, string>;
   form: FormStateMap;
   currentLocation: GeoLocation;
   searchedLocations: SearchedLocation[];

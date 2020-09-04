@@ -13,15 +13,14 @@ import {
   ClearListingAction,
   FetchListingsAction,
   ClearListingsAction,
-  FetchSavedListingsAction,
-  ClearSavedListingsAction,
+  FetchSavedListingIdsAction,
+  ClearSavedListingIdsAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
   SaveListingAction,
   UnsaveListingAction,
 } from '../utilities';
-import { ListingAttrs, UserDoc, ListingDoc } from '../../server/models';
-import { ApiRoutes } from '../../common';
+import { ApiRoutes, ListingAttrs, UserDoc, ListingDoc } from '../../common';
 import { AlertType, showAlert } from '.././components/alert';
 
 export const fetchListing = (
@@ -48,10 +47,6 @@ export const fetchListing = (
   }
 };
 
-export const clearListing = (): ClearListingAction => {
-  return { type: ActionTypes.clearListing };
-};
-
 export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
   dispatch: Dispatch
 ): Promise<void> => {
@@ -68,8 +63,8 @@ export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
       const { data } = await axios.post(ApiRoutes.FilterListingsSavedByUser, {
         listingIds: listings.map(listing => listing.id),
       });
-      dispatch<FetchSavedListingsAction>({
-        type: ActionTypes.fetchSavedListings,
+      dispatch<FetchSavedListingIdsAction>({
+        type: ActionTypes.fetchSavedListingIds,
         payload: data.data,
       });
     }
@@ -77,10 +72,6 @@ export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
     console.log(err);
     showAlert(AlertType.Error, `There's an issue loading listings`);
   }
-};
-
-export const clearListings = (): ClearListingsAction => {
-  return { type: ActionTypes.clearListings };
 };
 
 export const createListing = (
@@ -184,6 +175,14 @@ export const unsaveListing = (
   }
 };
 
-export const clearSavedListings = (): ClearSavedListingsAction => {
-  return { type: ActionTypes.clearSavedListings };
+export const clearListing = (): ClearListingAction => {
+  return { type: ActionTypes.clearListing };
+};
+
+export const clearListings = (): ClearListingsAction => {
+  return { type: ActionTypes.clearListings };
+};
+
+export const clearSavedListingIds = (): ClearSavedListingIdsAction => {
+  return { type: ActionTypes.clearSavedListingIds };
 };

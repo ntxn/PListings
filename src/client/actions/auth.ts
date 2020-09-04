@@ -14,15 +14,14 @@ import {
   UpdatePasswordAction,
   UpdatePasswordAttrs,
   SetDefaultFiltersAction,
-  ClearSavedListingsAction,
+  ClearSavedListingIdsAction,
   ClearListingsAction,
   FunctionalAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
   StoreState,
 } from '../utilities';
-import { UserAttrs } from '../../server/models';
-import { ApiRoutes } from '../../common';
+import { ApiRoutes, UserAttrs } from '../../common';
 import { reset } from 'redux-form';
 import { AlertType, showAlert } from '.././components/alert';
 
@@ -84,7 +83,9 @@ export const logOut = (nextRoute = '/') => async (
     payload: getState!().currentLocation,
   });
 
-  dispatch<ClearSavedListingsAction>({ type: ActionTypes.clearSavedListings });
+  dispatch<ClearSavedListingIdsAction>({
+    type: ActionTypes.clearSavedListingIds,
+  });
   dispatch<ClearListingsAction>({ type: ActionTypes.clearListings });
 };
 

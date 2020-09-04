@@ -6,7 +6,7 @@ import { btnLoaderReducer } from './loader';
 import {
   listingReducer,
   listingsReducer,
-  savedListingsReducer,
+  savedListingIdsReducer,
 } from './listing';
 import { filtersReducer } from './filters';
 import { StoreState } from '../utilities';
@@ -19,6 +19,6 @@ export const reducers = combineReducers<StoreState>({
   btnLoading: btnLoaderReducer,
   listing: listingReducer,
   listings: listingsReducer,
-  savedListings: savedListingsReducer,
+  savedListingIds: savedListingIdsReducer,
   defaultFilters: filtersReducer,
 });
