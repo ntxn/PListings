@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { fetchListings, clearListings } from '../../actions';
-import { ListingCard } from './ListingCard';
+import { ListingCardPublic } from '../ListingCard';
 import { Loader } from '../Modal';
 import {
   StoreState,
@@ -78,7 +78,7 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
         {props.listings.map(listing => {
           const [lng2, lat2] = listing.location.coordinates;
           return (
-            <ListingCard
+            <ListingCardPublic
               key={listing.id}
               listing={listing}
               distanceDiff={calcDistanceBetweenTwoPoints(
