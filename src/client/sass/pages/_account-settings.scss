@@ -1,9 +1,9 @@
 .settings {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
   margin: 2rem auto;
+  width: 100%;
   max-width: 70vw;
+  display: grid;
+  grid-template-columns: 20rem 1fr;
 
   .container__form {
     margin: 0;
@@ -15,8 +15,6 @@
     font-weight: 300;
     line-height: 3rem;
     border-right: 1px solid var(--color-grey-light-2);
-    flex: 1;
-    width: 20rem;
 
     &__option {
       display: flex;
@@ -52,6 +50,5 @@
 
   &__content {
     margin-left: 2rem;
-    flex: 3;
   }
 }
