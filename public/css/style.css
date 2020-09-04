@@ -967,7 +967,8 @@ main {
   .user-listings__header {
     padding-bottom: 2rem; }
   .user-listings__nav {
-    border-bottom: 1px solid var(--color-grey-light-2); }
+    border-bottom: 1px solid var(--color-grey-light-2);
+    margin-bottom: 2rem; }
     .user-listings__nav__item {
       display: inline-block;
       border-bottom: 3px solid transparent;
