@@ -1,0 +1,29 @@
+.user-listings {
+  max-width: 100rem;
+  margin: 0 auto;
+
+  &__header {
+    padding-bottom: 2rem;
+  }
+
+  &__nav {
+    border-bottom: 1px solid var(--color-grey-light-2);
+
+    &__item {
+      display: inline-block;
+      border-bottom: 3px solid transparent;
+      padding-bottom: 0.8rem;
+      cursor: pointer;
+
+      &:not(:last-child) {
+        margin-right: 1.5rem;
+      }
+
+      &:hover,
+      &--active {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+      }
+    }
+  }
+}

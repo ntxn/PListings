@@ -961,3 +961,21 @@ main {
   grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
   grid-gap: 0.8rem; }
 
+.user-listings {
+  max-width: 100rem;
+  margin: 0 auto; }
+  .user-listings__header {
+    padding-bottom: 2rem; }
+  .user-listings__nav {
+    border-bottom: 1px solid var(--color-grey-light-2); }
+    .user-listings__nav__item {
+      display: inline-block;
+      border-bottom: 3px solid transparent;
+      padding-bottom: 0.8rem;
+      cursor: pointer; }
+      .user-listings__nav__item:not(:last-child) {
+        margin-right: 1.5rem; }
+      .user-listings__nav__item:hover, .user-listings__nav__item--active {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary); }
+

@@ -8,7 +8,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { NotFound } from './NotFound';
 import { SignUp, LogIn } from './auth';
-import { AccountSettings } from './user';
+import { AccountSettings, UserListings } from './user';
 import { NewListing, EditListing, Listings, Listing } from './listings';
 
 interface AppProps {
@@ -32,6 +32,7 @@ const _App = (props: AppProps): JSX.Element => {
               <Route path="/" exact component={Listings} />
               <Route path="/auth/SignUp" exact component={SignUp} />
               <Route path="/auth/LogIn" exact component={LogIn} />
+              <Route path="/user/listings" exact component={UserListings} />
               <Route
                 path="/user/account-settings"
                 exact
