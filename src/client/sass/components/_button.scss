@@ -18,9 +18,13 @@
 
   &--outline {
     color: var(--color-primary);
-    background-color: var(--color-white);
+    background-color: transparent;
 
-    &:hover,
+    &:hover {
+      border-color: var(--color-secondary-dark);
+      color: var(--color-secondary-dark);
+    }
+
     &:disabled {
       border-color: var(--color-primary-light);
       color: var(--color-primary-light);
@@ -31,7 +35,11 @@
     background-color: var(--color-primary);
     color: var(--color-grey-light-1);
 
-    &:hover,
+    &:hover {
+      background-color: var(--color-secondary-dark);
+      border-color: var(--color-secondary-dark);
+    }
+
     &:disabled {
       background-color: var(--color-primary-light);
       border-color: var(--color-primary-light);

@@ -176,15 +176,21 @@ body {
 
 .btn--outline {
   color: var(--color-primary);
-  background-color: var(--color-white); }
-  .btn--outline:hover, .btn--outline:disabled {
+  background-color: transparent; }
+  .btn--outline:hover {
+    border-color: var(--color-secondary-dark);
+    color: var(--color-secondary-dark); }
+  .btn--outline:disabled {
     border-color: var(--color-primary-light);
     color: var(--color-primary-light); }
 
 .btn--filled {
   background-color: var(--color-primary);
   color: var(--color-grey-light-1); }
-  .btn--filled:hover, .btn--filled:disabled {
+  .btn--filled:hover {
+    background-color: var(--color-secondary-dark);
+    border-color: var(--color-secondary-dark); }
+  .btn--filled:disabled {
     background-color: var(--color-primary-light);
     border-color: var(--color-primary-light); }
 
