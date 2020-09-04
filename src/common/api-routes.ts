@@ -15,6 +15,7 @@ export enum Routes {
   UpdateMyAccount = '/update-my-account',
   DeleteMyAccount = '/delete-my-account',
   UpdateMyPassword = '/update-my-password',
+  MyListings = '/my-listings',
 
   // Public users data
   User = '/:id',
@@ -64,6 +65,7 @@ export enum ApiRoutes {
   UpdateMyAccount = '/api/v1/users/update-my-account',
   DeleteMyAccount = '/api/v1/users/delete-my-account',
   UpdateMyPassword = '/api/v1/users/update-my-password',
+  MyListings = '/api/v1/users/my-listings',
 
   // Listings
   Listings = '/api/v1/listings',

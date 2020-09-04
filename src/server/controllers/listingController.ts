@@ -73,8 +73,6 @@ const prepListingReqBody = (...allowedProps: string[]): MiddlewareHandler => {
   return (req: CustomRequest, res, next) => {
     const body: { [field: string]: any } = {};
     allowedProps.forEach(field => {
-      // if (field === 'location' && req.body.coordinates)
-      //   body.location = { coordinates: req.body.coordinates };
       if (field === 'owner') body.owner = req.user!.id;
       else if (req.body[field]) body[field] = req.body[field];
     });

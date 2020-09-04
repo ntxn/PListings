@@ -17,6 +17,9 @@ import {
   RequestStatus,
   ErrMsg,
   UserRole,
+  MyListings,
+  MyListingsTypes,
+  DEFAULT_MY_LISTINGS,
 } from '../../common';
 import {
   catchAsync,
@@ -39,7 +42,7 @@ import {
   accessRestrictor,
   authenticationChecker,
 } from '../middlewares';
-import { User, Listing } from '../models';
+import { User, Listing, Favorite } from '../models';
 
 const addIdToReqParams: MiddlewareHandler = (req: CustomRequest, res, next) => {
   req.params.id = req.user!.id;
@@ -155,6 +158,52 @@ class UserController {
       await Listing.deleteMany({ owner: req.user!.id });
 
       await removeSendExpiredCookieToken(res, 200);
+    })(req, res, next);
+  }
+
+  /**
+   * Get all listings that the current user posted and saved.
+   * Required user to be logged in
+   */
+  @use(authenticationChecker)
+  @GET(Routes.MyListings)
+  getMyListings(req: CustomRequest, res: Response, next: NextFunction): void {
+    catchAsync(async (req: CustomRequest, res, next) => {
+      const listings: MyListings = DEFAULT_MY_LISTINGS;
+
+      // get all listings saved by current user
+      const favorites = await Favorite.find({ user: req.user!.id }).sort(
+        '-createdAt'
+      );
+      await Promise.all(
+        favorites.map(async fav => {
+          const listing = await Listing.findById(fav.listing);
+          if (listing) listings[MyListingsTypes.Saved].push(listing);
+        })
+      );
+
+      // get all posted listings belong to current user
+      const selling = await Listing.find({
+        owner: req.user!.id,
+        active: true,
+        sold: false,
+      }).sort('-createdAt');
+      if (selling) listings[MyListingsTypes.Selling] = selling;
+
+      const sold = await Listing.find({
+        owner: req.user!.id,
+        sold: true,
+      }).sort('-createdAt');
+      if (sold) listings[MyListingsTypes.Sold] = sold;
+
+      const expired = await Listing.find({
+        owner: req.user!.id,
+        active: false,
+        sold: false,
+      }).sort('-createdAt');
+      if (expired) listings[MyListingsTypes.Expired] = expired;
+
+      res.status(200).json({ status: RequestStatus.Success, data: listings });
     })(req, res, next);
   }
 

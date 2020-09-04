@@ -45,6 +45,7 @@ const favoriteSchema = new mongoose.Schema(
 );
 
 favoriteSchema.index({ user: 1, listing: 1 }, { unique: true });
+favoriteSchema.index({ user: 1 });
 
 favoriteSchema.statics.build = (attrs: FavoriteAttr) => new Favorite(attrs);
 
