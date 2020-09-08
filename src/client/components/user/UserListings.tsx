@@ -11,6 +11,7 @@ import {
   DEFAULT_MY_LISTINGS,
   UserDoc,
   ApiRoutes,
+  ListingDoc,
 } from '../../../common';
 
 interface UserListingsProps {
@@ -45,6 +46,15 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
     nextActive!.classList.add('user-listings__nav__item--active');
   };
 
+  const onDelete = (index: number, listingType: MyListingsTypes): void => {
+    const current = listings[listingType];
+
+    setListings({
+      ...listings,
+      [listingType]: current.filter((l, i) => i !== index),
+    });
+  };
+
   const renderListings = (): JSX.Element => {
     let element: JSX.Element[] = [];
 
@@ -69,11 +79,12 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         });
         break;
       case MyListingsTypes.Selling:
-        element = listings[MyListingsTypes.Selling].map(listing => {
+        element = listings[MyListingsTypes.Selling].map((listing, i) => {
           return (
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
+              onDelete={() => onDelete(i, MyListingsTypes.Selling)}
               btnText="Mark as Sold"
               btnAction={() => console.log('sold')}
               showEditBtn
@@ -82,11 +93,12 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         });
         break;
       case MyListingsTypes.Expired:
-        element = listings[MyListingsTypes.Expired].map(listing => {
+        element = listings[MyListingsTypes.Expired].map((listing, i) => {
           return (
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
+              onDelete={() => onDelete(i, MyListingsTypes.Expired)}
               btnText="Renew listing"
               btnAction={() => console.log('renewed')}
             />
@@ -94,11 +106,12 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         });
         break;
       case MyListingsTypes.Sold:
-        element = listings[MyListingsTypes.Sold].map(listing => {
+        element = listings[MyListingsTypes.Sold].map((listing, i) => {
           return (
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
+              onDelete={() => onDelete(i, MyListingsTypes.Sold)}
               btnText="Sell item again"
               btnAction={() => console.log('sell again')}
             />

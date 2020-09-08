@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaHeart } from 'react-icons/fa';
-import { FiEdit } from 'react-icons/fi';
 import { FaEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 
-import { ListingDoc, UserDoc } from '../../common';
+import { ListingDoc, UserDoc, ApiRoutes } from '../../common';
 import { ImageSlider } from './ImageSlider';
+import { showAlert, AlertType } from './alert';
 import { promptUserToLogInToSaveListing } from './Modal';
 import { StoreState } from '../utilities';
 import { unsaveListing, saveListing } from '../actions';
@@ -20,6 +21,7 @@ interface ListingCardProps {
   saved?: boolean;
   showEditBtn?: boolean;
   showDeleteBtn?: boolean;
+  onDelete?(): void;
 
   // from StoreState
   user: UserDoc | null;
@@ -37,6 +39,19 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
     const imageSliderTimeout = setTimeout(() => setShowImageSlider(true), 500);
     return () => clearTimeout(imageSliderTimeout);
   }, []);
+
+  const deleteListing = async (id: string): Promise<void> => {
+    try {
+      await axios.delete(`${ApiRoutes.Listings}/${id}`);
+      props.onDelete!();
+    } catch (err) {
+      showAlert(
+        AlertType.Error,
+        'Having issue deleting this listing. Please try again later'
+      );
+      console.log(err);
+    }
+  };
 
   const renderSaveBtn = (): JSX.Element => {
     return (
@@ -78,7 +93,10 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
     return (
       <>
         {props.user && props.user.id === props.listing.owner.id && (
-          <div className="listing-card__icon-btn listing-card__icon-btn--delete">
+          <div
+            className="listing-card__icon-btn listing-card__icon-btn--delete"
+            onClick={() => deleteListing(props.listing.id)}
+          >
             <MdDelete title="Delete listing" />
           </div>
         )}
@@ -121,7 +139,7 @@ const mapStateToProps = (state: StoreState) => {
   return { user: state.user };
 };
 
-export const ListingCard = connect(mapStateToProps, {
+const ListingCard = connect(mapStateToProps, {
   saveListing,
   unsaveListing,
 })(_ListingCard);
@@ -169,6 +187,7 @@ interface ListingCardPrivateProps {
   showEditBtn?: boolean;
   btnText: string;
   btnAction(): void;
+  onDelete(): void;
 }
 
 export const ListingCardPrivate = (
@@ -201,6 +220,7 @@ export const ListingCardPrivate = (
       renderInfoContent={renderContent}
       showEditBtn={props.showEditBtn ? true : false}
       showDeleteBtn
+      onDelete={props.onDelete}
     />
   );
 };

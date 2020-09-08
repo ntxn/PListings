@@ -4,7 +4,7 @@ import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 import sharp from 'sharp';
 
-import { Listing } from '../models';
+import { Listing, Favorite } from '../models';
 import { controller, GET, POST, PATCH, DELETE, use } from '../decorators';
 import {
   authenticationChecker,
@@ -150,6 +150,22 @@ const parseStrData: MiddlewareHandler = (req, res, next) => {
 };
 
 /**
+ * Middleware to delete all Favorite docs by the listing Id in req.params
+ */
+const deleteFavDocsByListingId: MiddlewareHandler = async (req, res, next) => {
+  try {
+    await Favorite.deleteMany({ listing: req.params.id });
+  } catch (e) {
+    console.log(
+      `Issue with deleting Favorite Docs with listing Id ${req.params.id}`,
+      e
+    );
+  }
+
+  next();
+};
+
+/**
  * Handlers for listings' routes
  */
 @controller(Base.Listings)
@@ -232,6 +248,7 @@ class ListingController {
    * User can delete their own listing
    */
   @use(deleteOne(Listing))
+  @use(deleteFavDocsByListingId)
   @use(listingOwnerChecker)
   @use(authenticationChecker)
   @DELETE(Routes.Listing)
