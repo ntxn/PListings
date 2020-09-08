@@ -20,7 +20,12 @@
         margin-right: 1.5rem;
       }
 
-      &:hover,
+      &:hover {
+        color: var(--color-secondary-dark);
+        border-bottom-color: var(--color-secondary-dark);
+      }
+
+      &:active,
       &--active {
         color: var(--color-primary);
         border-bottom-color: var(--color-primary);

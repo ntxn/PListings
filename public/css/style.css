@@ -31,6 +31,12 @@
   color: var(--color-grey-dark-1);
   text-transform: capitalize; }
 
+.sub-heading-quinary {
+  font-size: 1.3rem;
+  font-weight: 300;
+  line-height: 1.3rem;
+  color: var(--color-grey-dark-2); }
+
 .paragraph-small-font-size {
   font-size: 1.5rem;
   font-weight: 500; }
@@ -542,42 +548,45 @@ body {
   .listing-card__info {
     padding-top: 1rem;
     padding-bottom: 1rem; }
-    .listing-card__info__city {
-      font-size: 1.3rem;
-      font-weight: 300;
-      line-height: 1.3rem;
-      color: var(--color-grey-dark-2); }
     .listing-card__info__title {
-      color: var(--var-grey-dark-3); }
+      color: var(--var-grey-dark-3);
+      line-height: 2rem;
+      display: inline-block; }
       .listing-card__info__title:link, .listing-card__info__title:active, .listing-card__info__title:hover {
         text-decoration: none; }
     .listing-card__info__price {
       line-height: 2rem; }
-  .listing-card__save-btn {
+  .listing-card__icon-btn {
     width: 3rem;
     height: 3rem;
     border-radius: var(--border-raidus-large);
     background-color: rgba(0, 0, 0, 0.5);
     cursor: pointer;
-    position: absolute;
-    top: 0.7rem;
-    right: 0.7rem;
+    margin-bottom: 0.5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center; }
-    .listing-card__save-btn svg {
+    .listing-card__icon-btn svg {
       width: 1.8rem;
       height: 1.8rem;
       color: var(--color-white); }
-    .listing-card__save-btn:hover {
-      background-color: rgba(0, 0, 0, 0.4); }
-      .listing-card__save-btn:hover svg {
-        color: var(--color-grey-light-1); }
-    .listing-card__save-btn--saved svg {
+    .listing-card__icon-btn:hover {
+      background-color: rgba(0, 0, 0, 0.8); }
+    .listing-card__icon-btn--saved svg {
       color: var(--color-primary); }
-    .listing-card__save-btn--saved:hover svg {
-      color: var(--color-primary-light); }
+    .listing-card__icon-btn--saved:hover svg {
+      color: var(--color-white); }
+    .listing-card__icon-btn--delete:hover svg {
+      color: var(--color-red); }
+    .listing-card__icon-btn--edit:hover svg {
+      color: var(--color-secondary-light); }
+  .listing-card__icon-btns {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    display: flex;
+    flex-direction: column; }
 
 .btn-loader {
   width: 14rem;
@@ -976,7 +985,10 @@ main {
       cursor: pointer; }
       .user-listings__nav__item:not(:last-child) {
         margin-right: 1.5rem; }
-      .user-listings__nav__item:hover, .user-listings__nav__item--active {
+      .user-listings__nav__item:hover {
+        color: var(--color-secondary-dark);
+        border-bottom-color: var(--color-secondary-dark); }
+      .user-listings__nav__item:active, .user-listings__nav__item--active {
         color: var(--color-primary);
         border-bottom-color: var(--color-primary); }
 

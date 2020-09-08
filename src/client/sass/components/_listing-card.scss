@@ -12,15 +12,10 @@
     padding-top: 1rem;
     padding-bottom: 1rem;
 
-    &__city {
-      font-size: 1.3rem;
-      font-weight: 300;
-      line-height: 1.3rem;
-      color: var(--color-grey-dark-2);
-    }
-
     &__title {
       color: var(--var-grey-dark-3);
+      line-height: 2rem;
+      display: inline-block;
 
       &:link,
       &:active,
@@ -34,16 +29,13 @@
     }
   }
 
-  &__save-btn {
+  &__icon-btn {
     width: 3rem;
     height: 3rem;
     border-radius: var(--border-raidus-large);
     background-color: rgba($color: #000000, $alpha: 0.5);
     cursor: pointer;
-
-    position: absolute;
-    top: 0.7rem;
-    right: 0.7rem;
+    margin-bottom: 0.5rem;
 
     display: flex;
     flex-direction: row;
@@ -57,10 +49,7 @@
     }
 
     &:hover {
-      background-color: rgba($color: #000000, $alpha: 0.4);
-      svg {
-        color: var(--color-grey-light-1);
-      }
+      background-color: rgba($color: #000000, $alpha: 0.8);
     }
 
     &--saved {
@@ -70,9 +59,34 @@
 
       &:hover {
         svg {
-          color: var(--color-primary-light);
+          color: var(--color-white);
         }
       }
     }
+
+    &--delete {
+      &:hover {
+        svg {
+          color: var(--color-red);
+        }
+      }
+    }
+
+    &--edit {
+      &:hover {
+        svg {
+          color: var(--color-secondary-light);
+        }
+      }
+    }
+  }
+
+  &__icon-btns {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+
+    display: flex;
+    flex-direction: column;
   }
 }
