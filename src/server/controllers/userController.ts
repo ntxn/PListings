@@ -42,7 +42,7 @@ import {
   accessRestrictor,
   authenticationChecker,
 } from '../middlewares';
-import { User, Listing, Favorite } from '../models';
+import { User, Listing, Favorite, ListingDoc } from '../models';
 
 const addIdToReqParams: MiddlewareHandler = (req: CustomRequest, res, next) => {
   req.params.id = req.user!.id;
@@ -175,12 +175,16 @@ class UserController {
       const favorites = await Favorite.find({ user: req.user!.id }).sort(
         '-createdAt'
       );
+      const saved: ListingDoc[] = [];
+
       await Promise.all(
         favorites.map(async fav => {
           const listing = await Listing.findById(fav.listing);
-          if (listing) listings[MyListingsTypes.Saved].push(listing);
+          if (listing && listing.active) saved.push(listing);
         })
       );
+
+      listings[MyListingsTypes.Saved] = saved;
 
       // get all posted listings belong to current user
       const selling = await Listing.find({
