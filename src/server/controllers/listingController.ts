@@ -182,16 +182,36 @@ class ListingController {
   /**
    * Mark the listing id included in req.params as sold
    */
+  @use(deleteFavDocsByListingId)
   @use(listingOwnerChecker)
   @use(authenticationChecker)
   @PATCH(Routes.ListingMarkedAsSold)
-  markAsSold(req: Request, res: Response, next: NextFunction): void {
+  markListingAsSold(req: Request, res: Response, next: NextFunction): void {
     catchAsync(async (req, res, next) => {
       const listing = await Listing.findById(req.params.id);
       if (!listing) return next(new NotFoundError(ErrMsg.NoDocWithId));
 
       listing.active = false;
       listing.sold = true;
+      await listing.save();
+
+      res.status(200).json({ status: RequestStatus.Success, data: listing });
+    })(req, res, next);
+  }
+
+  /**
+   * Renew the listing with id in req.params to be active (ready to sell)
+   */
+  @use(listingOwnerChecker)
+  @use(authenticationChecker)
+  @PATCH(Routes.ListingRenew)
+  renewListing(req: Request, res: Response, next: NextFunction): void {
+    catchAsync(async (req, res, next) => {
+      const listing = await Listing.findById(req.params.id);
+      if (!listing) return next(new NotFoundError(ErrMsg.NoDocWithId));
+
+      listing.active = true;
+      listing.sold = false;
       await listing.save();
 
       res.status(200).json({ status: RequestStatus.Success, data: listing });

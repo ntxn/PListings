@@ -75,6 +75,32 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
     }
   };
 
+  const renewListing = async (
+    index: number,
+    listingType: MyListingsTypes
+  ): Promise<void> => {
+    try {
+      const { data } = await axios.patch(
+        `${ApiRoutes.ListingRenew}/${listings[listingType][index].id}`
+      );
+
+      setListings({
+        ...listings,
+        [listingType]: listings[listingType].filter((l, i) => i !== index),
+        [MyListingsTypes.Selling]: [
+          data.data,
+          ...listings[MyListingsTypes.Selling],
+        ],
+      });
+    } catch (err) {
+      showAlert(
+        AlertType.Error,
+        'Having issue with renewing your listing. Please try again later.'
+      );
+      console.log(err);
+    }
+  };
+
   const renderListings = (): JSX.Element => {
     let element: JSX.Element[] = [];
 
@@ -120,7 +146,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
               listing={listing}
               onDelete={() => removeListing(i, MyListingsTypes.Expired)}
               btnText="Renew Listing"
-              btnAction={() => console.log('renewed')}
+              btnAction={() => renewListing(i, MyListingsTypes.Expired)}
             />
           );
         });
@@ -133,7 +159,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
               listing={listing}
               onDelete={() => removeListing(i, MyListingsTypes.Sold)}
               btnText="Sell Item Again"
-              btnAction={() => console.log('sell again')}
+              btnAction={() => renewListing(i, MyListingsTypes.Sold)}
             />
           );
         });
