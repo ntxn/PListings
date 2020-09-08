@@ -28,6 +28,7 @@ export enum Routes {
   // Listings routes
   Listings = '/',
   Listing = '/:id',
+  ListingMarkedAsSold = '/mark-as-sold/:id',
 
   // Admin only
   ListingProtected = '/admin/:id',
@@ -70,10 +71,10 @@ export enum ApiRoutes {
   // Listings
   Listings = '/api/v1/listings',
   ListingProtected = '/api/v1/listings/admin',
+  ListingMarkedAsSold = '/api/v1/listings/mark-as-sold',
 
   // Favorites
   Favorites = '/api/v1/favorites',
-  FavoriteListingsByUser = '/api/v1/favorites/user/:id',
+  FavoriteListingsByUser = '/api/v1/favorites/user',
   FilterListingsSavedByUser = '/api/v1/favorites/filter-listings-saved-by-user',
-  Favorite = '/api/v1/favorites/:id',
 }

@@ -191,20 +191,20 @@ class UserController {
         owner: req.user!.id,
         active: true,
         sold: false,
-      }).sort('-createdAt');
+      }).sort('-updatedAt');
       if (selling) listings[MyListingsTypes.Selling] = selling;
 
       const sold = await Listing.find({
         owner: req.user!.id,
         sold: true,
-      }).sort('-createdAt');
+      }).sort('-updatedAt');
       if (sold) listings[MyListingsTypes.Sold] = sold;
 
       const expired = await Listing.find({
         owner: req.user!.id,
         active: false,
         sold: false,
-      }).sort('-createdAt');
+      }).sort('-updatedAt');
       if (expired) listings[MyListingsTypes.Expired] = expired;
 
       res.status(200).json({ status: RequestStatus.Success, data: listings });

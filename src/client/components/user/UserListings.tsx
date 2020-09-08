@@ -11,8 +11,8 @@ import {
   DEFAULT_MY_LISTINGS,
   UserDoc,
   ApiRoutes,
-  ListingDoc,
 } from '../../../common';
+import { showAlert, AlertType } from '../alert';
 
 interface UserListingsProps {
   user: UserDoc | null;
@@ -46,13 +46,33 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
     nextActive!.classList.add('user-listings__nav__item--active');
   };
 
-  const onDelete = (index: number, listingType: MyListingsTypes): void => {
-    const current = listings[listingType];
-
+  const removeListing = (index: number, listingType: MyListingsTypes): void => {
     setListings({
       ...listings,
-      [listingType]: current.filter((l, i) => i !== index),
+      [listingType]: listings[listingType].filter((l, i) => i !== index),
     });
+  };
+
+  const markAsSold = async (index: number): Promise<void> => {
+    try {
+      const selling = listings[MyListingsTypes.Selling];
+
+      const { data } = await axios.patch(
+        `${ApiRoutes.ListingMarkedAsSold}/${selling[index].id}`
+      );
+
+      setListings({
+        ...listings,
+        [MyListingsTypes.Selling]: selling.filter((l, i) => i !== index),
+        [MyListingsTypes.Sold]: [data.data, ...listings[MyListingsTypes.Sold]],
+      });
+    } catch (err) {
+      showAlert(
+        AlertType.Error,
+        'Having issue with marking this listing as sold. Please try again later.'
+      );
+      console.log(err);
+    }
   };
 
   const renderListings = (): JSX.Element => {
@@ -84,9 +104,9 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
-              onDelete={() => onDelete(i, MyListingsTypes.Selling)}
+              onDelete={() => removeListing(i, MyListingsTypes.Selling)}
               btnText="Mark as Sold"
-              btnAction={() => console.log('sold')}
+              btnAction={() => markAsSold(i)}
               showEditBtn
             />
           );
@@ -98,8 +118,8 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
-              onDelete={() => onDelete(i, MyListingsTypes.Expired)}
-              btnText="Renew listing"
+              onDelete={() => removeListing(i, MyListingsTypes.Expired)}
+              btnText="Renew Listing"
               btnAction={() => console.log('renewed')}
             />
           );
@@ -111,8 +131,8 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
-              onDelete={() => onDelete(i, MyListingsTypes.Sold)}
-              btnText="Sell item again"
+              onDelete={() => removeListing(i, MyListingsTypes.Sold)}
+              btnText="Sell Item Again"
               btnAction={() => console.log('sell again')}
             />
           );

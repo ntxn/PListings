@@ -180,6 +180,25 @@ class ListingController {
   deleteListingByAdmin(req: Request, res: Response): void {}
 
   /**
+   * Mark the listing id included in req.params as sold
+   */
+  @use(listingOwnerChecker)
+  @use(authenticationChecker)
+  @PATCH(Routes.ListingMarkedAsSold)
+  markAsSold(req: Request, res: Response, next: NextFunction): void {
+    catchAsync(async (req, res, next) => {
+      const listing = await Listing.findById(req.params.id);
+      if (!listing) return next(new NotFoundError(ErrMsg.NoDocWithId));
+
+      listing.active = false;
+      listing.sold = true;
+      await listing.save();
+
+      res.status(200).json({ status: RequestStatus.Success, data: listing });
+    })(req, res, next);
+  }
+
+  /**
    * Get all active listings in db
    */
   @use(getAll(Listing))
