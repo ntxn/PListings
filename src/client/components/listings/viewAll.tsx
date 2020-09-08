@@ -18,6 +18,7 @@ interface StateProps {
   defaultFilters: FilterAttrs;
   listings: ListingDoc[];
   user: UserDoc | null;
+  savedListingIds: Record<string, string>;
 }
 
 interface DispatchProps {
@@ -81,6 +82,7 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
             <ListingCardPublic
               key={listing.id}
               listing={listing}
+              saved={props.savedListingIds[listing.id] ? true : false}
               distanceDiff={calcDistanceBetweenTwoPoints(
                 center[1],
                 center[0],
@@ -100,6 +102,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     defaultFilters: state.defaultFilters,
     listings: state.listings,
+    savedListingIds: state.savedListingIds,
     user: state.user,
   };
 };

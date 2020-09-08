@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaHeart } from 'react-icons/fa';
 import { FiEdit } from 'react-icons/fi';
+import { FaEdit } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
 
 import { ListingDoc, UserDoc } from '../../common';
 import { ImageSlider } from './ImageSlider';
@@ -15,11 +17,12 @@ interface ListingCardProps {
   listing: ListingDoc;
   renderInfoContent(): JSX.Element;
   showSavedBtn?: boolean;
+  saved?: boolean;
   showEditBtn?: boolean;
+  showDeleteBtn?: boolean;
 
   // from StoreState
   user: UserDoc | null;
-  savedListings: Record<string, string>;
 
   // From dispatch
   saveListing(listingId: string): void;
@@ -40,24 +43,17 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
       <>
         {(!props.user || props.user.id !== props.listing.owner.id) && (
           <div
-            className={`listing-card__save-btn ${
-              props.savedListings[props.listing.id]
-                ? 'listing-card__save-btn--saved'
-                : ''
+            className={`listing-card__icon-btn ${
+              props.saved ? 'listing-card__icon-btn--saved' : ''
             }`}
             onClick={() => {
               if (props.user) {
-                if (props.savedListings[props.listing.id])
-                  props.unsaveListing(props.listing.id);
+                if (props.saved) props.unsaveListing(props.listing.id);
                 else props.saveListing(props.listing.id);
               } else setShowLogInModal(true);
             }}
           >
-            <FaHeart
-              title={`${
-                props.savedListings[props.listing.id] ? 'Unsave' : 'Save'
-              } listing`}
-            />
+            <FaHeart title={`${props.saved ? 'Unsave' : 'Save'} listing`} />
           </div>
         )}
       </>
@@ -68,14 +64,23 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
     return (
       <>
         {props.user && props.user.id === props.listing.owner.id && (
-          <Link
-            to={`/listings/edit/${props.listing.id}`}
-            // className="listing__info__edit"
-          >
-            <div className="listing-card__save-btn">
-              <FiEdit title="Edit your listing" />
+          <Link to={`/listings/edit/${props.listing.id}`}>
+            <div className="listing-card__icon-btn listing-card__icon-btn--edit">
+              <FaEdit title="Edit your listing" />
             </div>
           </Link>
+        )}
+      </>
+    );
+  };
+
+  const renderDeleteBtn = (): JSX.Element => {
+    return (
+      <>
+        {props.user && props.user.id === props.listing.owner.id && (
+          <div className="listing-card__icon-btn listing-card__icon-btn--delete">
+            <MdDelete title="Delete listing" />
+          </div>
         )}
       </>
     );
@@ -99,8 +104,12 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
 
       <div className="listing-card__info">{props.renderInfoContent()}</div>
 
-      {props.showSavedBtn && renderSaveBtn()}
-      {props.showEditBtn && renderEditBtn()}
+      <div className="listing-card__icon-btns">
+        {props.showSavedBtn && renderSaveBtn()}
+        {props.showEditBtn && renderEditBtn()}
+        {props.showDeleteBtn && renderDeleteBtn()}
+      </div>
+
       {promptUserToLogInToSaveListing(showLogInModal, () =>
         setShowLogInModal(false)
       )}
@@ -109,7 +118,7 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { user: state.user, savedListings: state.savedListingIds };
+  return { user: state.user };
 };
 
 export const ListingCard = connect(mapStateToProps, {
@@ -120,6 +129,7 @@ export const ListingCard = connect(mapStateToProps, {
 interface ListingCardPublicProps {
   listing: ListingDoc;
   distanceDiff: number;
+  saved: boolean;
 }
 
 export const ListingCardPublic = (
@@ -128,16 +138,16 @@ export const ListingCardPublic = (
   const renderContent = () => {
     return (
       <>
-        <p className="listing-card__info__city">{`${
+        <p className="sub-heading-quinary">{`${
           props.listing.location.city
         } · ${props.distanceDiff.toFixed(1)} mi`}</p>
         <Link
           to={`/listings/${props.listing.id}`}
-          className="listing-card__info__title heading-tertiary"
+          className="listing-card__info__title heading-tertiary u-margin-top-xxsmall"
         >
           {props.listing.title}
         </Link>
-        <p className="listing-card__info__price heading-quaternary">
+        <p className="listing-card__info__price heading-quaternary u-margin-top-xxsmall">
           ${props.listing.price}
         </p>
       </>
@@ -149,6 +159,7 @@ export const ListingCardPublic = (
       listing={props.listing}
       renderInfoContent={renderContent}
       showSavedBtn
+      saved={props.saved}
     />
   );
 };
@@ -172,12 +183,14 @@ export const ListingCardPrivate = (
         >
           {props.listing.title}
         </Link>
-        <p className="listing-card__info__city">{`${props.listing.visits} visits · ${props.listing.favorites} favorites`}</p>
-        <div className="u-center-text">
-          <span className="btn-text btn-text--orange" onClick={props.btnAction}>
-            {props.btnText}
-          </span>
-        </div>
+        <p className="sub-heading-quinary u-margin-top-xxsmall">{`${props.listing.visits} visits · ${props.listing.favorites} favorites`}</p>
+
+        <p
+          className="btn-text btn-text--orange u-margin-top-xxsmall"
+          onClick={props.btnAction}
+        >
+          {props.btnText}
+        </p>
       </>
     );
   };
@@ -187,6 +200,7 @@ export const ListingCardPrivate = (
       listing={props.listing}
       renderInfoContent={renderContent}
       showEditBtn={props.showEditBtn ? true : false}
+      showDeleteBtn
     />
   );
 };

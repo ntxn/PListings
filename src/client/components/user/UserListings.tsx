@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 
 import { AuthRequired } from '../AuthRequired';
-import { StoreState } from '../../utilities';
+import { StoreState, calcDistanceBetweenTwoPoints } from '../../utilities';
 import { Loader } from '../Modal';
 import { ListingCardPublic, ListingCardPrivate } from '../ListingCard';
 import {
@@ -46,20 +46,68 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
   };
 
   const renderListings = (): JSX.Element => {
-    return (
-      <>
-        {listings[activeListingType].map(listing => {
+    let element: JSX.Element[] = [];
+
+    switch (activeListingType) {
+      case MyListingsTypes.Saved:
+        element = listings[MyListingsTypes.Saved].map(listing => {
+          const [lng2, lat2] = listing.location.coordinates;
+          const [lng1, lat1] = props.user!.location.coordinates;
+          return (
+            <ListingCardPublic
+              key={listing.id}
+              listing={listing}
+              saved
+              distanceDiff={calcDistanceBetweenTwoPoints(
+                lat1,
+                lng1,
+                lat2,
+                lng2
+              )}
+            />
+          );
+        });
+        break;
+      case MyListingsTypes.Selling:
+        element = listings[MyListingsTypes.Selling].map(listing => {
           return (
             <ListingCardPrivate
               key={listing.id}
               listing={listing}
-              btnText="hello"
-              btnAction={() => console.log(listing.id)}
+              btnText="Mark as Sold"
+              btnAction={() => console.log('sold')}
+              showEditBtn
             />
           );
-        })}
-      </>
-    );
+        });
+        break;
+      case MyListingsTypes.Expired:
+        element = listings[MyListingsTypes.Expired].map(listing => {
+          return (
+            <ListingCardPrivate
+              key={listing.id}
+              listing={listing}
+              btnText="Renew listing"
+              btnAction={() => console.log('renewed')}
+            />
+          );
+        });
+        break;
+      case MyListingsTypes.Sold:
+        element = listings[MyListingsTypes.Sold].map(listing => {
+          return (
+            <ListingCardPrivate
+              key={listing.id}
+              listing={listing}
+              btnText="Sell item again"
+              btnAction={() => console.log('sell again')}
+            />
+          );
+        });
+        break;
+    }
+
+    return <>{element}</>;
   };
 
   const renderContent = (): JSX.Element => {
