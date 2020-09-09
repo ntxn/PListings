@@ -74,6 +74,23 @@ export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
   }
 };
 
+export const fetchSavedListingIds = (listingIds: string[]) => async (
+  dispatch: Dispatch
+): Promise<void> => {
+  try {
+    const { data } = await axios.post(ApiRoutes.FilterListingsSavedByUser, {
+      listingIds,
+    });
+    dispatch<FetchSavedListingIdsAction>({
+      type: ActionTypes.fetchSavedListingIds,
+      payload: data.data,
+    });
+  } catch (err) {
+    console.log(err);
+    showAlert(AlertType.Error, `Issue with fetching saved listing IDs`);
+  }
+};
+
 export const createListing = (
   formValues: ListingAttrs,
   imagesParams: ListingImagesParams
