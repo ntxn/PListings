@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
+import { UserPageLayout, NavItem } from './UserPageLayout';
 import { AuthRequired } from '../AuthRequired';
 import { StoreState, calcDistanceBetweenTwoPoints } from '../../utilities';
 import { Loader } from '../Modal';
@@ -35,16 +36,6 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
   );
   const [listings, setListings] = useState(DEFAULT_MY_LISTINGS);
   const [showLoader, setShowLoader] = useState(false);
-
-  const onClickNavItemWithId = (id: string): void => {
-    const currentlyActive = document.querySelector(
-      '.user-listings__nav__item--active'
-    );
-    currentlyActive!.classList.remove('user-listings__nav__item--active');
-
-    const nextActive = document.getElementById(id);
-    nextActive!.classList.add('user-listings__nav__item--active');
-  };
 
   const removeListing = (index: number, listingType: MyListingsTypes): void => {
     setListings({
@@ -114,6 +105,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
               key={listing.id}
               listing={listing}
               saved
+              clickable
               distanceDiff={calcDistanceBetweenTwoPoints(
                 lat1,
                 lng1,
@@ -166,65 +158,44 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         break;
     }
 
-    return <>{element}</>;
+    return <div className="listings">{element}</div>;
   };
 
-  const renderContent = (): JSX.Element => {
-    return (
-      <div className="user-listings">
-        <h2 className="user-listings__header heading-primary">My Listings</h2>
-        <div className="user-listings__nav sub-heading-tertiary">
-          <span
-            className="user-listings__nav__item user-listings__nav__item--active"
-            id="user-listings--selling"
-            onClick={() => {
-              onClickNavItemWithId('user-listings--selling');
-              setActiveListingType(MyListingsTypes.Selling);
-            }}
-          >
-            Selling
-          </span>
-          <span
-            className="user-listings__nav__item"
-            id="user-listings--saved"
-            onClick={() => {
-              onClickNavItemWithId('user-listings--saved');
-              setActiveListingType(MyListingsTypes.Saved);
-            }}
-          >
-            Saved
-          </span>
-          <span
-            className="user-listings__nav__item"
-            id="user-listings--expired"
-            onClick={() => {
-              onClickNavItemWithId('user-listings--expired');
-              setActiveListingType(MyListingsTypes.Expired);
-            }}
-          >
-            Expired
-          </span>
-          <span
-            className="user-listings__nav__item"
-            id="user-listings--sold"
-            onClick={() => {
-              onClickNavItemWithId('user-listings--sold');
-              setActiveListingType(MyListingsTypes.Sold);
-            }}
-          >
-            Sold
-          </span>
-        </div>
-        <div className="user-listings__content listings">
-          {renderListings()}
-        </div>
-      </div>
-    );
+  const renderHeader = (): JSX.Element => (
+    <h2 className="heading-primary">My Listings</h2>
+  );
+
+  const navList: Record<MyListingsTypes, NavItem> = {
+    [MyListingsTypes.Selling]: {
+      name: 'Selling',
+      onClick: () => setActiveListingType(MyListingsTypes.Selling),
+    },
+    [MyListingsTypes.Saved]: {
+      name: 'Saved',
+      onClick: () => setActiveListingType(MyListingsTypes.Saved),
+    },
+    [MyListingsTypes.Expired]: {
+      name: 'Expired',
+      onClick: () => setActiveListingType(MyListingsTypes.Expired),
+    },
+    [MyListingsTypes.Sold]: {
+      name: 'Sold',
+      onClick: () => setActiveListingType(MyListingsTypes.Sold),
+    },
   };
 
   return (
     <>
-      {props.user ? renderContent() : <AuthRequired route="Your listings" />}
+      {props.user ? (
+        <UserPageLayout
+          header={renderHeader()}
+          body={renderListings()}
+          navList={navList}
+          active={MyListingsTypes.Selling}
+        />
+      ) : (
+        <AuthRequired route="Your listings" />
+      )}
       {showLoader && <Loader />}
     </>
   );
