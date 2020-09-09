@@ -83,6 +83,7 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
               key={listing.id}
               listing={listing}
               saved={props.savedListingIds[listing.id] ? true : false}
+              clickable
               distanceDiff={calcDistanceBetweenTwoPoints(
                 center[1],
                 center[0],

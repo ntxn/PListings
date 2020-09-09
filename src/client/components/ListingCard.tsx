@@ -12,13 +12,19 @@ import { showAlert, AlertType } from './alert';
 import { promptUserToLogInToSaveListing } from './Modal';
 import { StoreState } from '../utilities';
 import { unsaveListing, saveListing } from '../actions';
+import { BsTypeH3 } from 'react-icons/bs';
 
 interface ListingCardProps {
   // from Parent component
   listing: ListingDoc;
   renderInfoContent(): JSX.Element;
+
+  // Props for public card
   showSavedBtn?: boolean;
   saved?: boolean;
+  clickable?: boolean;
+
+  // Props for private card
   showEditBtn?: boolean;
   showDeleteBtn?: boolean;
   onDelete?(): void;
@@ -112,7 +118,9 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
             images={props.listing.photos}
             containerClassName="listing-card__photos"
             pagination
-            linkTo={`/listings/${props.listing.id}`}
+            linkTo={
+              props.clickable ? `/listings/${props.listing.id}` : undefined
+            }
             backgroundSize="cover"
             bordered
             squared
@@ -148,6 +156,7 @@ interface ListingCardPublicProps {
   listing: ListingDoc;
   distanceDiff: number;
   saved: boolean;
+  clickable?: boolean;
 }
 
 export const ListingCardPublic = (
@@ -159,12 +168,18 @@ export const ListingCardPublic = (
         <p className="sub-heading-quinary">{`${
           props.listing.location.city
         } · ${props.distanceDiff.toFixed(1)} mi`}</p>
-        <Link
-          to={`/listings/${props.listing.id}`}
-          className="listing-card__info__title heading-tertiary u-margin-top-xxsmall"
-        >
-          {props.listing.title}
-        </Link>
+        {props.clickable ? (
+          <Link
+            to={`/listings/${props.listing.id}`}
+            className="listing-card__info__title heading-tertiary u-margin-top-xxsmall"
+          >
+            {props.listing.title}
+          </Link>
+        ) : (
+          <h3 className="listing-card__info__title heading-tertiary u-margin-top-xxsmall">
+            {props.listing.title}
+          </h3>
+        )}
         <p className="listing-card__info__price heading-quaternary u-margin-top-xxsmall">
           ${props.listing.price}
         </p>
@@ -176,8 +191,9 @@ export const ListingCardPublic = (
     <ListingCard
       listing={props.listing}
       renderInfoContent={renderContent}
-      showSavedBtn
+      showSavedBtn={props.clickable}
       saved={props.saved}
+      clickable={props.clickable}
     />
   );
 };
