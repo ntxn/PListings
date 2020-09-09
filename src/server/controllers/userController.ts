@@ -172,9 +172,7 @@ class UserController {
       const listings: MyListings = DEFAULT_MY_LISTINGS;
 
       // get all listings saved by current user
-      const favorites = await Favorite.find({ user: req.user!.id }).sort(
-        '-createdAt'
-      );
+      const favorites = await Favorite.find({ user: req.user!.id });
       const saved: ListingDoc[] = [];
 
       await Promise.all(
@@ -191,20 +189,20 @@ class UserController {
         owner: req.user!.id,
         active: true,
         sold: false,
-      }).sort('-updatedAt');
+      });
       if (selling) listings[MyListingsTypes.Selling] = selling;
 
       const sold = await Listing.find({
         owner: req.user!.id,
         sold: true,
-      }).sort('-updatedAt');
+      });
       if (sold) listings[MyListingsTypes.Sold] = sold;
 
       const expired = await Listing.find({
         owner: req.user!.id,
         active: false,
         sold: false,
-      }).sort('-updatedAt');
+      });
       if (expired) listings[MyListingsTypes.Expired] = expired;
 
       res.status(200).json({ status: RequestStatus.Success, data: listings });
@@ -276,10 +274,9 @@ class UserController {
       const user = await User.findById(req.params.id)
         .populate({
           path: 'listings',
-          select: 'title photos sold -owner',
-          match: { active: true },
+          match: { $or: [{ active: true }, { sold: true }] },
         })
-        .select('name location photo listings');
+        .select('name location photo createdAt listings');
 
       if (!user) return next(new NotFoundError(ErrMsg.NoUserWithId));
 

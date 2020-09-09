@@ -170,6 +170,11 @@ const listingSchema = new mongoose.Schema(
 listingSchema.index({ location: '2dsphere' });
 
 listingSchema.pre(/^find/, function (next) {
+  (this as mongoose.Query<any>).sort('-updatedAt');
+  next();
+});
+
+listingSchema.pre(/^find/, function (next) {
   (this as mongoose.Query<any>).populate({
     path: 'owner',
     select: 'id name photo',
