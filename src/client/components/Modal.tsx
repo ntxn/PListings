@@ -133,7 +133,7 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
       >
         <div className="user-menu__option">
           <Link
-            to={`/user/${props.user.id}`}
+            to={`/user/profile/${props.user.id}`}
             className="user-menu__option__hover"
             onClick={props.closeUserMenu}
           >
