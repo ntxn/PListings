@@ -8,6 +8,7 @@ import {
   listingsReducer,
   savedListingIdsReducer,
 } from './listing';
+import { socketReducer } from './socket-io';
 import { filtersReducer } from './filters';
 import { StoreState } from '../utilities';
 
@@ -21,4 +22,5 @@ export const reducers = combineReducers<StoreState>({
   listings: listingsReducer,
   savedListingIds: savedListingIdsReducer,
   defaultFilters: filtersReducer,
+  socket: socketReducer,
 });

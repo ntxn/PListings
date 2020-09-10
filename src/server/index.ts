@@ -7,6 +7,7 @@ process.on('uncaughtException', (err: Error): void => {
 });
 
 import './db/mongoose';
+import './socket-io';
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () =>

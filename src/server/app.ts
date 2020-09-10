@@ -1,30 +1,29 @@
-import path from 'path';
-
 import express from 'express';
+import http from 'http';
 import cookieParser from 'cookie-parser';
 
 import './controllers';
 import { globalErrorHandler } from './controllers';
 import { AppRouter, NotFoundError } from './utils';
 
-const app = express();
+const expressApp = express();
 
 /****************** GLOBAL MIDDLEWARES ******************/
 // Serving static files
-app.use(express.static('public'));
+expressApp.use(express.static('public'));
 
 // Body parsers
-app.use(express.json());
-app.use(cookieParser());
+expressApp.use(express.json());
+expressApp.use(cookieParser());
 
 /****************** ROUTES ******************/
-app.use(AppRouter.instance);
-app.all('/api/*', (req, res, next) =>
+expressApp.use(AppRouter.instance);
+expressApp.all('/api/*', (req, res, next) =>
   next(new NotFoundError('Route not found'))
 );
-app.get('*', (req, res) => res.redirect(`/#${req.url}`));
+expressApp.get('*', (req, res) => res.redirect(`/#${req.url}`));
 
 /****************** GLOBAL ERROR HANDLER ******************/
-app.use(globalErrorHandler);
+expressApp.use(globalErrorHandler);
 
-export { app };
+export const app = http.createServer(expressApp);

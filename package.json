@@ -42,6 +42,8 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/redux-form": "^8.2.6",
     "@types/sharp": "^0.25.1",
+    "@types/socket.io": "^2.1.11",
+    "@types/socket.io-client": "^1.4.33",
     "@types/supertest": "^2.0.9",
     "@types/validator": "^13.0.0",
     "@types/webpack": "^4.41.17",

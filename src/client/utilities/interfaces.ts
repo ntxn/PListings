@@ -147,6 +147,7 @@ export interface StoreState {
   searchedLocations: SearchedLocation[];
   btnLoading: boolean;
   defaultFilters: FilterAttrs;
+  socket: SocketIOClient.Socket;
 }
 
 export interface SearchedLocation {

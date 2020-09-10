@@ -21,6 +21,8 @@ interface ListingProps {
   listing: ListingDoc;
   user: UserDoc | null;
   savedListings: Record<string, string>;
+  socket: SocketIOClient.Socket;
+
   fetchListing(id: string): void;
   clearListing(): void;
   saveListing(listingId: string): void;
@@ -32,6 +34,8 @@ const _Listing = (props: ListingProps): JSX.Element => {
     const fetchData = async () => {
       //@ts-ignore
       await props.fetchListing(props.match.params.id);
+
+      props.socket.emit('chat message', 'hello');
     };
 
     fetchData();
@@ -259,6 +263,7 @@ const mapStateToProps = (state: StoreState) => {
     listing: state.listing,
     user: state.user,
     savedListings: state.savedListingIds,
+    socket: state.socket,
   };
 };
 
