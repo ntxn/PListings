@@ -20,19 +20,50 @@ import {
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
   StoreState,
+  SavedSocketsAction,
 } from '../utilities';
-import { ApiRoutes, UserAttrs } from '../../common';
+import { ApiRoutes, UserAttrs, UserDoc, SocketIOEvents } from '../../common';
 import { reset } from 'redux-form';
 import { AlertType, showAlert } from '.././components/alert';
 
 export const fetchCurrentUser = (): FunctionalAction<
   FetchCurrentUserAction
-> => async dispatch => {
-  const { data } = await axios.get(ApiRoutes.CurrentUser);
+> => async (dispatch, getState) => {
+  const response = await axios.get(ApiRoutes.CurrentUser);
+  const user = response.data.data as UserDoc;
+
+  // Create namespaces for each of the listing in socket io
+
+  const sockets: Record<string, SocketIOClient.Socket> = {};
+
+  user.listings.forEach(listing => {
+    // create a namespace per listing
+    getState!().sockets.default.emit(SocketIOEvents.CreateNamespace, listing);
+
+    // create a socket per namespace
+    const id = `${listing.id}`;
+    sockets[id] = io(`/${listing.id}`, {
+      query: { user: user.id },
+    });
+
+    sockets[id].on(SocketIOEvents.CreateRoom, (roomName: string) => {
+      sockets[id].emit(SocketIOEvents.CreateRoom, roomName);
+    });
+
+    sockets[id].on(SocketIOEvents.SendMessage, (data: string) =>
+      console.log(data)
+    );
+  });
+
+  // @ts-ignore
+  dispatch<SavedSocketsAction>({
+    type: ActionTypes.saveSockets,
+    payload: sockets,
+  });
 
   dispatch({
     type: ActionTypes.fetchCurrentUser,
-    payload: data.data,
+    payload: user,
   });
 };
 
