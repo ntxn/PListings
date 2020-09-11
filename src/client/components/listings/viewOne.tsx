@@ -5,12 +5,19 @@ import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
-import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
+import {
+  StoreState,
+  listingMapSmall,
+  listingMapLarge,
+  initializeSocket,
+  SavedSocketsAction,
+} from '../../utilities';
 import {
   fetchListing,
   clearListing,
   saveListing,
   unsaveListing,
+  saveSockets,
 } from '../../actions';
 import { ListingDoc, UserDoc, SocketIOEvents } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
@@ -27,6 +34,9 @@ interface ListingProps {
   clearListing(): void;
   saveListing(listingId: string): void;
   unsaveListing(listingId: string): void;
+  saveSockets(
+    sockets: Record<string, SocketIOClient.Socket>
+  ): SavedSocketsAction;
 
   match: { params: { id: string } };
 }
@@ -94,23 +104,23 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const [showLoader, setShowLoader] = useState(false);
   const [showImageSlider, setShowImageSlider] = useState(false);
   const [chatboxContent, setChatboxContent] = useState('');
-  const [socket, setSocket] = useState(io('/ns'));
 
   const onSubmitChatbox = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
+    const sockets: Record<string, SocketIOClient.Socket> = {};
     if (props.user) {
-      props.sockets.default.emit(SocketIOEvents.CreateNamespace, props.listing);
+      initializeSocket(
+        props.sockets.default,
+        props.listing,
+        sockets,
+        props.user
+      );
+      props.saveSockets(sockets);
 
-      setSocket(io(`/${props.listing.id}`, { query: { user: props.user.id } }));
-
-      socket.on(SocketIOEvents.CreateRoom, (roomName: string) => {
-        socket.emit(SocketIOEvents.CreateRoom, roomName);
-      });
-
-      socket.emit(SocketIOEvents.SendMessage, chatboxContent);
-      socket.on(SocketIOEvents.SendMessage, (data: string) =>
-        console.log('received', data)
+      sockets[`/${props.listing.id}`].emit(
+        SocketIOEvents.SendMessage,
+        chatboxContent
       );
     }
   };
@@ -308,6 +318,7 @@ export const Listing = connect(mapStateToProps, {
   clearListing,
   saveListing,
   unsaveListing,
+  saveSockets,
 })(
   //@ts-ignore
   _Listing

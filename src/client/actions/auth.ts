@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Dispatch } from 'redux';
+import { reset } from 'redux-form';
 
 import { history } from '../history';
 import {
@@ -21,47 +22,29 @@ import {
   processFormValuesToFormData,
   StoreState,
   SavedSocketsAction,
+  initializeSocket,
 } from '../utilities';
-import { ApiRoutes, UserAttrs, UserDoc, SocketIOEvents } from '../../common';
-import { reset } from 'redux-form';
+import { ApiRoutes, UserAttrs, UserDoc } from '../../common';
+import { saveSockets } from './socket-io';
 import { AlertType, showAlert } from '.././components/alert';
 
-export const fetchCurrentUser = (): FunctionalAction<
-  FetchCurrentUserAction
-> => async (dispatch, getState) => {
+export const fetchCurrentUser = () => async (
+  dispatch: Dispatch,
+  getState: () => StoreState
+): Promise<void> => {
   const response = await axios.get(ApiRoutes.CurrentUser);
   const user = response.data.data as UserDoc;
 
-  // Create namespaces for each of the listing in socket io
-
-  const sockets: Record<string, SocketIOClient.Socket> = {};
-
-  user.listings.forEach(listing => {
-    // create a namespace per listing
-    getState!().sockets.default.emit(SocketIOEvents.CreateNamespace, listing);
-
-    // create a socket per namespace
-    const id = `${listing.id}`;
-    sockets[id] = io(`/${listing.id}`, {
-      query: { user: user.id },
+  if (user) {
+    const sockets: Record<string, SocketIOClient.Socket> = {};
+    user.listings.forEach(listing => {
+      initializeSocket(getState!().sockets.default, listing, sockets, user);
     });
 
-    sockets[id].on(SocketIOEvents.CreateRoom, (roomName: string) => {
-      sockets[id].emit(SocketIOEvents.CreateRoom, roomName);
-    });
+    dispatch<SavedSocketsAction>(saveSockets(sockets));
+  }
 
-    sockets[id].on(SocketIOEvents.SendMessage, (data: string) =>
-      console.log(data)
-    );
-  });
-
-  // @ts-ignore
-  dispatch<SavedSocketsAction>({
-    type: ActionTypes.saveSockets,
-    payload: sockets,
-  });
-
-  dispatch({
+  dispatch<FetchCurrentUserAction>({
     type: ActionTypes.fetchCurrentUser,
     payload: user,
   });
