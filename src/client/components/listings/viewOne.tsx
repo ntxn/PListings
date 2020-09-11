@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaHeart } from 'react-icons/fa';
@@ -12,7 +12,7 @@ import {
   saveListing,
   unsaveListing,
 } from '../../actions';
-import { ListingDoc, UserDoc } from '../../../common';
+import { ListingDoc, UserDoc, SocketIOEvents } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
@@ -21,25 +21,23 @@ interface ListingProps {
   listing: ListingDoc;
   user: UserDoc | null;
   savedListings: Record<string, string>;
-  socket: SocketIOClient.Socket;
+  sockets: Record<string, SocketIOClient.Socket>;
 
   fetchListing(id: string): void;
   clearListing(): void;
   saveListing(listingId: string): void;
   unsaveListing(listingId: string): void;
+
+  match: { params: { id: string } };
 }
 
 const _Listing = (props: ListingProps): JSX.Element => {
   useEffect(() => {
     const fetchData = async () => {
-      //@ts-ignore
       await props.fetchListing(props.match.params.id);
-
-      props.socket.emit('chat message', 'hello');
     };
 
     fetchData();
-
     return () => props.clearListing();
   }, []);
 
@@ -95,6 +93,27 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const [showLogInModal, setShowLogInModal] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [showImageSlider, setShowImageSlider] = useState(false);
+  const [chatboxContent, setChatboxContent] = useState('');
+  const [socket, setSocket] = useState(io('/ns'));
+
+  const onSubmitChatbox = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+
+    if (props.user) {
+      props.sockets.default.emit(SocketIOEvents.CreateNamespace, props.listing);
+
+      setSocket(io(`/${props.listing.id}`, { query: { user: props.user.id } }));
+
+      socket.on(SocketIOEvents.CreateRoom, (roomName: string) => {
+        socket.emit(SocketIOEvents.CreateRoom, roomName);
+      });
+
+      socket.emit(SocketIOEvents.SendMessage, chatboxContent);
+      socket.on(SocketIOEvents.SendMessage, (data: string) =>
+        console.log('received', data)
+      );
+    }
+  };
 
   const renderListing = (): JSX.Element => {
     return (
@@ -250,6 +269,23 @@ const _Listing = (props: ListingProps): JSX.Element => {
           )}
 
           {/******** Mini chat box ********/}
+          <div className="listing__mini-chat-box">
+            <p className="listing__mini-chat-box__title">
+              Send seller a message
+            </p>
+            <form
+              className="listing__mini-chat-box__form"
+              onSubmit={onSubmitChatbox}
+            >
+              <input
+                value={chatboxContent}
+                onChange={e => setChatboxContent(e.target.value)}
+              />
+              <button type="submit" disabled={chatboxContent === ''}>
+                Send
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     );
@@ -263,7 +299,7 @@ const mapStateToProps = (state: StoreState) => {
     listing: state.listing,
     user: state.user,
     savedListings: state.savedListingIds,
-    socket: state.socket,
+    sockets: state.sockets,
   };
 };
 
