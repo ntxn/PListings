@@ -113,6 +113,11 @@ export interface SetDefaultFiltersAction {
   payload: CombinedLocation;
 }
 
+export interface SavedSocketsAction {
+  type: ActionTypes.saveSockets;
+  payload: Record<string, SocketIOClient.Socket>;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -134,7 +139,8 @@ export type Action =
   | UnsaveListingAction
   | FetchSavedListingIdsAction
   | ClearSavedListingIdsAction
-  | SetDefaultFiltersAction;
+  | SetDefaultFiltersAction
+  | SavedSocketsAction;
 
 // Store State
 export interface StoreState {
@@ -147,7 +153,7 @@ export interface StoreState {
   searchedLocations: SearchedLocation[];
   btnLoading: boolean;
   defaultFilters: FilterAttrs;
-  socket: SocketIOClient.Socket;
+  sockets: Record<string, SocketIOClient.Socket>;
 }
 
 export interface SearchedLocation {

@@ -22,5 +22,5 @@ export const reducers = combineReducers<StoreState>({
   listings: listingsReducer,
   savedListingIds: savedListingIdsReducer,
   defaultFilters: filtersReducer,
-  socket: socketReducer,
+  sockets: socketReducer,
 });

@@ -31,4 +31,7 @@ export enum ActionTypes {
 
   // listings filters
   setDefaultFilters,
+
+  // socket-io
+  saveSockets,
 }

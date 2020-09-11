@@ -1,6 +1,13 @@
-import { Action } from '../utilities';
+import { Action, ActionTypes } from '../utilities';
 
 export const socketReducer = (
-  state: SocketIOClient.Socket = io(),
+  state: Record<string, SocketIOClient.Socket> = { default: io() },
   action: Action
-): SocketIOClient.Socket => state;
+): Record<string, SocketIOClient.Socket> => {
+  switch (action.type) {
+    case ActionTypes.saveSockets:
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+};
