@@ -11,6 +11,12 @@ export interface GeoLocation extends BaseLocation {
   country: string;
 }
 
+export enum MessageStatus {
+  Sent,
+  Delivered,
+  Seen,
+}
+
 export enum MyListingsTypes {
   Selling,
   Expired,
