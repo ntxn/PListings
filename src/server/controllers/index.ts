@@ -3,3 +3,4 @@ export * from './userController';
 export * from './listingController';
 export * from './errorController';
 export * from './favoriteController';
+export * from './chatroomController';

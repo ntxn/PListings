@@ -1,5 +1,4 @@
 import { Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
 
 import { controller, use, POST, DELETE, GET } from '../decorators';
 import { authenticationChecker } from '../middlewares';
@@ -9,7 +8,6 @@ import {
   CustomRequest,
   NotFoundError,
   BadRequestError,
-  MiddlewareHandler,
 } from '../utils';
 import { Listing, Favorite } from '../models';
 

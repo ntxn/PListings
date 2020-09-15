@@ -39,6 +39,9 @@ export enum Routes {
   Favorite = '/:id',
   FavoriteListingsByUser = '/user/:id',
   FilterListingsSavedByUser = '/filter-listings-saved-by-user',
+
+  // ------------------- CHATROOM ---------------------
+  ChatroomsByUser = '/user',
 }
 
 // base route for each resource
@@ -48,6 +51,8 @@ export enum Base {
 
   Listings = '/api/v1/listings',
   Favorites = '/api/v1/favorites',
+
+  Chatrooms = '/api/v1/chatrooms',
 }
 
 /** These routes are used for making API calls */
@@ -79,4 +84,7 @@ export enum ApiRoutes {
   Favorites = '/api/v1/favorites',
   FavoriteListingsByUser = '/api/v1/favorites/user',
   FilterListingsSavedByUser = '/api/v1/favorites/filter-listings-saved-by-user',
+
+  // Chatrooms
+  ChatroomsByUser = '/api/v1/chatrooms/user',
 }
