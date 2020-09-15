@@ -2,7 +2,13 @@ import { Dispatch, Action as ReduxAction } from 'redux';
 import { FormStateMap } from 'redux-form';
 
 import { ActionTypes } from './action-types';
-import { GeoLocation, BaseLocation, UserDoc, ListingDoc } from '../../common';
+import {
+  GeoLocation,
+  BaseLocation,
+  UserDoc,
+  ListingDoc,
+  ChatroomDoc,
+} from '../../common';
 
 // ACTIONS
 
@@ -113,9 +119,23 @@ export interface SetDefaultFiltersAction {
   payload: CombinedLocation;
 }
 
-export interface SavedSocketsAction {
-  type: ActionTypes.saveSockets;
+export interface AddSocketsAction {
+  type: ActionTypes.addSockets;
   payload: Record<string, SocketIOClient.Socket>;
+}
+
+export interface FetchChatroomsAction {
+  type: ActionTypes.fetchChatrooms;
+  payload: Record<string, ChatroomDoc>;
+}
+
+export interface ClearChatroomsAction {
+  type: ActionTypes.clearChatrooms;
+}
+
+export interface AddNewChatroomAction {
+  type: ActionTypes.addNewChatroom;
+  payload: ChatroomDoc;
 }
 
 export type Action =
@@ -140,7 +160,10 @@ export type Action =
   | FetchSavedListingIdsAction
   | ClearSavedListingIdsAction
   | SetDefaultFiltersAction
-  | SavedSocketsAction;
+  | AddSocketsAction
+  | FetchChatroomsAction
+  | ClearChatroomsAction
+  | AddNewChatroomAction;
 
 // Store State
 export interface StoreState {
@@ -154,6 +177,7 @@ export interface StoreState {
   btnLoading: boolean;
   defaultFilters: FilterAttrs;
   sockets: Record<string, SocketIOClient.Socket>;
+  chatrooms: Record<string, ChatroomDoc>;
 }
 
 export interface SearchedLocation {

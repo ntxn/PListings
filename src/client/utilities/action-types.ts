@@ -33,5 +33,10 @@ export enum ActionTypes {
   setDefaultFilters,
 
   // socket-io
-  saveSockets,
+  addSockets,
+
+  // chatrooms
+  fetchChatrooms,
+  clearChatrooms,
+  addNewChatroom,
 }
