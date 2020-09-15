@@ -1,10 +1,10 @@
-import { ActionTypes, SavedSocketsAction } from '../utilities';
+import { ActionTypes, AddSocketsAction } from '../utilities';
 
-export const saveSockets = (
+export const addSockets = (
   sockets: Record<string, SocketIOClient.Socket>
-): SavedSocketsAction => {
+): AddSocketsAction => {
   return {
-    type: ActionTypes.saveSockets,
+    type: ActionTypes.addSockets,
     payload: sockets,
   };
 };
