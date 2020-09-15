@@ -5,7 +5,7 @@ export const socketReducer = (
   action: Action
 ): Record<string, SocketIOClient.Socket> => {
   switch (action.type) {
-    case ActionTypes.saveSockets:
+    case ActionTypes.addSockets:
       return { ...state, ...action.payload };
     default:
       return state;
