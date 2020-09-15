@@ -9,34 +9,34 @@ import {
   StoreState,
   listingMapSmall,
   listingMapLarge,
-  initializeSocket,
-  SavedSocketsAction,
+  createChatroomByBuyer,
 } from '../../utilities';
 import {
   fetchListing,
   clearListing,
   saveListing,
   unsaveListing,
-  saveSockets,
+  addSockets,
+  addNewChatroom,
 } from '../../actions';
-import { ListingDoc, UserDoc, SocketIOEvents } from '../../../common';
+import { ListingDoc, UserDoc, ChatroomDoc } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
 
 interface ListingProps {
-  listing: ListingDoc;
+  listing: ListingDoc | null;
   user: UserDoc | null;
   savedListings: Record<string, string>;
   sockets: Record<string, SocketIOClient.Socket>;
+  chatrooms: Record<string, ChatroomDoc>;
 
   fetchListing(id: string): void;
   clearListing(): void;
   saveListing(listingId: string): void;
   unsaveListing(listingId: string): void;
-  saveSockets(
-    sockets: Record<string, SocketIOClient.Socket>
-  ): SavedSocketsAction;
+  addSockets(sockets: Record<string, SocketIOClient.Socket>): void;
+  addNewChatroom(chatroom: ChatroomDoc): void;
 
   match: { params: { id: string } };
 }
@@ -81,7 +81,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
 
   // Calculate when the listing was posted
   const getTimePosted = (): string => {
-    const listingTime = new Date(props.listing.createdAt).getTime();
+    const listingTime = new Date(props.listing!.createdAt).getTime();
     const now = new Date().getTime();
     let diff = Math.round((now - listingTime) / (1000 * 60)); // minutes
     if (diff < 60) return `${diff}m`;
@@ -108,30 +108,35 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const onSubmitChatbox = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
-    const sockets: Record<string, SocketIOClient.Socket> = {};
+    const listing = props.listing!;
     if (props.user) {
-      initializeSocket(
+      const socket = createChatroomByBuyer(
         props.sockets.default,
-        props.listing,
-        sockets,
-        props.user
+        listing,
+        props.user,
+        props.addNewChatroom
       );
-      props.saveSockets(sockets);
+      props.addSockets({ [`/${listing.id}`]: socket });
 
-      sockets[`/${props.listing.id}`].emit(
-        SocketIOEvents.SendMessage,
-        chatboxContent
-      );
+      // socket.emit(
+      //   SocketIOEvents.Message,
+      //   Object.values(props.chatrooms).filter(
+      //     room => room.listing.id === listing.id
+      //   )[0].id,
+      //   chatboxContent
+      // );
     }
   };
 
   const renderListing = (): JSX.Element => {
+    const listing = props.listing!;
+
     return (
       <div className="listing">
         <div className="listing__photos">
           {showImageSlider && (
             <ImageSlider
-              images={props.listing.photos}
+              images={listing.photos}
               containerClassName="listing__photos"
               arrowDisabled
               pagination
@@ -143,18 +148,18 @@ const _Listing = (props: ListingProps): JSX.Element => {
           {/******** Listing Title, Price & stats ********/}
 
           <p className="sub-heading-quaternary u-margin-bottom-xsmall">
-            {props.listing.category} › {props.listing.subcategory}
+            {listing.category} › {listing.subcategory}
           </p>
           <div className="listing__info__title">
             <h1
               className="heading-primary"
               style={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              {props.listing.title}
+              {listing.title}
             </h1>
-            {props.user && props.user.id === props.listing.owner.id ? (
+            {props.user && props.user.id === listing.owner.id ? (
               <Link
-                to={`/listings/edit/${props.listing.id}`}
+                to={`/listings/edit/${listing.id}`}
                 className="listing__info__edit"
               >
                 <FiEdit />
@@ -162,13 +167,13 @@ const _Listing = (props: ListingProps): JSX.Element => {
             ) : (
               <div
                 className={`listing__info__heart listing__info__heart--${
-                  props.savedListings[props.listing.id] ? 'red' : 'gray'
+                  props.savedListings[listing.id] ? 'red' : 'gray'
                 }`}
                 onClick={() => {
                   if (props.user) {
-                    if (props.savedListings[props.listing.id])
-                      props.unsaveListing(props.listing.id);
-                    else props.saveListing(props.listing.id);
+                    if (props.savedListings[listing.id])
+                      props.unsaveListing(listing.id);
+                    else props.saveListing(listing.id);
                   } else setShowLogInModal(true);
                 }}
               >
@@ -181,43 +186,41 @@ const _Listing = (props: ListingProps): JSX.Element => {
           </div>
 
           <h2 className="heading-secondary u-margin-bottom-xsmall">
-            {props.listing.price > 0 ? '$' + props.listing.price : 'Free'}
+            {listing.price > 0 ? '$' + listing.price : 'Free'}
           </h2>
 
           <div className="listing__info__stats sub-heading-quaternary">
             <div className="listing__info__stats--time">{getTimePosted()}</div>
             <div className="listing__info__stats--seens-likes">
               <div>
-                <AiFillEye /> {props.listing.visits}
+                <AiFillEye /> {listing.visits}
               </div>
               <div>
-                <FaHeart /> {props.listing.favorites}
+                <FaHeart /> {listing.favorites}
               </div>
             </div>
           </div>
 
           {/******** Listing Details ********/}
 
-          {(props.listing.condition ||
-            props.listing.brand ||
-            props.listing.description) && (
+          {(listing.condition || listing.brand || listing.description) && (
             <div className="listing__info__details u-margin-top-small">
               <h3 className="heading-tertiary u-margin-bottom-small">
                 Details
               </h3>
-              {props.listing.brand && (
+              {listing.brand && (
                 <div className="paragraph-small-font-size">
-                  <div>Brand</div> {props.listing.brand}
+                  <div>Brand</div> {listing.brand}
                 </div>
               )}
-              {props.listing.condition && (
+              {listing.condition && (
                 <div className="paragraph-small-font-size">
-                  <div>Condition</div> {props.listing.condition}
+                  <div>Condition</div> {listing.condition}
                 </div>
               )}
-              {props.listing.description && (
+              {listing.description && (
                 <p className="paragraph-small-font-size u-margin-top-xxsmall">
-                  {props.listing.description}
+                  {listing.description}
                 </p>
               )}
             </div>
@@ -226,12 +229,12 @@ const _Listing = (props: ListingProps): JSX.Element => {
           {/******** Listing's Seller info (avatar, name, rating) ********/}
           <hr className="u-divider u-margin-top-small" />
           <div className="listing__info__owner u-margin-top-medium">
-            <Link to={`/user/profile/${props.listing.owner.id}`}>
-              <UserAvatar user={props.listing.owner} className="icon" />
+            <Link to={`/user/profile/${listing.owner.id}`}>
+              <UserAvatar user={listing.owner} className="icon" />
             </Link>
             <div className="listing__info__owner__info">
               <div className="listing__info__owner__info--name">
-                {props.listing.owner.name}
+                {listing.owner.name}
               </div>
             </div>
           </div>
@@ -255,14 +258,14 @@ const _Listing = (props: ListingProps): JSX.Element => {
 
                 listingMapLarge(
                   process.env.MAPBOX_KEY!,
-                  props.listing.location.coordinates
+                  listing.location.coordinates
                 );
               }, 50);
             }}
           ></div>
 
           <div className="listing__info__location paragraph-small-font-size">
-            {`${props.listing.location.city}, ${props.listing.location.state} ${props.listing.location.zip}`}
+            {`${listing.location.city}, ${listing.location.state} ${listing.location.zip}`}
           </div>
           {showLoader && <Loader />}
           {showMapModal && (
@@ -310,6 +313,7 @@ const mapStateToProps = (state: StoreState) => {
     user: state.user,
     savedListings: state.savedListingIds,
     sockets: state.sockets,
+    chatrooms: state.chatrooms,
   };
 };
 
@@ -318,8 +322,6 @@ export const Listing = connect(mapStateToProps, {
   clearListing,
   saveListing,
   unsaveListing,
-  saveSockets,
-})(
-  //@ts-ignore
-  _Listing
-);
+  addSockets,
+  addNewChatroom,
+})(_Listing);
