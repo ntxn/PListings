@@ -3,13 +3,13 @@ import mongoose from 'mongoose';
 import { Model, ModelAttribute } from '../utils';
 import { ListingDoc, UserDoc } from './index';
 
-interface ChatRoomAttr extends ModelAttribute {
+export interface ChatroomAttr extends ModelAttribute {
   listing: mongoose.Types.ObjectId;
   buyer: mongoose.Types.ObjectId;
   seller: mongoose.Types.ObjectId;
 }
 
-interface ChatRoomDoc extends mongoose.Document {
+export interface ChatroomDoc extends mongoose.Document {
   listing: ListingDoc;
   buyer: UserDoc;
   seller: UserDoc;
@@ -17,10 +17,10 @@ interface ChatRoomDoc extends mongoose.Document {
   deletedBySeller: boolean;
 }
 
-type ChatRoomModel = Model<ChatRoomAttr, ChatRoomDoc>;
+type ChatroomModel = Model<ChatroomAttr, ChatroomDoc>;
 
 const displayOptions = {
-  transform(doc: ChatRoomDoc, ret: ChatRoomDoc) {
+  transform(doc: ChatroomDoc, ret: ChatroomDoc) {
     ret.id = ret._id;
     delete ret._id;
   },
@@ -28,7 +28,7 @@ const displayOptions = {
   virtuals: true,
 };
 
-const chatRoomSchema = new mongoose.Schema(
+const chatroomSchema = new mongoose.Schema(
   {
     listing: {
       type: mongoose.Types.ObjectId,
@@ -58,36 +58,54 @@ const chatRoomSchema = new mongoose.Schema(
   { toJSON: displayOptions, toObject: displayOptions }
 );
 
-chatRoomSchema.index({ listing: 1, buyer: 1, seller: 1 }, { unique: true });
+chatroomSchema.index({ listing: 1, buyer: 1, seller: 1 }, { unique: true });
 
 // Virtual Populate Messages of a chat room
-chatRoomSchema.virtual('messages', {
+chatroomSchema.virtual('messages', {
   ref: 'Message',
   foreignField: 'roomId',
   localField: '_id',
 });
 
-chatRoomSchema.pre(/^find/, function (next) {
-  (this as mongoose.Query<ChatRoomDoc>)
-    .populate({
-      path: 'listing',
-      select: 'id photos title price location',
-    })
-    .populate({
-      path: 'seller',
-      select: 'id name photo location',
-    })
-    .populate({
-      path: 'buyer',
-      select: 'id name photo location',
-    });
+const listingPopulatedOption = {
+  path: 'listing',
+  select: 'id photos title price location',
+};
+
+const sellerPopulatedOption = {
+  path: 'seller',
+  select: 'id name photo location',
+};
+
+const buyerPopulatedOption = {
+  path: 'buyer',
+  select: 'id name photo location',
+};
+
+chatroomSchema.pre('save', function (next) {
+  (this as mongoose.Document)
+    .populate(listingPopulatedOption)
+    .populate(sellerPopulatedOption)
+    .populate(buyerPopulatedOption)
+    .execPopulate();
 
   next();
 });
 
-chatRoomSchema.statics.build = (attrs: ChatRoomAttr) => new ChatRoom(attrs);
+chatroomSchema.pre(/^find/, function (next) {
+  (this as mongoose.Query<ChatroomDoc>)
+    .populate(listingPopulatedOption)
+    .populate(sellerPopulatedOption)
+    .populate(buyerPopulatedOption)
+    .populate('messages')
+    .sort({ 'messages.updatedAt.0': 1 });
 
-export const ChatRoom = mongoose.model<ChatRoomDoc, ChatRoomModel>(
-  'ChatRoom',
-  chatRoomSchema
+  next();
+});
+
+chatroomSchema.statics.build = (attrs: ChatroomAttr) => new Chatroom(attrs);
+
+export const Chatroom = mongoose.model<ChatroomDoc, ChatroomModel>(
+  'Chatroom',
+  chatroomSchema
 );
