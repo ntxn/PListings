@@ -6,11 +6,13 @@ import { MessageStatus } from '../../common';
 interface MessageAttr extends ModelAttribute {
   roomId: mongoose.Types.ObjectId;
   content: string;
+  sender: mongoose.Types.ObjectId;
 }
 
-interface MessageDoc extends mongoose.Document {
+export interface MessageDoc extends mongoose.Document {
   roomId: mongoose.Types.ObjectId;
   content: string;
+  sender: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   status: MessageStatus;
@@ -36,6 +38,10 @@ const messageSchema = new mongoose.Schema(
     content: {
       type: String,
       required: [true, 'Message content is required'],
+    },
+    sender: {
+      type: mongoose.Types.ObjectId,
+      required: [true, 'Sender Id is required'],
     },
     status: {
       type: MessageStatus,
