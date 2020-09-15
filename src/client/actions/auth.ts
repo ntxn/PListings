@@ -15,18 +15,16 @@ import {
   UpdatePasswordAction,
   UpdatePasswordAttrs,
   SetDefaultFiltersAction,
-  ClearSavedListingIdsAction,
-  ClearListingsAction,
   FunctionalAction,
   processCombinedLocationToGeoLocation,
   processFormValuesToFormData,
   StoreState,
-  SavedSocketsAction,
-  initializeSocket,
+  setupDefaultSocket,
 } from '../utilities';
 import { ApiRoutes, UserAttrs, UserDoc } from '../../common';
-import { saveSockets } from './socket-io';
 import { AlertType, showAlert } from '.././components/alert';
+import { fetchChatrooms, clearChatrooms } from './chatroom';
+import { clearListings, clearSavedListingIds } from './listing';
 
 export const fetchCurrentUser = () => async (
   dispatch: Dispatch,
@@ -35,19 +33,15 @@ export const fetchCurrentUser = () => async (
   const response = await axios.get(ApiRoutes.CurrentUser);
   const user = response.data.data as UserDoc;
 
-  if (user) {
-    const sockets: Record<string, SocketIOClient.Socket> = {};
-    user.listings.forEach(listing => {
-      initializeSocket(getState!().sockets.default, listing, sockets, user);
-    });
-
-    dispatch<SavedSocketsAction>(saveSockets(sockets));
-  }
-
   dispatch<FetchCurrentUserAction>({
     type: ActionTypes.fetchCurrentUser,
     payload: user,
   });
+
+  if (user) {
+    setupDefaultSocket(dispatch, user, getState().sockets);
+    await fetchChatrooms(dispatch, user);
+  }
 };
 
 export const signUp = (formValues: UserAttrs): FunctionalAction<SignUpAction> =>
@@ -68,14 +62,17 @@ export const signUp = (formValues: UserAttrs): FunctionalAction<SignUpAction> =>
 export const logIn = (formValue: {
   email: string;
   password: string;
-}): FunctionalAction<LogInAction> =>
-  catchSubmissionError(async dispatch => {
+}): ((dispatch: Dispatch, getState: () => StoreState) => Promise<void>) =>
+  catchSubmissionError(async (dispatch, getState) => {
     const { data } = await axios.post(ApiRoutes.LogIn, formValue);
 
-    dispatch({
+    dispatch<LogInAction>({
       type: ActionTypes.logIn,
       payload: data.data,
     });
+
+    setupDefaultSocket(dispatch, data.data, getState!().sockets);
+    await fetchChatrooms(dispatch, data.data);
 
     showAlert(AlertType.Success, 'Logged in successfully');
     history.push('/');
@@ -97,10 +94,9 @@ export const logOut = (nextRoute = '/') => async (
     payload: getState!().currentLocation,
   });
 
-  dispatch<ClearSavedListingIdsAction>({
-    type: ActionTypes.clearSavedListingIds,
-  });
-  dispatch<ClearListingsAction>({ type: ActionTypes.clearListings });
+  dispatch(clearChatrooms());
+  dispatch(clearSavedListingIds());
+  dispatch(clearListings());
 };
 
 export const updatePassword = (
