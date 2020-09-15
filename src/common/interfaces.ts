@@ -1,4 +1,12 @@
-import { ListingDoc, ListingAttrs, UserDoc, UserAttrs } from '../server/models';
+import {
+  ListingDoc,
+  ListingAttrs,
+  UserDoc,
+  UserAttrs,
+  ChatroomDoc,
+  ChatroomAttr,
+  MessageDoc,
+} from '../server/models';
 
 export interface BaseLocation {
   zip: string;
@@ -12,9 +20,9 @@ export interface GeoLocation extends BaseLocation {
 }
 
 export enum MessageStatus {
-  Sent,
-  Delivered,
-  Seen,
+  Sent = 'Sent',
+  Delivered = 'Delivered',
+  Seen = 'Seen',
 }
 
 export enum MyListingsTypes {
@@ -31,4 +39,12 @@ export interface MyListings {
   [MyListingsTypes.Saved]: ListingDoc[];
 }
 
-export { ListingDoc, ListingAttrs, UserDoc, UserAttrs };
+export {
+  ListingDoc,
+  ListingAttrs,
+  UserDoc,
+  UserAttrs,
+  ChatroomDoc,
+  ChatroomAttr,
+  MessageDoc,
+};
