@@ -2,43 +2,67 @@ import { app } from './app';
 import socketIO from 'socket.io';
 import mongoose from 'mongoose';
 
-import { ListingDoc } from './models';
+import { ListingDoc, Message, Chatroom, ChatroomDoc } from './models';
 import { SocketIOEvents } from '../common';
 
-const listingIds: Set<mongoose.Types.ObjectId> = new Set();
 const namespaces: Record<string, socketIO.Namespace> = {};
+const chatrooms: Record<string, ChatroomDoc> = {};
 
 const io = socketIO(app);
 
 io.on('connection', socket => {
   socket.on(SocketIOEvents.CreateNamespace, (listing: ListingDoc) => {
-    if (!listingIds.has(listing.id)) {
-      listingIds.add(listing.id);
+    const namespaceName = `/${listing.id}`;
 
-      const namespaceName = `/${listing.id}`;
+    if (!(namespaceName in namespaces)) {
       const namespace = io.of(namespaceName);
 
+      // Notify all sockets in default namespace that there's a new namespace created
+      io.emit(SocketIOEvents.NamespaceCreated, listing);
+
+      // Initialize the current namespace
       namespace.on('connection', socket => {
         const { user } = socket.handshake.query;
-        const roomName = `${user}`;
 
-        if (listing.owner.id !== user)
-          socket.join(roomName, () => {
-            namespace.emit(SocketIOEvents.CreateRoom, roomName);
-          });
-
-        if (listing.owner.id === user)
-          socket.on(SocketIOEvents.CreateRoom, (roomName: string) => {
-            socket.join(roomName, () =>
-              console.log(`owner joined ${roomName}`)
-            );
-          });
-
-        socket.on(SocketIOEvents.SendMessage, (data: string) => {
-          console.log(data);
-
-          namespace.to(roomName).emit(SocketIOEvents.SendMessage, data);
+        // A chatroom already existed, rejoin
+        socket.on(SocketIOEvents.JoinRoom, (chatroom: ChatroomDoc) => {
+          if (!(chatroom.id in chatrooms)) chatrooms[chatroom.id] = chatroom;
         });
+
+        // Buyer creates a new chatroom & invites owner to join
+        socket.on(SocketIOEvents.CreateRoom, async () => {
+          const chatroom = Chatroom.build({
+            listing: listing.id,
+            seller: listing.owner.id,
+            buyer: user,
+          });
+          await chatroom.save();
+
+          chatrooms[chatroom.id] = chatroom;
+          namespace.emit(SocketIOEvents.RoomCreated, chatroom);
+        });
+
+        socket.on(
+          SocketIOEvents.Message,
+          async (chatroomId: mongoose.Types.ObjectId, msg: string) => {
+            const message = Message.build({
+              roomId: chatroomId,
+              content: msg,
+              sender: user.id,
+            });
+            await message.save();
+
+            const roomName = chatroomId.toHexString();
+            console.log('chatroomid', roomName, chatroomId);
+            namespace.to(roomName).emit(SocketIOEvents.MessageSent, message);
+
+            // if receiver is online, send message, if not, save message to another collection to be retrieved later when the user logged in
+            console.log(
+              namespace.to(roomName).clients,
+              namespace.to(roomName).sockets
+            );
+          }
+        );
       });
 
       namespaces[namespaceName] = namespace;
