@@ -39,8 +39,9 @@ export const fetchCurrentUser = () => async (
   });
 
   if (user) {
-    setupDefaultSocket(dispatch, user, getState().sockets);
-    await fetchChatrooms(dispatch, user);
+    const reduxStore = getState();
+    setupDefaultSocket(dispatch, user, reduxStore.sockets);
+    await fetchChatrooms(dispatch, reduxStore, user);
   }
 };
 
@@ -71,8 +72,9 @@ export const logIn = (formValue: {
       payload: data.data,
     });
 
-    setupDefaultSocket(dispatch, data.data, getState!().sockets);
-    await fetchChatrooms(dispatch, data.data);
+    const reduxStore = getState!();
+    setupDefaultSocket(dispatch, data.data, reduxStore.sockets);
+    await fetchChatrooms(dispatch, reduxStore, data.data);
 
     showAlert(AlertType.Success, 'Logged in successfully');
     history.push('/');

@@ -7,6 +7,7 @@ import {
   AddNewChatroomAction,
   ActionTypes,
   rejoinChatroom,
+  StoreState,
 } from '../utilities';
 import { addSockets } from './socket-io';
 import { ApiRoutes, ChatroomDoc, UserDoc } from '../../common';
@@ -28,6 +29,7 @@ export const clearChatrooms = (): ClearChatroomsAction => {
  */
 export const fetchChatrooms = async (
   dispatch: Dispatch,
+  reduxStore: StoreState,
   user: UserDoc
 ): Promise<void> => {
   const response = await axios.get(ApiRoutes.ChatroomsByUser);
@@ -40,6 +42,7 @@ export const fetchChatrooms = async (
       chatrooms[chatroom.id] = chatroom;
 
       rejoinChatroom(
+        reduxStore.sockets.default,
         sockets,
         user,
         chatroom.listing,

@@ -19,7 +19,12 @@ import {
   addSockets,
   addNewChatroom,
 } from '../../actions';
-import { ListingDoc, UserDoc, ChatroomDoc } from '../../../common';
+import {
+  ListingDoc,
+  UserDoc,
+  ChatroomDoc,
+  SocketIOEvents,
+} from '../../../common';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
@@ -118,13 +123,9 @@ const _Listing = (props: ListingProps): JSX.Element => {
       );
       props.addSockets({ [`/${listing.id}`]: socket });
 
-      // socket.emit(
-      //   SocketIOEvents.Message,
-      //   Object.values(props.chatrooms).filter(
-      //     room => room.listing.id === listing.id
-      //   )[0].id,
-      //   chatboxContent
-      // );
+      socket.on(SocketIOEvents.RoomCreated, (room: ChatroomDoc) => {
+        socket.emit(SocketIOEvents.Message, room.id, chatboxContent);
+      });
     }
   };
 
