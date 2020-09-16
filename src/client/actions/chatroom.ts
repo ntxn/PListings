@@ -6,12 +6,16 @@ import {
   ClearChatroomsAction,
   AddNewChatroomAction,
   ActionTypes,
-  rejoinChatroom,
+  rejoinChatrooms,
   StoreState,
+  createChatroomAndSendMessageByBuyer,
 } from '../utilities';
-import { addSockets } from './socket-io';
 import { ApiRoutes, ChatroomDoc, UserDoc } from '../../common';
 
+/**
+ * An action creator to add a new chatroom to redux store chatrooms
+ * @param chatroom (ChatroomDoc)
+ */
 export const addNewChatroom = (chatroom: ChatroomDoc): AddNewChatroomAction => {
   return {
     type: ActionTypes.addNewChatroom,
@@ -19,13 +23,26 @@ export const addNewChatroom = (chatroom: ChatroomDoc): AddNewChatroomAction => {
   };
 };
 
+/**
+ * Action creator to reset chatrooms from redux store
+ */
 export const clearChatrooms = (): ClearChatroomsAction => {
   return { type: ActionTypes.clearChatrooms };
 };
 
 /**
+ * An action creator used for buyer to initiate a conversation with seller through a mini chatbox in the listing page
+ * @param msg (string) input value from the chatbox
+ */
+export const initiateConversation = (msg: string) => (
+  dispatch: Dispatch,
+  getState: () => StoreState
+): void => createChatroomAndSendMessageByBuyer(dispatch, getState(), msg);
+
+/**
  * When the user first logged in, all chatrooms that they participated in will be fetched,
- * a new socket for each namespace that a chatroom belonged to will be recreated
+ * a new socket for each namespace that a chatroom belonged to will be recreated.
+ * This function is called by an action creator
  */
 export const fetchChatrooms = async (
   dispatch: Dispatch,
@@ -35,24 +52,7 @@ export const fetchChatrooms = async (
   const response = await axios.get(ApiRoutes.ChatroomsByUser);
   const chatroomDocs = response.data.data as ChatroomDoc[];
 
-  const chatrooms: Record<string, ChatroomDoc> = {};
-  const sockets: Record<string, SocketIOClient.Socket> = {};
-  if (chatroomDocs.length > 0) {
-    chatroomDocs.forEach(chatroom => {
-      chatrooms[chatroom.id] = chatroom;
-
-      rejoinChatroom(
-        reduxStore.sockets.default,
-        sockets,
-        user,
-        chatroom.listing,
-        (chatroom: ChatroomDoc) => dispatch(addNewChatroom(chatroom)),
-        chatroom
-      );
-    });
-
-    dispatch(addSockets(sockets));
-  }
+  const chatrooms = rejoinChatrooms(dispatch, reduxStore, user, chatroomDocs);
 
   dispatch<FetchChatroomsAction>({
     type: ActionTypes.fetchChatrooms,

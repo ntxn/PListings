@@ -5,26 +5,15 @@ import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
-import {
-  StoreState,
-  listingMapSmall,
-  listingMapLarge,
-  createChatroomByBuyer,
-} from '../../utilities';
+import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
 import {
   fetchListing,
   clearListing,
   saveListing,
   unsaveListing,
-  addSockets,
-  addNewChatroom,
+  initiateConversation,
 } from '../../actions';
-import {
-  ListingDoc,
-  UserDoc,
-  ChatroomDoc,
-  SocketIOEvents,
-} from '../../../common';
+import { ListingDoc, UserDoc, ChatroomDoc } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
@@ -40,8 +29,7 @@ interface ListingProps {
   clearListing(): void;
   saveListing(listingId: string): void;
   unsaveListing(listingId: string): void;
-  addSockets(sockets: Record<string, SocketIOClient.Socket>): void;
-  addNewChatroom(chatroom: ChatroomDoc): void;
+  initiateConversation(msg: string): void;
 
   match: { params: { id: string } };
 }
@@ -113,20 +101,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const onSubmitChatbox = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
-    const listing = props.listing!;
-    if (props.user) {
-      const socket = createChatroomByBuyer(
-        props.sockets.default,
-        listing,
-        props.user,
-        props.addNewChatroom
-      );
-      props.addSockets({ [`/${listing.id}`]: socket });
-
-      socket.on(SocketIOEvents.RoomCreated, (room: ChatroomDoc) => {
-        socket.emit(SocketIOEvents.Message, room.id, chatboxContent);
-      });
-    }
+    if (props.user) props.initiateConversation(chatboxContent);
   };
 
   const renderListing = (): JSX.Element => {
@@ -323,6 +298,5 @@ export const Listing = connect(mapStateToProps, {
   clearListing,
   saveListing,
   unsaveListing,
-  addSockets,
-  addNewChatroom,
+  initiateConversation,
 })(_Listing);
