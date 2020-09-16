@@ -21,21 +21,24 @@ const initializeNamespaceSocket = (
   const namespace = `/${listing.id}`;
 
   // Create a socket that subscribes to a namespace
-  const socket = io(namespace, { query: { user: user.id } });
+  const socket = io(namespace, { query: { userId: user.id } });
 
   // --------------- Set event listeners for each socket ----------------
   // If the current user is the owner, join the newly created room. If the user is the buyer, insert a new chatroom to the store's chatrooms
   socket.on(SocketIOEvents.RoomCreated, (room: ChatroomDoc) => {
+    if (typeof room.listing === 'string') room.listing = listing;
+
     if (user.id === room.seller.id) socket.emit(SocketIOEvents.JoinRoom, room);
     if (user.id === room.seller.id || user.id === room.buyer.id)
       addNewChatroom(room);
   });
 
   socket.on(SocketIOEvents.MessageSent, (message: MessageDoc) => {
+    console.log(user.id, listing, message);
     if (message.sender === user.id) {
       console.log(message);
       // update the message status (like add a tick)
-    }
+    } else if (user.id === listing.owner.id) console.log(message);
   });
 
   socket.on(SocketIOEvents.Message, (message: MessageDoc) =>
@@ -93,13 +96,14 @@ export const createChatroomByBuyer = (
  * The reduxStore sockets will only contain the default socket
  */
 export const rejoinChatroom = (
+  defaultSocket: SocketIOClient.Socket,
   sockets: Record<string, SocketIOClient.Socket>,
   user: UserDoc,
   listing: ListingDoc,
   addNewChatroom: (chatroom: ChatroomDoc) => void,
   chatroom: ChatroomDoc
 ): void => {
-  sockets.default.emit(SocketIOEvents.CreateNamespace, listing);
+  defaultSocket.emit(SocketIOEvents.CreateNamespace, listing);
 
   const namespace = `/${listing.id}`;
 
