@@ -157,4 +157,74 @@
       align-items: center;
     }
   }
+
+  &__mini-chatbox {
+    border-radius: var(--border-radius-xsmall);
+    background-color: var(--color-secondary-dark);
+
+    padding: 1.5rem;
+    font-weight: 300;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.8rem;
+
+      font-size: 1.5rem;
+      color: var(--color-white);
+
+      svg {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 0.5rem;
+      }
+
+      &:link,
+      &:visited {
+        text-decoration: none;
+        margin-bottom: 0;
+      }
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    &__input {
+      @include input-field-common-styles;
+      font-size: 1.4rem;
+      height: 2.8rem;
+      padding: 1.2rem;
+      border-radius: var(--border-radius-xsmall);
+      margin-bottom: 0.8rem;
+    }
+
+    &__btn {
+      font-size: 1.4rem;
+      border: none;
+      border-radius: var(--border-radius-small);
+      padding: 0.5rem 1.2rem;
+      color: var(--color-secondary-dark);
+      background-color: var(--color-grey-light-1);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--color-white);
+        transform: translateY(-1px);
+        transition: all 0.2s;
+      }
+
+      &:disabled {
+        background-color: var(--color-grey-light-2);
+        color: var(--color-grey-dark-1);
+        cursor: default;
+
+        &:hover {
+          transform: none;
+        }
+      }
+    }
+  }
 }

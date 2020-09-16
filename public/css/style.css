@@ -733,11 +733,11 @@ body {
       width: 100%;
       height: 100%;
       border: none;
+      color: var(--color-grey-dark-3);
       padding: 1.5rem;
       padding-right: 4rem;
       font-size: var(--default-font-size);
-      border-radius: var(--border-radius-small);
-      color: var(--color-grey-dark-3); }
+      border-radius: var(--border-radius-small); }
       .search-input__search--input:focus {
         outline: none;
         box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }
@@ -963,6 +963,61 @@ main {
       display: flex;
       flex-direction: row;
       align-items: center; }
+  .listing__mini-chatbox {
+    border-radius: var(--border-radius-xsmall);
+    background-color: var(--color-secondary-dark);
+    padding: 1.5rem;
+    font-weight: 300; }
+    .listing__mini-chatbox__title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      font-size: 1.5rem;
+      color: var(--color-white); }
+      .listing__mini-chatbox__title svg {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 0.5rem; }
+      .listing__mini-chatbox__title:link, .listing__mini-chatbox__title:visited {
+        text-decoration: none;
+        margin-bottom: 0; }
+    .listing__mini-chatbox__form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end; }
+    .listing__mini-chatbox__input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      color: var(--color-grey-dark-3);
+      font-size: 1.4rem;
+      height: 2.8rem;
+      padding: 1.2rem;
+      border-radius: var(--border-radius-xsmall);
+      margin-bottom: 0.8rem; }
+      .listing__mini-chatbox__input:focus {
+        outline: none;
+        box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }
+      .listing__mini-chatbox__input::placeholder {
+        color: var(--color-grey-light-4); }
+    .listing__mini-chatbox__btn {
+      font-size: 1.4rem;
+      border: none;
+      border-radius: var(--border-radius-small);
+      padding: 0.5rem 1.2rem;
+      color: var(--color-secondary-dark);
+      background-color: var(--color-grey-light-1);
+      cursor: pointer; }
+      .listing__mini-chatbox__btn:hover {
+        background-color: var(--color-white);
+        transform: translateY(-1px);
+        transition: all 0.2s; }
+      .listing__mini-chatbox__btn:disabled {
+        background-color: var(--color-grey-light-2);
+        color: var(--color-grey-dark-1);
+        cursor: default; }
+        .listing__mini-chatbox__btn:disabled:hover {
+          transform: none; }
 
 .listings {
   width: 100%;

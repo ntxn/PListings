@@ -2,15 +2,10 @@ import React, { useEffect, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { FaHeart } from 'react-icons/fa';
-import { AiFillEye } from 'react-icons/ai';
+import { AiFillEye, AiOutlineMessage } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
-import {
-  StoreState,
-  listingMapSmall,
-  listingMapLarge,
-  ChatroomDocClient,
-} from '../../utilities';
+import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
 import {
   fetchListing,
   clearListing,
@@ -28,7 +23,6 @@ interface ListingProps {
   user: UserDoc | null;
   savedListings: Record<string, string>;
   sockets: Record<string, SocketIOClient.Socket>;
-  chatrooms: Record<string, ChatroomDocClient>;
 
   fetchListing(id: string): void;
   clearListing(): void;
@@ -107,6 +101,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
     event.preventDefault();
 
     if (props.user) props.initiateConversation(chatboxContent);
+    else setShowLogInModal(true);
   };
 
   const renderListing = (): JSX.Element => {
@@ -248,6 +243,46 @@ const _Listing = (props: ListingProps): JSX.Element => {
           <div className="listing__info__location paragraph-small-font-size">
             {`${listing.location.city}, ${listing.location.state} ${listing.location.zip}`}
           </div>
+
+          {/******** Mini chat box ********/}
+          {!props.user ||
+            (props.user.id != listing.owner.id && (
+              <div className="listing__mini-chatbox u-margin-top-small">
+                {props.sockets[`/${listing.id}`] ? (
+                  <Link to="" className="listing__mini-chatbox__title">
+                    <AiOutlineMessage />
+                    <span>Go to Conversation</span>
+                  </Link>
+                ) : (
+                  <>
+                    <p className="listing__mini-chatbox__title">
+                      <AiOutlineMessage />
+                      <span>Send seller a message</span>
+                    </p>
+                    <form
+                      onSubmit={onSubmitChatbox}
+                      className="listing__mini-chatbox__form"
+                    >
+                      <input
+                        value={chatboxContent}
+                        onChange={e => setChatboxContent(e.target.value)}
+                        placeholder="Is it available?"
+                        className="listing__mini-chatbox__input"
+                      />
+                      <button
+                        type="submit"
+                        disabled={chatboxContent === ''}
+                        className="listing__mini-chatbox__btn"
+                      >
+                        Send
+                      </button>
+                    </form>
+                  </>
+                )}
+              </div>
+            ))}
+
+          {/************** Loader & Modal **************/}
           {showLoader && <Loader />}
           {showMapModal && (
             <MapModal
@@ -261,25 +296,6 @@ const _Listing = (props: ListingProps): JSX.Element => {
               }}
             />
           )}
-
-          {/******** Mini chat box ********/}
-          <div className="listing__mini-chat-box">
-            <p className="listing__mini-chat-box__title">
-              Send seller a message
-            </p>
-            <form
-              className="listing__mini-chat-box__form"
-              onSubmit={onSubmitChatbox}
-            >
-              <input
-                value={chatboxContent}
-                onChange={e => setChatboxContent(e.target.value)}
-              />
-              <button type="submit" disabled={chatboxContent === ''}>
-                Send
-              </button>
-            </form>
-          </div>
         </div>
       </div>
     );
@@ -294,7 +310,6 @@ const mapStateToProps = (state: StoreState) => {
     user: state.user,
     savedListings: state.savedListingIds,
     sockets: state.sockets,
-    chatrooms: state.chatrooms,
   };
 };
 
