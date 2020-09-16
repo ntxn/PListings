@@ -1,10 +1,9 @@
-import { ActionTypes, Action } from '../utilities';
-import { ChatroomDoc } from '../../common';
+import { ActionTypes, Action, ChatroomDocClient } from '../utilities';
 
 export const chatroomReducer = (
-  state: Record<string, ChatroomDoc> = {},
+  state: Record<string, ChatroomDocClient> = {},
   action: Action
-): Record<string, ChatroomDoc> => {
+): Record<string, ChatroomDocClient> => {
   switch (action.type) {
     case ActionTypes.fetchChatrooms:
       return action.payload;
@@ -12,6 +11,14 @@ export const chatroomReducer = (
       return {};
     case ActionTypes.addNewChatroom:
       return { ...state, [action.payload.id]: action.payload };
+    case ActionTypes.insertMessage:
+      const roomId = `${action.payload.roomId}`;
+      const room = state[roomId];
+      const messages = {
+        ...room.messages,
+        [action.payload.id]: action.payload,
+      };
+      return { ...state, [roomId]: { ...room, messages } };
     default:
       return state;
   }

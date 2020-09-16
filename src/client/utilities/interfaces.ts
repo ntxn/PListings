@@ -7,10 +7,8 @@ import {
   BaseLocation,
   UserDoc,
   ListingDoc,
-  ChatroomDoc,
+  MessageDoc,
 } from '../../common';
-
-// ACTIONS
 
 // auth
 export interface FetchCurrentUserAction {
@@ -126,7 +124,7 @@ export interface AddSocketsAction {
 
 export interface FetchChatroomsAction {
   type: ActionTypes.fetchChatrooms;
-  payload: Record<string, ChatroomDoc>;
+  payload: Record<string, ChatroomDocClient>;
 }
 
 export interface ClearChatroomsAction {
@@ -135,7 +133,12 @@ export interface ClearChatroomsAction {
 
 export interface AddNewChatroomAction {
   type: ActionTypes.addNewChatroom;
-  payload: ChatroomDoc;
+  payload: ChatroomDocClient;
+}
+
+export interface InsertMessageAction {
+  type: ActionTypes.insertMessage;
+  payload: MessageDoc;
 }
 
 export type Action =
@@ -163,7 +166,8 @@ export type Action =
   | AddSocketsAction
   | FetchChatroomsAction
   | ClearChatroomsAction
-  | AddNewChatroomAction;
+  | AddNewChatroomAction
+  | InsertMessageAction;
 
 // Store State
 export interface StoreState {
@@ -177,7 +181,7 @@ export interface StoreState {
   btnLoading: boolean;
   defaultFilters: FilterAttrs;
   sockets: Record<string, SocketIOClient.Socket>;
-  chatrooms: Record<string, ChatroomDoc>;
+  chatrooms: Record<string, ChatroomDocClient>;
 }
 
 export interface SearchedLocation {
@@ -260,4 +264,12 @@ export interface FilterAttrs {
   category?: string;
   subcategory?: string;
   searchTerm?: string;
+}
+
+export interface ChatroomDocClient {
+  id: string;
+  listing: ListingDoc;
+  buyer: UserDoc;
+  seller: UserDoc;
+  messages: Record<string, MessageDoc>;
 }

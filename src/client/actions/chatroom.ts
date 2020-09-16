@@ -5,18 +5,22 @@ import {
   FetchChatroomsAction,
   ClearChatroomsAction,
   AddNewChatroomAction,
+  InsertMessageAction,
   ActionTypes,
   rejoinChatrooms,
   StoreState,
+  ChatroomDocClient,
   createChatroomAndSendMessageByBuyer,
 } from '../utilities';
-import { ApiRoutes, ChatroomDoc, UserDoc } from '../../common';
+import { ApiRoutes, ChatroomDoc, MessageDoc, UserDoc } from '../../common';
 
 /**
  * An action creator to add a new chatroom to redux store chatrooms
  * @param chatroom (ChatroomDoc)
  */
-export const addNewChatroom = (chatroom: ChatroomDoc): AddNewChatroomAction => {
+export const addNewChatroom = (
+  chatroom: ChatroomDocClient
+): AddNewChatroomAction => {
   return {
     type: ActionTypes.addNewChatroom,
     payload: chatroom,
@@ -58,4 +62,11 @@ export const fetchChatrooms = async (
     type: ActionTypes.fetchChatrooms,
     payload: chatrooms,
   });
+};
+
+export const insertMessage = (message: MessageDoc): InsertMessageAction => {
+  return {
+    type: ActionTypes.insertMessage,
+    payload: message,
+  };
 };

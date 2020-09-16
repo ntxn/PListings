@@ -5,7 +5,12 @@ import { FaHeart } from 'react-icons/fa';
 import { AiFillEye } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
-import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
+import {
+  StoreState,
+  listingMapSmall,
+  listingMapLarge,
+  ChatroomDocClient,
+} from '../../utilities';
 import {
   fetchListing,
   clearListing,
@@ -13,7 +18,7 @@ import {
   unsaveListing,
   initiateConversation,
 } from '../../actions';
-import { ListingDoc, UserDoc, ChatroomDoc } from '../../../common';
+import { ListingDoc, UserDoc } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
 import { UserAvatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
@@ -23,7 +28,7 @@ interface ListingProps {
   user: UserDoc | null;
   savedListings: Record<string, string>;
   sockets: Record<string, SocketIOClient.Socket>;
-  chatrooms: Record<string, ChatroomDoc>;
+  chatrooms: Record<string, ChatroomDocClient>;
 
   fetchListing(id: string): void;
   clearListing(): void;
