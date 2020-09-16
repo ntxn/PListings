@@ -17,7 +17,10 @@ class ChatroomController {
     catchAsync(async (req: CustomRequest, res, next) => {
       const { id } = req.user!;
       const chatrooms = await Chatroom.find({
-        $or: [{ seller: id }, { buyer: id }],
+        $or: [
+          { seller: id, deletedBySeller: false },
+          { buyer: id, deletedByBuyer: false },
+        ],
       });
 
       res.status(200).json({ status: RequestStatus.Success, data: chatrooms });

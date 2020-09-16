@@ -6,9 +6,31 @@ import {
   ListingDoc,
   ChatroomDoc,
   MessageDoc,
+  MessageStatus,
 } from '../../common';
-import { addNewChatroom, addSockets } from '../actions';
-import { StoreState } from './interfaces';
+import { addNewChatroom, addSockets, insertMessage } from '../actions';
+import { StoreState, ChatroomDocClient } from './interfaces';
+
+const getChatroomDocClient = (
+  chatroom: ChatroomDoc,
+  socket?: SocketIOClient.Socket
+): ChatroomDocClient => {
+  const messages: Record<string, MessageDoc> = {};
+  if (chatroom.messages && chatroom.messages.length > 0)
+    chatroom.messages.forEach(msg => {
+      messages[msg.id] = msg;
+      if (msg.status === MessageStatus.Sent && socket)
+        socket.emit(SocketIOEvents.MessageReceived, msg);
+    });
+
+  return {
+    id: chatroom.id,
+    listing: chatroom.listing,
+    buyer: chatroom.buyer,
+    seller: chatroom.seller,
+    messages,
+  };
+};
 
 /**
  * Initialize a socket to connect to a namespace of the provided listing.id.
@@ -26,25 +48,28 @@ const initializeNamespaceSocket = (
 
   // --------------- Set event listeners for each socket ----------------
   // If the current user is the owner, join the newly created room. If the user is the buyer, insert a new chatroom to the store's chatrooms
-  socket.on(SocketIOEvents.RoomCreated, (room: ChatroomDoc) => {
-    if (typeof room.listing === 'string') room.listing = listing;
+  socket.on(SocketIOEvents.RoomCreated, (chatroom: ChatroomDoc) => {
+    if (typeof chatroom.listing === 'string') chatroom.listing = listing;
+    if (user.id === chatroom.seller.id)
+      socket.emit(SocketIOEvents.JoinRoom, chatroom);
 
-    if (user.id === room.seller.id) socket.emit(SocketIOEvents.JoinRoom, room);
+    const room = getChatroomDocClient(chatroom);
     if (user.id === room.seller.id || user.id === room.buyer.id)
       dispatch(addNewChatroom(room));
   });
 
   socket.on(SocketIOEvents.MessageSent, (message: MessageDoc) => {
-    console.log(user.id, listing, message);
-    if (message.sender === user.id) {
-      console.log(message);
-      // update the message status (like add a tick)
-    } else if (user.id === listing.owner.id) console.log(message);
+    // insert message to the chatroom
+    dispatch(insertMessage(message));
+
+    if (user.id === listing.owner.id)
+      socket.emit(SocketIOEvents.MessageReceived, message);
   });
 
-  socket.on(SocketIOEvents.Message, (message: MessageDoc) =>
-    console.log(message)
-  );
+  socket.on(SocketIOEvents.MessageReceived, (message: MessageDoc) => {
+    // update this message with the one saved before
+    dispatch(insertMessage(message));
+  });
 
   return socket;
 };
@@ -65,7 +90,7 @@ export const setupDefaultSocket = (
     const namespace = `/${listing.id}`;
     if (user.id === listing.owner.id && !(namespace in sockets)) {
       const socket = initializeNamespaceSocket(dispatch, user, listing);
-      dispatch(addSockets({ namespace: socket }));
+      dispatch(addSockets({ [namespace]: socket }));
     }
   });
 };
@@ -104,13 +129,11 @@ export const rejoinChatrooms = (
   reduxStore: StoreState,
   user: UserDoc,
   chatroomDocs: ChatroomDoc[]
-): Record<string, ChatroomDoc> => {
-  const chatrooms: Record<string, ChatroomDoc> = {};
+): Record<string, ChatroomDocClient> => {
+  const chatrooms: Record<string, ChatroomDocClient> = {};
   const sockets: Record<string, SocketIOClient.Socket> = {};
 
   chatroomDocs.forEach(chatroom => {
-    chatrooms[chatroom.id] = chatroom;
-
     const { listing } = chatroom;
     const namespace = `/${listing.id}`;
 
@@ -120,6 +143,7 @@ export const rejoinChatrooms = (
     }
 
     sockets[namespace].emit(SocketIOEvents.JoinRoom, chatroom);
+    chatrooms[chatroom.id] = getChatroomDocClient(chatroom, sockets[namespace]);
   });
 
   dispatch(addSockets(sockets));

@@ -6,4 +6,5 @@ export enum SocketIOEvents {
   RoomCreated = 'New room created',
   Message = 'Message',
   MessageSent = 'Message sent',
+  MessageReceived = 'Message received',
 }

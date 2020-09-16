@@ -2,8 +2,14 @@ import { app } from './app';
 import socketIO from 'socket.io';
 import mongoose from 'mongoose';
 
-import { ListingDoc, Message, Chatroom, ChatroomDoc } from './models';
-import { SocketIOEvents } from '../common';
+import {
+  ListingDoc,
+  Message,
+  Chatroom,
+  ChatroomDoc,
+  MessageDoc,
+} from './models';
+import { MessageStatus, SocketIOEvents } from '../common';
 
 const namespaces: Record<string, socketIO.Namespace> = {};
 const chatrooms: Record<string, ChatroomDoc> = {};
@@ -54,10 +60,25 @@ io.on('connection', socket => {
             });
             await message.save();
 
-            const roomName = (chatroomId as unknown) as string;
-            namespace.to(roomName).emit(SocketIOEvents.MessageSent, message);
+            namespace
+              .to(`${chatroomId}`)
+              .emit(SocketIOEvents.MessageSent, message);
           }
         );
+
+        socket.on(SocketIOEvents.MessageReceived, async (msg: MessageDoc) => {
+          const message = await Message.findByIdAndUpdate(
+            msg.id,
+            {
+              status: MessageStatus.Delivered,
+            },
+            { new: true }
+          );
+
+          namespace
+            .to(`${msg.roomId}`)
+            .emit(SocketIOEvents.MessageReceived, message);
+        });
       });
 
       namespaces[namespaceName] = namespace;
