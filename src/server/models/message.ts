@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { Model, ModelAttribute } from '../utils';
 import { MessageStatus } from '../../common';
 
-interface MessageAttr extends ModelAttribute {
+export interface MessageAttr extends ModelAttribute {
   roomId: mongoose.Types.ObjectId;
   content: string;
   sender: mongoose.Types.ObjectId;
@@ -21,7 +21,7 @@ export interface MessageDoc extends mongoose.Document {
 type MessageModel = Model<MessageAttr, MessageDoc>;
 
 const displayOptions = {
-  transform(doc: MessageDoc, ret: MessageDoc) {
+  transform(doc: MessageDoc, ret: MessageDoc): void {
     ret.id = ret._id;
     delete ret._id;
   },
@@ -58,9 +58,12 @@ messageSchema.pre(/^find/, function (next) {
   next();
 });
 
-messageSchema.statics.build = (attrs: MessageAttr) => new Message(attrs);
+messageSchema.statics.build = (attrs: MessageAttr): MessageDoc =>
+  new Message(attrs);
 
-export const Message = mongoose.model<MessageDoc, MessageModel>(
+const Message = mongoose.model<MessageDoc, MessageModel>(
   'Message',
   messageSchema
 );
+
+export { Message };

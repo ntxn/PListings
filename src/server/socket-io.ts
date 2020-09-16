@@ -12,20 +12,21 @@ const io = socketIO(app);
 
 io.on('connection', socket => {
   socket.on(SocketIOEvents.CreateNamespace, (listing: ListingDoc) => {
+    // Notify all sockets in default namespace that there's a new namespace created
+    io.emit(SocketIOEvents.NamespaceCreated, listing);
+
     const namespaceName = `/${listing.id}`;
 
     if (!(namespaceName in namespaces)) {
       const namespace = io.of(namespaceName);
 
-      // Notify all sockets in default namespace that there's a new namespace created
-      io.emit(SocketIOEvents.NamespaceCreated, listing);
-
       // Initialize the current namespace
       namespace.on('connection', socket => {
-        const { user } = socket.handshake.query;
+        const { userId } = socket.handshake.query;
 
         // A chatroom already existed, rejoin
         socket.on(SocketIOEvents.JoinRoom, (chatroom: ChatroomDoc) => {
+          socket.join(chatroom.id);
           if (!(chatroom.id in chatrooms)) chatrooms[chatroom.id] = chatroom;
         });
 
@@ -34,11 +35,12 @@ io.on('connection', socket => {
           const chatroom = Chatroom.build({
             listing: listing.id,
             seller: listing.owner.id,
-            buyer: user,
+            buyer: userId,
           });
           await chatroom.save();
 
           chatrooms[chatroom.id] = chatroom;
+          socket.join(chatroom.id);
           namespace.emit(SocketIOEvents.RoomCreated, chatroom);
         });
 
@@ -48,19 +50,12 @@ io.on('connection', socket => {
             const message = Message.build({
               roomId: chatroomId,
               content: msg,
-              sender: user.id,
+              sender: userId,
             });
             await message.save();
 
-            const roomName = chatroomId.toHexString();
-            console.log('chatroomid', roomName, chatroomId);
+            const roomName = (chatroomId as unknown) as string;
             namespace.to(roomName).emit(SocketIOEvents.MessageSent, message);
-
-            // if receiver is online, send message, if not, save message to another collection to be retrieved later when the user logged in
-            console.log(
-              namespace.to(roomName).clients,
-              namespace.to(roomName).sockets
-            );
           }
         );
       });

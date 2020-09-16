@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import { Model, ModelAttribute } from '../utils';
-import { ListingDoc, UserDoc } from './index';
+import { ListingDoc, UserDoc, MessageDoc } from './index';
 
 export interface ChatroomAttr extends ModelAttribute {
   listing: mongoose.Types.ObjectId;
@@ -13,6 +13,7 @@ export interface ChatroomDoc extends mongoose.Document {
   listing: ListingDoc;
   buyer: UserDoc;
   seller: UserDoc;
+  messages: MessageDoc[];
   deletedByBuyer: boolean;
   deletedBySeller: boolean;
 }
