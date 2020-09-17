@@ -8,7 +8,12 @@ import {
   MessageDoc,
   MessageStatus,
 } from '../../common';
-import { addNewChatroom, addSockets, insertMessage } from '../actions';
+import {
+  addNewChatroom,
+  addSockets,
+  insertMessage,
+  updateMessage,
+} from '../actions';
 import { StoreState, ChatroomDocClient } from './interfaces';
 
 const getChatroomDocClient = (
@@ -16,12 +21,15 @@ const getChatroomDocClient = (
   socket?: SocketIOClient.Socket
 ): ChatroomDocClient => {
   const messages: Record<string, MessageDoc> = {};
-  if (chatroom.messages && chatroom.messages.length > 0)
+  let lastMessage: MessageDoc | undefined = undefined;
+  if (chatroom.messages && chatroom.messages.length > 0) {
+    lastMessage = chatroom.messages[chatroom.messages.length - 1];
     chatroom.messages.forEach(msg => {
       messages[msg.id] = msg;
       if (msg.status === MessageStatus.Sent && socket)
         socket.emit(SocketIOEvents.MessageReceived, msg);
     });
+  }
 
   return {
     id: chatroom.id,
@@ -29,6 +37,7 @@ const getChatroomDocClient = (
     buyer: chatroom.buyer,
     seller: chatroom.seller,
     messages,
+    lastMessage,
   };
 };
 
@@ -68,7 +77,7 @@ const initializeNamespaceSocket = (
 
   socket.on(SocketIOEvents.MessageReceived, (message: MessageDoc) => {
     // update this message with the one saved before
-    dispatch(insertMessage(message));
+    dispatch(updateMessage(message));
   });
 
   return socket;

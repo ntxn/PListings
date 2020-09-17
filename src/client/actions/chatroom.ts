@@ -6,6 +6,7 @@ import {
   ClearChatroomsAction,
   AddNewChatroomAction,
   InsertMessageAction,
+  UpdateMessageAction,
   ActionTypes,
   rejoinChatrooms,
   StoreState,
@@ -67,6 +68,13 @@ export const fetchChatrooms = async (
 export const insertMessage = (message: MessageDoc): InsertMessageAction => {
   return {
     type: ActionTypes.insertMessage,
+    payload: message,
+  };
+};
+
+export const updateMessage = (message: MessageDoc): UpdateMessageAction => {
+  return {
+    type: ActionTypes.updateMessage,
     payload: message,
   };
 };

@@ -112,16 +112,19 @@ export interface ClearSavedListingIdsAction {
   type: ActionTypes.clearSavedListingIds;
 }
 
+// Filters
 export interface SetDefaultFiltersAction {
   type: ActionTypes.setDefaultFilters;
   payload: CombinedLocation;
 }
 
+// SOCKETS
 export interface AddSocketsAction {
   type: ActionTypes.addSockets;
   payload: Record<string, SocketIOClient.Socket>;
 }
 
+// CHAT
 export interface FetchChatroomsAction {
   type: ActionTypes.fetchChatrooms;
   payload: Record<string, ChatroomDocClient>;
@@ -138,6 +141,11 @@ export interface AddNewChatroomAction {
 
 export interface InsertMessageAction {
   type: ActionTypes.insertMessage;
+  payload: MessageDoc;
+}
+
+export interface UpdateMessageAction {
+  type: ActionTypes.updateMessage;
   payload: MessageDoc;
 }
 
@@ -167,7 +175,8 @@ export type Action =
   | FetchChatroomsAction
   | ClearChatroomsAction
   | AddNewChatroomAction
-  | InsertMessageAction;
+  | InsertMessageAction
+  | UpdateMessageAction;
 
 // Store State
 export interface StoreState {
@@ -272,4 +281,5 @@ export interface ChatroomDocClient {
   buyer: UserDoc;
   seller: UserDoc;
   messages: Record<string, MessageDoc>;
+  lastMessage?: MessageDoc;
 }
