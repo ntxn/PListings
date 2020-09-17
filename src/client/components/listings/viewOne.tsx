@@ -5,7 +5,12 @@ import { FaHeart } from 'react-icons/fa';
 import { AiFillEye, AiOutlineMessage } from 'react-icons/ai';
 import { FiEdit } from 'react-icons/fi';
 
-import { StoreState, listingMapSmall, listingMapLarge } from '../../utilities';
+import {
+  StoreState,
+  listingMapSmall,
+  listingMapLarge,
+  getTimeAgo,
+} from '../../utilities';
 import {
   fetchListing,
   clearListing,
@@ -70,26 +75,6 @@ const _Listing = (props: ListingProps): JSX.Element => {
         );
     }
   }, [props.listing]);
-
-  // Calculate when the listing was posted
-  const getTimePosted = (): string => {
-    const listingTime = new Date(props.listing!.createdAt).getTime();
-    const now = new Date().getTime();
-    let diff = Math.round((now - listingTime) / (1000 * 60)); // minutes
-    if (diff < 60) return `${diff}m`;
-
-    diff = Math.round(diff / 60); // hours
-    if (diff < 24) return `${diff}h`;
-
-    diff = Math.round(diff / 24); // days
-    if (diff < 7) return `${diff} day${diff === 1 ? '' : 's'}`;
-
-    diff = Math.round(diff / 7); // weeks
-    if (diff < 4) return `${diff} week${diff === 1 ? '' : 's'}`;
-
-    diff = Math.round(diff / 4); // months
-    return `${diff} month${diff === 1 ? '' : 's'}`;
-  };
 
   const [showMapModal, setShowMapModal] = useState(false);
   const [showLogInModal, setShowLogInModal] = useState(false);
@@ -166,7 +151,9 @@ const _Listing = (props: ListingProps): JSX.Element => {
           </h2>
 
           <div className="listing__info__stats sub-heading-quaternary">
-            <div className="listing__info__stats--time">{getTimePosted()}</div>
+            <div className="listing__info__stats--time">
+              {getTimeAgo(props.listing!.createdAt)}
+            </div>
             <div className="listing__info__stats--seens-likes">
               <div>
                 <AiFillEye /> {listing.visits}
