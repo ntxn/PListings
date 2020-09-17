@@ -10,6 +10,7 @@ import { NotFound } from './NotFound';
 import { SignUp, LogIn } from './auth';
 import { AccountSettings, UserListings, Profile } from './user';
 import { NewListing, EditListing, Listings, Listing } from './listings';
+import { Messenger } from './messages';
 
 interface AppProps {
   fetchCurrentUser(): Promise<void>;
@@ -32,6 +33,8 @@ const _App = (props: AppProps): JSX.Element => {
               <Route path="/" exact component={Listings} />
               <Route path="/auth/SignUp" exact component={SignUp} />
               <Route path="/auth/LogIn" exact component={LogIn} />
+              <Route path="/messages" exact component={Messenger} />
+              <Route path="/messages/:id" exact component={Messenger} />
               <Route path="/user/listings" exact component={UserListings} />
               <Route
                 path="/user/account-settings"
