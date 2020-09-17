@@ -205,11 +205,7 @@ const _Listing = (props: ListingProps): JSX.Element => {
           {/******** Listing's Seller info (avatar, name, rating) ********/}
           <hr className="u-divider u-margin-top-small" />
           <div className="listing__info__owner u-margin-top-medium">
-            <Avatar
-              user={listing.owner}
-              className="avatar--icon"
-              to={`/user/profile/${listing.owner.id}`}
-            />
+            <Avatar user={listing.owner} className="avatar--icon" useLink />
             <div className="listing__info__owner__info">
               <div className="listing__info__owner__info--name">
                 {listing.owner.name}

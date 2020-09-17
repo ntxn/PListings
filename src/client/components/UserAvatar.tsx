@@ -7,7 +7,7 @@ import { UserDoc } from '../../common';
 interface AvatarProps {
   user: UserDoc;
   className?: string;
-  to?: string;
+  useLink?: boolean;
   onClick?(): void;
 }
 
@@ -32,8 +32,8 @@ export const Avatar = (props: AvatarProps): JSX.Element => {
 
   return (
     <>
-      {props.to ? (
-        <Link to={props.to} className="avatar--link">
+      {props.useLink ? (
+        <Link to={`/user/profile/${props.user.id}`} className="avatar--link">
           {renderAvatar()}
         </Link>
       ) : (
