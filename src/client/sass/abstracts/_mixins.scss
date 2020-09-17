@@ -21,3 +21,21 @@
     color: var(--color-grey-light-4);
   }
 }
+
+@mixin icon-like-common-styles {
+  cursor: pointer;
+  background-color: var(--color-grey-light-2);
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-secondary-dark);
+    color: var(--color-white);
+    transition: all 0.2s;
+  }
+}
+
+@mixin img-100-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

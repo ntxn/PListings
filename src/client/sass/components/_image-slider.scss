@@ -69,7 +69,7 @@
   }
 
   &__thumbnail {
-    object-fit: cover;
+    @include img-100-cover;
     border-radius: var(--border-radius-small);
     cursor: pointer;
     opacity: 0.6;
