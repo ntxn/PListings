@@ -15,7 +15,7 @@ import {
 } from '../../actions';
 import { ListingDoc, UserDoc } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
-import { UserAvatar } from '../UserAvatar';
+import { Avatar } from '../UserAvatar';
 import { MapModal, promptUserToLogInToSaveListing, Loader } from '../Modal';
 
 interface ListingProps {
@@ -205,9 +205,11 @@ const _Listing = (props: ListingProps): JSX.Element => {
           {/******** Listing's Seller info (avatar, name, rating) ********/}
           <hr className="u-divider u-margin-top-small" />
           <div className="listing__info__owner u-margin-top-medium">
-            <Link to={`/user/profile/${listing.owner.id}`}>
-              <UserAvatar user={listing.owner} className="icon" />
-            </Link>
+            <Avatar
+              user={listing.owner}
+              className="avatar--icon"
+              to={`/user/profile/${listing.owner.id}`}
+            />
             <div className="listing__info__owner__info">
               <div className="listing__info__owner__info--name">
                 {listing.owner.name}

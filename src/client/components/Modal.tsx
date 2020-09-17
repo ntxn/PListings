@@ -9,7 +9,7 @@ import { MdClose } from 'react-icons/md';
 import ClipLoader from 'react-spinners/ClipLoader';
 
 import { UserDoc } from '../../common';
-import { UserAvatar } from './UserAvatar';
+import { Avatar } from './UserAvatar';
 import { FiltersForm } from './forms';
 import { FilterAttrs } from '../utilities';
 import { history } from '../history';
@@ -137,10 +137,7 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
             className="user-menu__option__hover"
             onClick={props.closeUserMenu}
           >
-            <UserAvatar
-              user={props.user}
-              className="user-menu__option__avatar"
-            />
+            <Avatar user={props.user} className="avatar--user-menu" />
             <div className="user-menu__brief-info">
               <span className="heading-tertiary">{props.user.name}</span>
               <span className="sub-heading-tertiary">

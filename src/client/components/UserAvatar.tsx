@@ -1,28 +1,44 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { BsPersonFill } from 'react-icons/bs';
 
 import { UserDoc } from '../../common';
 
-interface UserAvatarProps {
-  onClick?(): void;
+interface AvatarProps {
   user: UserDoc;
-  className: string;
+  className?: string;
+  to?: string;
+  onClick?(): void;
 }
 
-export const UserAvatar = (props: UserAvatarProps): JSX.Element => {
-  return (
-    <div onClick={props.onClick}>
-      {props.user.photo ? (
-        <img
-          src={`/img/users/${props.user.photo}`}
-          alt={`${props.user.name} photo`}
-          className={props.className}
-        />
-      ) : (
-        <div className={props.className}>
+export const Avatar = (props: AvatarProps): JSX.Element => {
+  const renderAvatar = (): JSX.Element => {
+    return (
+      <div
+        className={`avatar ${props.className ? props.className : ''}`}
+        onClick={props.onClick}
+      >
+        {props.user.photo ? (
+          <img
+            src={`/img/users/${props.user.photo}`}
+            alt={`${props.user.name} photo`}
+          />
+        ) : (
           <BsPersonFill title="Default Avatar" />
-        </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {props.to ? (
+        <Link to={props.to} className="avatar--link">
+          {renderAvatar()}
+        </Link>
+      ) : (
+        renderAvatar()
       )}
-    </div>
+    </>
   );
 };

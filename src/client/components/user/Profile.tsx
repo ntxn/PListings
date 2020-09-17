@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BsPersonFill } from 'react-icons/bs';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
 import { UserPageLayout, NavItem } from './UserPageLayout';
 import { ListingCardPublic } from '../ListingCard';
 import { Loader } from '../Modal';
+import { Avatar } from '../UserAvatar';
 import { calcDistanceBetweenTwoPoints, StoreState } from '../../utilities';
 import { ApiRoutes, UserDoc, ListingDoc, GeoLocation } from '../../../common';
 import { fetchSavedListingIds, clearSavedListingIds } from '../../actions';
@@ -71,7 +71,7 @@ const _Profile = (props: ProfileProps): JSX.Element => {
   }, [props.user, props.currentLocation]);
 
   const renderHeader = (): JSX.Element => {
-    const { name, photo, location, createdAt } = user!;
+    const { name, location, createdAt } = user!;
     const joined = new Date(createdAt).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -79,13 +79,7 @@ const _Profile = (props: ProfileProps): JSX.Element => {
 
     return (
       <div className="profile__header">
-        <div className="profile__header__left">
-          {photo ? (
-            <img src={`/img/users/${photo}`} alt={`${name}'s photo`} />
-          ) : (
-            <BsPersonFill title="Default Avatar" />
-          )}
-        </div>
+        <Avatar user={user!} className="avatar--profile" />
         <div className="profile__header__right">
           <h3 className="heading-secondary">{name}</h3>
           <p className="sub-heading-quaternary">{`${location.city}, ${location.state}`}</p>

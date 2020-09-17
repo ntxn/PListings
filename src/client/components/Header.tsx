@@ -8,7 +8,7 @@ import { UserDoc } from '../../common';
 import { StoreState } from '../utilities';
 import { logOut } from '../actions';
 import { UserMenuModal } from './Modal';
-import { UserAvatar } from './UserAvatar';
+import { Avatar } from './UserAvatar';
 import { SearchInput } from './SearchInput';
 
 interface HeaderProps {
@@ -36,10 +36,10 @@ const renderNavigationAuthenticated = (
       <div className="icon">
         <FaBell title="Notifications" />
       </div>
-      <UserAvatar
+      <Avatar
         onClick={() => setUserMenuModal(!userMenuModal)}
         user={props.user!}
-        className="icon"
+        className="avatar--icon"
       />
       {userMenuModal && (
         <UserMenuModal
