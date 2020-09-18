@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { UserDoc } from '../../../common';
 import { StoreState, ChatroomDocClient } from '../../utilities';
 import { InfoCard } from './InfoCard';
+import { ConversationCard } from './ConversationCard';
 import { Unauthorized } from '../Unauthorized';
 
 interface MessengerProps {
@@ -12,6 +13,15 @@ interface MessengerProps {
 }
 
 const _Messenger = (props: MessengerProps): JSX.Element => {
+  const [chatroom, setChatroom] = useState<ChatroomDocClient>();
+
+  useEffect(() => {
+    if (props.user) {
+      const rooms = Object.values(props.chatrooms);
+      if (rooms.length > 0) setChatroom(rooms[0]);
+    }
+  }, [props.user, props.chatrooms]);
+
   const renderInfoCards = (): JSX.Element => {
     return (
       <div className="messenger__info-cards">
@@ -25,7 +35,7 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
                 listing={listing}
                 lastMsg={lastMessage!}
                 recipient={props.user!.id == buyer.id ? seller : buyer}
-                onClick={() => console.log(id)}
+                onClick={() => setChatroom(props.chatrooms[id])}
               />
             );
           })}
@@ -37,7 +47,7 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
     return (
       <div className="messenger">
         {renderInfoCards()}
-        <div className="messenger__conversation-card">hi</div>
+        {chatroom && <ConversationCard chatroom={chatroom} />}
       </div>
     );
   };

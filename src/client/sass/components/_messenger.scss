@@ -1,20 +1,21 @@
 .messenger {
   display: flex;
   flex-direction: row;
+  height: calc(100vh - 10rem); // TODO: get footer actual height
 
   &__info-cards {
     min-width: 20rem;
     max-width: 30rem;
     width: 30%;
 
-    height: 100vh;
+    height: 100%;
     overflow: scroll;
 
-    border-right: 1px solid var(--color-grey-light-2);
+    border-right: 1px solid var(--color-grey-light-1);
 
     &__item {
       width: 100%;
-      height: 6.5rem;
+      min-height: 6.5rem;
       padding: 0.8rem;
 
       display: flex;
@@ -23,11 +24,11 @@
       align-items: center;
 
       cursor: pointer;
-      border-bottom: 1px solid var(--color-grey-light-2);
+      position: relative;
 
       &__middle {
         flex: 1;
-        margin: 0 0.7rem 0.4rem 0.7rem;
+        margin: 0 1rem 0.4rem 0.7rem;
 
         overflow: hidden;
       }
@@ -40,9 +41,10 @@
       }
 
       &__last-msg {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 400;
         white-space: nowrap;
+        color: var(--color-grey-dark-2);
       }
 
       &__last-sent-at {
@@ -52,8 +54,9 @@
       }
 
       &__listing-photo {
-        width: 4.5rem;
-        height: 4.5rem;
+        width: 4rem;
+        height: 4rem;
+        flex-shrink: 0;
 
         img {
           @include img-100-cover;
@@ -62,16 +65,123 @@
 
           &:hover {
             box-shadow: $shadow-green;
-            transition: box-shadow 0.2s;
           }
+        }
+      }
+
+      &--unread {
+        .messenger__info-cards__item__recipient-name {
+          font-weight: 700;
+        }
+
+        .messenger__info-cards__item__last-msg {
+          font-weight: 700;
+          color: var(--color-grey-dark-3);
+        }
+
+        &::before {
+          content: '';
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: var(--color-primary);
+
+          position: absolute;
+          top: 1.3rem;
         }
       }
     }
   }
 
   &__conversation-card {
-    margin-left: 1rem;
     width: 70%;
-    background-color: bisque;
+    height: 100%;
+    position: relative;
+
+    &__listing {
+      width: 100%;
+      display: flex;
+      overflow: hidden;
+
+      padding: 1rem;
+      transition: background-color 0.2s;
+      box-shadow: $shadow-bottom-grey;
+
+      &:link,
+      &:visited {
+        text-decoration: none;
+        color: var(--color-grey-dark-3);
+      }
+
+      &:hover {
+        background-color: var(--color-grey-light-1);
+      }
+
+      &__photo {
+        width: 5rem;
+        height: 5rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+
+        img {
+          @include img-100-cover;
+          border-radius: var(--border-radius-xsmall);
+        }
+      }
+
+      & > p {
+        white-space: nowrap;
+      }
+    }
+
+    &__body {
+      margin: 0 1rem;
+      height: calc(
+        100% - 7rem - 5rem
+      ); // TODO: get listing's height and input form's height
+      overflow: scroll;
+    }
+
+    &__recipient {
+      &:link,
+      &:visited {
+        text-decoration: none;
+        color: var(--color-grey-dark-3);
+      }
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin: 2rem 0;
+
+      &__info {
+        margin-left: 0.8rem;
+      }
+    }
+
+    &__message {
+      &--left {
+        display: flex;
+
+        &__content {
+          background-color: khaki;
+        }
+      }
+
+      &--right {
+        display: flex;
+        justify-content: flex-end;
+
+        &__content {
+          background-color: skyblue;
+        }
+      }
+    }
+
+    &__form {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+    }
   }
 }
