@@ -9,11 +9,17 @@ interface InfoCardProps {
   recipient: UserDoc;
   lastMsg: MessageDoc;
   onClick(): void;
+  unread?: boolean;
 }
 
 export const InfoCard = (props: InfoCardProps): JSX.Element => {
   return (
-    <div className="messenger__info-cards__item" onClick={props.onClick}>
+    <div
+      className={`messenger__info-cards__item ${
+        props.unread ? 'messenger__info-cards__item--unread' : ''
+      }`}
+      onClick={props.onClick}
+    >
       <Avatar user={props.recipient} useLink className="avatar--icon" />
       <div className="messenger__info-cards__item__middle">
         <p className="messenger__info-cards__item__recipient-name">
