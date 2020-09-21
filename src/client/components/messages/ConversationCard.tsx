@@ -2,9 +2,15 @@ import React, { FormEvent, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
+import { BsCheck, BsCheckAll } from 'react-icons/bs';
 
 import { deleteChatroom } from '../../actions';
-import { MessageDoc, SocketIOEvents, UserDoc } from '../../../common';
+import {
+  MessageDoc,
+  MessageStatus,
+  SocketIOEvents,
+  UserDoc,
+} from '../../../common';
 import { Avatar } from '../UserAvatar';
 import {
   StoreState,
@@ -69,6 +75,26 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     );
   };
 
+  const formatDate = (date: Date, rightAlign = false): JSX.Element => {
+    const dateArr = getDateTimeStr(date).split(',');
+    return (
+      <p
+        className={`messenger__conversation-card__message__sent-at ${
+          rightAlign
+            ? 'messenger__conversation-card__message__sent-at--right-align'
+            : ''
+        }`}
+      >
+        {dateArr[0]}
+        {dateArr.length === 2 && (
+          <>
+            <br /> {dateArr[1]}
+          </>
+        )}
+      </p>
+    );
+  };
+
   const renderRecipientMessage = (
     msg: MessageDoc,
     showAvatar: boolean
@@ -78,26 +104,38 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
         <Avatar
           useLink
           user={recipient}
-          className={`avatar--chat ${showAvatar ? '' : 'avatar--hide'}`}
+          className={`avatar--chat ${showAvatar ? '' : 'u-invisible'}`}
         />
         <div className="messenger__conversation-card__message--left__content">
           {msg.content}
         </div>
-        <p className="messenger__conversation-card__message__sent-at">
-          {getDateTimeStr(msg.createdAt)}
-        </p>
+        {formatDate(msg.createdAt)}
       </li>
     );
   };
 
   const renderSenderMessage = (msg: MessageDoc): JSX.Element => {
+    const getStatus = (): JSX.Element => {
+      switch (msg.status) {
+        case MessageStatus.Sent:
+          return <BsCheck />;
+        case MessageStatus.Delivered:
+          return <BsCheckAll />;
+        case MessageStatus.Seen:
+          return (
+            <BsCheckAll className="messenger__conversation-card__message--right__status--seen" />
+          );
+      }
+    };
+
     return (
       <li className="messenger__conversation-card__message--right" key={msg.id}>
-        <p className="messenger__conversation-card__message__sent-at">
-          {getDateTimeStr(msg.createdAt)}
-        </p>
+        {formatDate(msg.createdAt, true)}
         <div className="messenger__conversation-card__message--right__content">
-          {msg.content} - {msg.status}
+          {msg.content}
+        </div>
+        <div className="messenger__conversation-card__message--right__status">
+          {getStatus()}
         </div>
       </li>
     );

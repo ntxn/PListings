@@ -32,6 +32,13 @@ export const getDateTimeStr = (d: Date): string => {
   let options: Intl.DateTimeFormatOptions = {};
 
   if (diff < 24) options = { hour: 'numeric', minute: 'numeric' };
+  else if (Math.round(diff / 24) < 7)
+    options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    };
   else if (date.getFullYear() === now.getFullYear())
     options = { month: 'short', day: 'numeric' };
   else options = { year: 'numeric', month: 'numeric', day: 'numeric' };

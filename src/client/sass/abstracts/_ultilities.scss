@@ -54,6 +54,10 @@
   display: none;
 }
 
+.u-invisible {
+  visibility: hidden;
+}
+
 .u-show-arrow-on-hover {
   &:hover > .arrow {
     display: flex;
