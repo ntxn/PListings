@@ -9,6 +9,7 @@ interface InfoCardProps {
   recipient: UserDoc;
   lastMsg: MessageDoc;
   onClick(): void;
+  active: boolean;
   unread?: boolean;
 }
 
@@ -17,7 +18,7 @@ export const InfoCard = (props: InfoCardProps): JSX.Element => {
     <div
       className={`messenger__info-cards__item ${
         props.unread ? 'messenger__info-cards__item--unread' : ''
-      }`}
+      } ${props.active ? 'messenger__info-cards__item--active' : ''}`}
       onClick={props.onClick}
     >
       <Avatar user={props.recipient} useLink className="avatar--icon" />

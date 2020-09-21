@@ -36,6 +36,7 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
                 lastMsg={lastMessage!}
                 recipient={props.user!.id == buyer.id ? seller : buyer}
                 onClick={() => setChatroom(props.chatrooms[id])}
+                active={chatroom ? id == chatroom.id : false}
               />
             );
           })}
