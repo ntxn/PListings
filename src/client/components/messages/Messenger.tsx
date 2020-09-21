@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
+import { history } from '../../history';
 import { UserDoc } from '../../../common';
 import { StoreState, ChatroomDocClient } from '../../utilities';
 import { InfoCard } from './InfoCard';
@@ -10,6 +11,8 @@ import { Unauthorized } from '../Unauthorized';
 interface MessengerProps {
   user: UserDoc | null;
   chatrooms: Record<string, ChatroomDocClient>;
+
+  match: { params: { id?: string } };
 }
 
 const _Messenger = (props: MessengerProps): JSX.Element => {
@@ -17,8 +20,21 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
 
   useEffect(() => {
     if (props.user) {
-      const rooms = Object.values(props.chatrooms);
-      if (rooms.length > 0) setChatroom(rooms[0]);
+      const roomIds = Object.keys(props.chatrooms);
+
+      if (roomIds.length > 0) {
+        if (props.match.params.id && props.chatrooms[props.match.params.id])
+          setChatroom(props.chatrooms[props.match.params.id]);
+        else {
+          setChatroom(props.chatrooms[roomIds[0]]);
+          history.push(`/messages/${roomIds[0]}`);
+        }
+      } else {
+        // no chat messages, display 'No conversation'
+        console.log('No conversations found');
+        setChatroom(undefined);
+        history.push('/messages');
+      }
     }
   }, [props.user, props.chatrooms]);
 
@@ -35,7 +51,10 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
                 listing={listing}
                 lastMsg={lastMessage!}
                 recipient={props.user!.id == buyer.id ? seller : buyer}
-                onClick={() => setChatroom(props.chatrooms[id])}
+                onClick={() => {
+                  setChatroom(room);
+                  history.push(`/messages/${id}`);
+                }}
                 active={chatroom ? id == chatroom.id : false}
               />
             );

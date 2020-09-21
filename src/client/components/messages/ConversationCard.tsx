@@ -1,7 +1,9 @@
 import React, { FormEvent, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { MdDelete } from 'react-icons/md';
 
+import { deleteChatroom } from '../../actions';
 import { SocketIOEvents, UserDoc } from '../../../common';
 import { Avatar } from '../UserAvatar';
 import { StoreState, ChatroomDocClient, getLocationStr } from '../../utilities';
@@ -13,6 +15,9 @@ interface ConversationCardProps {
   // from reduxStore
   user: UserDoc | null;
   sockets: Record<string, SocketIOClient.Socket>;
+
+  // from dispatch
+  deleteChatroom(id: string): void;
 }
 
 const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
@@ -32,22 +37,30 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
 
   const renderHeader = (): JSX.Element => {
     return (
-      <Link
-        to={`/listings/${listing.id}`}
-        className="messenger__conversation-card__listing"
-      >
-        <div className="messenger__conversation-card__listing__photo">
-          <img src={`/img/listings/${listing.photos[0]}`} />
+      <div className="messenger__conversation-card__header">
+        <Link
+          to={`/listings/${listing.id}`}
+          className="messenger__conversation-card__listing"
+        >
+          <div className="messenger__conversation-card__listing__photo">
+            <img src={`/img/listings/${listing.photos[0]}`} />
+          </div>
+          <div className="messenger__conversation-card__listing__details">
+            <p className="u-margin-bottom-xxsmall heading-quaternary">
+              {listing.title}
+            </p>
+            <p className="sub-heading-quaternary">
+              ${listing.price} · {getLocationStr(listing.location)}
+            </p>
+          </div>
+        </Link>
+        <div
+          className="messenger__conversation-card__delete icon"
+          onClick={() => props.deleteChatroom(id)}
+        >
+          <MdDelete title="Delete conversation" />
         </div>
-        <div className="messenger__conversation-card__listing__details">
-          <p className="u-margin-bottom-xxsmall heading-quaternary">
-            {listing.title}
-          </p>
-          <p className="sub-heading-quaternary">
-            ${listing.price} · {getLocationStr(listing.location)}
-          </p>
-        </div>
-      </Link>
+      </div>
     );
   };
 
@@ -117,4 +130,6 @@ const mapStateToProps = (state: StoreState) => {
   return { user: state.user, sockets: state.sockets };
 };
 
-export const ConversationCard = connect(mapStateToProps)(_ConversationCard);
+export const ConversationCard = connect(mapStateToProps, { deleteChatroom })(
+  _ConversationCard
+);

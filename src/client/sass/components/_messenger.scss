@@ -106,6 +106,19 @@
     height: 100%;
     position: relative;
 
+    &__header {
+      display: flex;
+      flex-direction: row;
+
+      box-shadow: $shadow-bottom-grey;
+    }
+
+    &__delete {
+      flex-shrink: 0;
+      margin: auto 1rem;
+      background-color: transparent;
+    }
+
     &__listing {
       width: 100%;
       display: flex;
@@ -113,7 +126,6 @@
 
       padding: 1rem;
       transition: background-color 0.2s;
-      box-shadow: $shadow-bottom-grey;
 
       &:link,
       &:visited {
@@ -123,6 +135,7 @@
 
       &:hover {
         background-color: var(--color-grey-light-1);
+        border-top-right-radius: var(--border-radius-xsmall);
       }
 
       &__photo {
