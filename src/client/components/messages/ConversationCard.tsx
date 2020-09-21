@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
 
 import { deleteChatroom } from '../../actions';
-import { SocketIOEvents, UserDoc } from '../../../common';
+import { MessageDoc, SocketIOEvents, UserDoc } from '../../../common';
 import { Avatar } from '../UserAvatar';
 import { StoreState, ChatroomDocClient, getLocationStr } from '../../utilities';
 
@@ -64,6 +64,52 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     );
   };
 
+  const renderRecipientMessage = (
+    msg: MessageDoc,
+    showAvatar: boolean
+  ): JSX.Element => {
+    return (
+      <li className="messenger__conversation-card__message--left" key={msg.id}>
+        <Avatar
+          useLink
+          user={recipient}
+          className={`avatar--chat ${showAvatar ? '' : 'avatar--hide'}`}
+        />
+        <div className="messenger__conversation-card__message--left__content">
+          {msg.content}
+        </div>
+      </li>
+    );
+  };
+
+  const renderSenderMessage = (msg: MessageDoc): JSX.Element => {
+    return (
+      <li className="messenger__conversation-card__message--right" key={msg.id}>
+        <div className="messenger__conversation-card__message--right__content">
+          {msg.content} - {msg.status}
+        </div>
+      </li>
+    );
+  };
+
+  const renderMessages = (): JSX.Element => {
+    const msgs = Object.values(messages);
+    return (
+      <ul>
+        {msgs.map((msg, i) => {
+          const lastMsg = i === msgs.length - 1;
+          if (recipient.id == msg.sender)
+            return renderRecipientMessage(
+              msg,
+              lastMsg || recipient.id != msgs[i + 1].sender
+            );
+
+          return renderSenderMessage(msg);
+        })}
+      </ul>
+    );
+  };
+
   const renderBody = (): JSX.Element => {
     return (
       <div className="messenger__conversation-card__body">
@@ -79,20 +125,7 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
             </p>
           </div>
         </Link>
-        <ul className="messenger__conversation-card__messages">
-          {Object.values(messages).map(msg => {
-            const className = `messenger__conversation-card__message--${
-              recipient.id == msg.sender ? 'left' : 'right'
-            }`;
-            return (
-              <li className={className} key={msg.id}>
-                <div className={`${className}__content`}>
-                  {msg.content} - {msg.status}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        {renderMessages()}
       </div>
     );
   };

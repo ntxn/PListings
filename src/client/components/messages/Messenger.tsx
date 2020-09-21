@@ -19,12 +19,12 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
   const [chatroom, setChatroom] = useState<ChatroomDocClient>();
 
   useEffect(() => {
+    const { id } = props.match.params;
     if (props.user) {
       const roomIds = Object.keys(props.chatrooms);
 
       if (roomIds.length > 0) {
-        if (props.match.params.id && props.chatrooms[props.match.params.id])
-          setChatroom(props.chatrooms[props.match.params.id]);
+        if (id && roomIds.includes(id)) setChatroom(props.chatrooms[id]);
         else {
           setChatroom(props.chatrooms[roomIds[0]]);
           history.push(`/messages/${roomIds[0]}`);
@@ -36,7 +36,7 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
         history.push('/messages');
       }
     }
-  }, [props.user, props.chatrooms]);
+  }, [props.chatrooms]);
 
   const renderInfoCards = (): JSX.Element => {
     return (

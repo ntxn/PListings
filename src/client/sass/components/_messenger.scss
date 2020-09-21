@@ -158,7 +158,8 @@
 
     // ------------ BODY -----------------
     &__body {
-      margin: 0 1rem;
+      width: 100%;
+      padding: 0 1rem;
       height: calc(
         100% - 7rem - 5rem
       ); // TODO: get listing's height and input form's height
@@ -185,9 +186,16 @@
     &__message {
       &--left {
         display: flex;
+        align-items: flex-end;
+
+        a {
+          margin-bottom: 0.5rem;
+        }
 
         &__content {
-          background-color: khaki;
+          @include message-content;
+          background-color: var(--color-grey-light-1);
+          margin-left: 1rem;
         }
       }
 
@@ -196,7 +204,9 @@
         justify-content: flex-end;
 
         &__content {
-          background-color: skyblue;
+          @include message-content;
+          background-color: var(--color-secondary-dark);
+          color: var(--color-white);
         }
       }
     }

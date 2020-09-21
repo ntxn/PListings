@@ -28,13 +28,6 @@
 
   &--icon {
     @include icon-like-common-styles;
-
-    &:hover {
-      img {
-        box-shadow: $shadow-green;
-        transition: box-shadow 0.2s;
-      }
-    }
   }
 
   &--user-menu {
@@ -56,5 +49,20 @@
       width: 80%;
       height: 80%;
     }
+  }
+
+  &--chat {
+    @include icon-like-common-styles;
+    width: 2.5rem;
+    height: 2.5rem;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &--hide {
+    visibility: hidden;
   }
 }

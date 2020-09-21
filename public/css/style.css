@@ -193,9 +193,9 @@ body {
     .avatar--icon:hover {
       background-color: var(--color-secondary-dark);
       color: var(--color-white); }
-    .avatar--icon:hover img {
-      box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1);
-      transition: box-shadow 0.2s; }
+      .avatar--icon:hover img {
+        box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1);
+        transition: box-shadow 0.2s; }
   .avatar--user-menu {
     width: 6rem;
     height: 6rem; }
@@ -209,6 +209,23 @@ body {
     .avatar--profile svg {
       width: 80%;
       height: 80%; }
+  .avatar--chat {
+    cursor: pointer;
+    background-color: var(--color-grey-light-2);
+    transition: all 0.2s;
+    width: 2.5rem;
+    height: 2.5rem; }
+    .avatar--chat:hover {
+      background-color: var(--color-secondary-dark);
+      color: var(--color-white); }
+      .avatar--chat:hover img {
+        box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1);
+        transition: box-shadow 0.2s; }
+    .avatar--chat svg {
+      width: 1.5rem;
+      height: 1.5rem; }
+  .avatar--hide {
+    visibility: hidden; }
 
 .btn, .btn:link, .btn:visited {
   font-size: var(--default-font-size);
@@ -515,6 +532,9 @@ body {
   .icon:hover {
     background-color: var(--color-secondary-dark);
     color: var(--color-white); }
+    .icon:hover img {
+      box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1);
+      transition: box-shadow 0.2s; }
 
 .image-slider {
   width: 100%; }
@@ -770,7 +790,8 @@ body {
       .messenger__conversation-card__listing > p {
         white-space: nowrap; }
     .messenger__conversation-card__body {
-      margin: 0 1rem;
+      width: 100%;
+      padding: 0 1rem;
       height: calc( 100% - 7rem - 5rem);
       overflow: scroll; }
     .messenger__conversation-card__recipient {
@@ -784,14 +805,31 @@ body {
       .messenger__conversation-card__recipient__info {
         margin-left: 0.8rem; }
     .messenger__conversation-card__message--left {
-      display: flex; }
+      display: flex;
+      align-items: flex-end; }
+      .messenger__conversation-card__message--left a {
+        margin-bottom: 0.5rem; }
       .messenger__conversation-card__message--left__content {
-        background-color: khaki; }
+        font-size: 1.5rem;
+        max-width: 50%;
+        padding: 0.7rem 1.2rem;
+        border-radius: var(--border-radius-medium);
+        margin: 0.1rem;
+        line-height: 1.5;
+        background-color: var(--color-grey-light-1);
+        margin-left: 1rem; }
     .messenger__conversation-card__message--right {
       display: flex;
       justify-content: flex-end; }
       .messenger__conversation-card__message--right__content {
-        background-color: skyblue; }
+        font-size: 1.5rem;
+        max-width: 50%;
+        padding: 0.7rem 1.2rem;
+        border-radius: var(--border-radius-medium);
+        margin: 0.1rem;
+        line-height: 1.5;
+        background-color: var(--color-secondary-dark);
+        color: var(--color-white); }
     .messenger__conversation-card__form {
       width: 100%;
       position: absolute;
