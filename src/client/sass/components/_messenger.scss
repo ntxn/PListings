@@ -102,10 +102,11 @@
   }
 
   &__conversation-card {
-    width: 70%;
+    flex: 1;
     height: 100%;
     position: relative;
 
+    // ------------ HEADER -----------------
     &__header {
       display: flex;
       flex-direction: row;
@@ -155,6 +156,7 @@
       }
     }
 
+    // ------------ BODY -----------------
     &__body {
       margin: 0 1rem;
       height: calc(
@@ -199,10 +201,25 @@
       }
     }
 
+    // ------------ FOOTER -----------------
     &__form {
       width: 100%;
       position: absolute;
       bottom: 0;
+
+      padding: 0 1rem;
+      display: flex;
+    }
+
+    &__input {
+      @include input-field-common-styles;
+      border-radius: var(--border-raidus-large);
+      background-color: var(--color-grey-light-1);
+      padding: 1rem;
+    }
+
+    &__submit-btn {
+      margin-left: 1rem;
     }
   }
 }

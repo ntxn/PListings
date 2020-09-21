@@ -104,10 +104,11 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
           type="text"
           className="messenger__conversation-card__input"
           value={inputContent}
+          placeholder="Type a message..."
           onChange={e => setInputContent(e.target.value)}
         />
         <button
-          className="messenger__conversation-card__submit-btn"
+          className="messenger__conversation-card__submit-btn btn btn--filled"
           type="submit"
           disabled={inputContent === ''}
         >
