@@ -50,6 +50,14 @@ export const chatroomReducer = (
     case ActionTypes.updateMessage:
       [roomId, room] = copyRoomAndInsertMessage(action);
       return { [roomId]: room, ...state };
+    case ActionTypes.typing:
+      room = { ...state[action.payload] };
+      room.typing = true;
+      return { ...state, [action.payload]: room };
+    case ActionTypes.stopTyping:
+      room = { ...state[action.payload] };
+      room.typing = false;
+      return { ...state, [action.payload]: room };
     default:
       return state;
   }

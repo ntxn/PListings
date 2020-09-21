@@ -13,6 +13,8 @@ import {
   addSockets,
   insertMessage,
   updateMessage,
+  typing,
+  stopTyping,
 } from '../actions';
 import { StoreState, ChatroomDocClient } from './interfaces';
 
@@ -37,6 +39,7 @@ const getChatroomDocClient = (
     buyer: chatroom.buyer,
     seller: chatroom.seller,
     messages,
+    typing: false,
     lastMessage,
   };
 };
@@ -79,6 +82,20 @@ const initializeNamespaceSocket = (
     // update this message with the one saved before
     dispatch(updateMessage(message));
   });
+
+  socket.on(
+    SocketIOEvents.Typing,
+    ({ userId, roomId }: { userId: string; roomId: string }) => {
+      if (user.id !== userId) dispatch(typing(roomId));
+    }
+  );
+
+  socket.on(
+    SocketIOEvents.StopTyping,
+    ({ userId, roomId }: { userId: string; roomId: string }) => {
+      if (user.id !== userId) dispatch(stopTyping(roomId));
+    }
+  );
 
   return socket;
 };

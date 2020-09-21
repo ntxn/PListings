@@ -252,7 +252,7 @@
       @include input-field-common-styles;
       border-radius: var(--border-raidus-large);
       background-color: var(--color-grey-light-1);
-      padding: 1rem;
+      padding: 1rem 1.5rem;
     }
 
     &__submit-btn {

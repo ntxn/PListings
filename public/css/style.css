@@ -861,7 +861,7 @@ body {
       color: var(--color-grey-dark-3);
       border-radius: var(--border-raidus-large);
       background-color: var(--color-grey-light-1);
-      padding: 1rem; }
+      padding: 1rem 1.5rem; }
       .messenger__conversation-card__input:focus {
         outline: none;
         box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }

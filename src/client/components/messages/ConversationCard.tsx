@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
 import { BsCheck, BsCheckAll } from 'react-icons/bs';
+import SyncLoader from 'react-spinners/SyncLoader';
 
 import { deleteChatroom } from '../../actions';
 import {
@@ -32,15 +33,15 @@ interface ConversationCardProps {
 }
 
 const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
-  const { listing, messages, buyer, seller, id } = props.chatroom;
+  const { listing, messages, buyer, seller, id, typing } = props.chatroom;
   const recipient = props.user!.id == buyer.id ? seller : buyer;
+  const namespace = `/${listing.id}`;
 
   const [inputContent, setInputContent] = useState('');
 
   const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
-    const namespace = `/${listing.id}`;
     props.sockets[namespace].emit(SocketIOEvents.Message, id, inputContent);
 
     setInputContent('');
@@ -175,6 +176,14 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
           </div>
         </Link>
         {renderMessages()}
+        {typing && (
+          <div className="messenger__conversation-card__message--left">
+            <Avatar useLink user={recipient} className="avatar--chat" />
+            <div className="messenger__conversation-card__message--left__content">
+              <SyncLoader color={'rgb(82, 82, 82)'} size={6} />
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -188,6 +197,12 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
           value={inputContent}
           placeholder="Type a message..."
           onChange={e => setInputContent(e.target.value)}
+          onKeyPress={() => {
+            props.sockets[namespace].emit(SocketIOEvents.Typing, id);
+          }}
+          onKeyUp={() => {
+            props.sockets[namespace].emit(SocketIOEvents.StopTyping, id);
+          }}
         />
         <button
           className="messenger__conversation-card__submit-btn btn btn--filled"

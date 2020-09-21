@@ -154,6 +154,16 @@ export interface UpdateMessageAction {
   payload: MessageDoc;
 }
 
+export interface TypingAction {
+  type: ActionTypes.typing;
+  payload: string;
+}
+
+export interface StopTypingAction {
+  type: ActionTypes.stopTyping;
+  payload: string;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -182,7 +192,9 @@ export type Action =
   | AddNewChatroomAction
   | InsertMessageAction
   | UpdateMessageAction
-  | DeleteChatroomAction;
+  | DeleteChatroomAction
+  | TypingAction
+  | StopTypingAction;
 
 // Store State
 export interface StoreState {
@@ -288,4 +300,5 @@ export interface ChatroomDocClient {
   seller: UserDoc;
   messages: Record<string, MessageDoc>;
   lastMessage?: MessageDoc;
+  typing: boolean;
 }

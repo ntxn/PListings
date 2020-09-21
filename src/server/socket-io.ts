@@ -79,6 +79,16 @@ io.on('connection', socket => {
             .to(`${msg.roomId}`)
             .emit(SocketIOEvents.MessageReceived, message);
         });
+
+        socket.on(SocketIOEvents.Typing, (roomId: string) => {
+          namespace.to(roomId).emit(SocketIOEvents.Typing, { userId, roomId });
+        });
+
+        socket.on(SocketIOEvents.StopTyping, (roomId: string) => {
+          namespace
+            .to(roomId)
+            .emit(SocketIOEvents.StopTyping, { userId, roomId });
+        });
       });
 
       namespaces[namespaceName] = namespace;

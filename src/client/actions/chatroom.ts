@@ -8,6 +8,8 @@ import {
   DeleteChatroomAction,
   InsertMessageAction,
   UpdateMessageAction,
+  TypingAction,
+  StopTypingAction,
   ActionTypes,
   rejoinChatrooms,
   StoreState,
@@ -99,5 +101,19 @@ export const updateMessage = (message: MessageDoc): UpdateMessageAction => {
   return {
     type: ActionTypes.updateMessage,
     payload: message,
+  };
+};
+
+export const typing = (roomId: string): TypingAction => {
+  return {
+    type: ActionTypes.typing,
+    payload: roomId,
+  };
+};
+
+export const stopTyping = (roomId: string): StopTypingAction => {
+  return {
+    type: ActionTypes.stopTyping,
+    payload: roomId,
   };
 };
