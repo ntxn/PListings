@@ -39,6 +39,7 @@ export enum ActionTypes {
   fetchChatrooms,
   clearChatrooms,
   addNewChatroom,
+  deleteChatroom,
   insertMessage,
   updateMessage,
 }

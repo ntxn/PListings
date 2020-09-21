@@ -139,6 +139,11 @@ export interface AddNewChatroomAction {
   payload: ChatroomDocClient;
 }
 
+export interface DeleteChatroomAction {
+  type: ActionTypes.deleteChatroom;
+  payload: string;
+}
+
 export interface InsertMessageAction {
   type: ActionTypes.insertMessage;
   payload: MessageDoc;
@@ -176,7 +181,8 @@ export type Action =
   | ClearChatroomsAction
   | AddNewChatroomAction
   | InsertMessageAction
-  | UpdateMessageAction;
+  | UpdateMessageAction
+  | DeleteChatroomAction;
 
 // Store State
 export interface StoreState {

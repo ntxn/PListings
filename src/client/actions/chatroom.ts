@@ -5,6 +5,7 @@ import {
   FetchChatroomsAction,
   ClearChatroomsAction,
   AddNewChatroomAction,
+  DeleteChatroomAction,
   InsertMessageAction,
   UpdateMessageAction,
   ActionTypes,
@@ -13,6 +14,7 @@ import {
   ChatroomDocClient,
   createChatroomAndSendMessageByBuyer,
 } from '../utilities';
+import { AlertType, showAlert } from '../components/alert';
 import { ApiRoutes, ChatroomDoc, MessageDoc, UserDoc } from '../../common';
 
 /**
@@ -26,6 +28,27 @@ export const addNewChatroom = (
     type: ActionTypes.addNewChatroom,
     payload: chatroom,
   };
+};
+
+/**
+ * Delete chatroom with the provided Id from db and remove it from redux store
+ */
+export const deleteChatroom = (id: string) => async (
+  dispatch: Dispatch
+): Promise<void> => {
+  try {
+    await axios.delete(`${ApiRoutes.Chatrooms}/${id}`);
+
+    dispatch<DeleteChatroomAction>({
+      type: ActionTypes.deleteChatroom,
+      payload: id,
+    });
+
+    showAlert(AlertType.Success, 'Deleted conversation successfully');
+  } catch (err) {
+    console.log(err);
+    showAlert(AlertType.Error, 'Issue with deleting this conversation');
+  }
 };
 
 /**

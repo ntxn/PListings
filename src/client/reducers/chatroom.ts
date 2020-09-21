@@ -14,15 +14,19 @@ export const chatroomReducer = (
   let room: ChatroomDocClient;
 
   const copyRoomAndInsertMessage = (
-    roomId: string,
     action: InsertMessageAction | UpdateMessageAction
-  ): ChatroomDocClient => {
-    const chatroom = { ...state[roomId] };
+  ): [string, ChatroomDocClient] => {
+    const id = `${action.payload.roomId}`;
+
+    const chatroom = { ...state[id] };
     chatroom.messages = {
       ...chatroom.messages,
       [action.payload.id]: action.payload,
     };
-    return chatroom;
+
+    delete state[id];
+
+    return [id, chatroom];
   };
 
   switch (action.type) {
@@ -32,19 +36,20 @@ export const chatroomReducer = (
       return {};
     case ActionTypes.addNewChatroom:
       return { ...state, [action.payload.id]: action.payload };
+    case ActionTypes.deleteChatroom:
+      const rooms = { ...state };
+      delete rooms[action.payload];
+      return rooms;
     case ActionTypes.insertMessage:
-      roomId = `${action.payload.roomId}`;
-      room = copyRoomAndInsertMessage(roomId, action);
-
-      delete state[roomId];
+      [roomId, room] = copyRoomAndInsertMessage(action);
 
       // Set last message
       room.lastMessage = action.payload;
 
-      return { ...state, [roomId]: room };
+      return { [roomId]: room, ...state };
     case ActionTypes.updateMessage:
-      roomId = `${action.payload.roomId}`;
-      return { ...state, [roomId]: copyRoomAndInsertMessage(roomId, action) };
+      [roomId, room] = copyRoomAndInsertMessage(action);
+      return { [roomId]: room, ...state };
     default:
       return state;
   }

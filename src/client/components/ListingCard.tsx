@@ -12,7 +12,6 @@ import { showAlert, AlertType } from './alert';
 import { promptUserToLogInToSaveListing } from './Modal';
 import { StoreState } from '../utilities';
 import { unsaveListing, saveListing } from '../actions';
-import { BsTypeH3 } from 'react-icons/bs';
 
 interface ListingCardProps {
   // from Parent component
