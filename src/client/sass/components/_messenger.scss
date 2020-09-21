@@ -184,6 +184,12 @@
     }
 
     &__message {
+      &__sent-at {
+        font-size: 1rem;
+        font-weight: 300;
+        color: var(--color-grey-dark-1);
+      }
+
       &--left {
         display: flex;
         align-items: flex-end;
@@ -196,17 +202,20 @@
           @include message-content;
           background-color: var(--color-grey-light-1);
           margin-left: 1rem;
+          margin-right: 0.5rem;
         }
       }
 
       &--right {
         display: flex;
         justify-content: flex-end;
+        align-items: flex-end;
 
         &__content {
           @include message-content;
           background-color: var(--color-secondary-dark);
           color: var(--color-white);
+          margin-left: 0.5rem;
         }
       }
     }

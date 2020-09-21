@@ -6,7 +6,12 @@ import { MdDelete } from 'react-icons/md';
 import { deleteChatroom } from '../../actions';
 import { MessageDoc, SocketIOEvents, UserDoc } from '../../../common';
 import { Avatar } from '../UserAvatar';
-import { StoreState, ChatroomDocClient, getLocationStr } from '../../utilities';
+import {
+  StoreState,
+  ChatroomDocClient,
+  getLocationStr,
+  getDateTimeStr,
+} from '../../utilities';
 
 interface ConversationCardProps {
   // from parent component
@@ -78,6 +83,9 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
         <div className="messenger__conversation-card__message--left__content">
           {msg.content}
         </div>
+        <p className="messenger__conversation-card__message__sent-at">
+          {getDateTimeStr(msg.createdAt)}
+        </p>
       </li>
     );
   };
@@ -85,6 +93,9 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const renderSenderMessage = (msg: MessageDoc): JSX.Element => {
     return (
       <li className="messenger__conversation-card__message--right" key={msg.id}>
+        <p className="messenger__conversation-card__message__sent-at">
+          {getDateTimeStr(msg.createdAt)}
+        </p>
         <div className="messenger__conversation-card__message--right__content">
           {msg.content} - {msg.status}
         </div>

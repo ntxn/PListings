@@ -804,6 +804,10 @@ body {
         color: var(--color-grey-dark-3); }
       .messenger__conversation-card__recipient__info {
         margin-left: 0.8rem; }
+    .messenger__conversation-card__message__sent-at {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--color-grey-dark-1); }
     .messenger__conversation-card__message--left {
       display: flex;
       align-items: flex-end; }
@@ -813,23 +817,26 @@ body {
         font-size: 1.5rem;
         max-width: 50%;
         padding: 0.7rem 1.2rem;
-        border-radius: var(--border-radius-medium);
+        border-radius: var(--border-radius-small);
         margin: 0.1rem;
         line-height: 1.5;
         background-color: var(--color-grey-light-1);
-        margin-left: 1rem; }
+        margin-left: 1rem;
+        margin-right: 0.5rem; }
     .messenger__conversation-card__message--right {
       display: flex;
-      justify-content: flex-end; }
+      justify-content: flex-end;
+      align-items: flex-end; }
       .messenger__conversation-card__message--right__content {
         font-size: 1.5rem;
         max-width: 50%;
         padding: 0.7rem 1.2rem;
-        border-radius: var(--border-radius-medium);
+        border-radius: var(--border-radius-small);
         margin: 0.1rem;
         line-height: 1.5;
         background-color: var(--color-secondary-dark);
-        color: var(--color-white); }
+        color: var(--color-white);
+        margin-left: 0.5rem; }
     .messenger__conversation-card__form {
       width: 100%;
       position: absolute;
