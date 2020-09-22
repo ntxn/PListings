@@ -23,10 +23,11 @@ const getChatroomDocClient = (
   socket?: SocketIOClient.Socket
 ): ChatroomDocClient => {
   const messages: Record<string, MessageDoc> = {};
-  let lastMessage: MessageDoc | undefined = undefined;
   if (chatroom.messages && chatroom.messages.length > 0) {
-    lastMessage = chatroom.messages[chatroom.messages.length - 1];
     chatroom.messages.forEach(msg => {
+      if (!msg.id) msg.id = msg._id;
+      delete msg._id;
+
       messages[msg.id] = msg;
       if (msg.status === MessageStatus.Sent && socket)
         socket.emit(SocketIOEvents.MessageReceived, msg);
@@ -38,9 +39,9 @@ const getChatroomDocClient = (
     listing: chatroom.listing,
     buyer: chatroom.buyer,
     seller: chatroom.seller,
+    lastMessage: chatroom.lastMessage,
     messages,
     typing: false,
-    lastMessage,
   };
 };
 
