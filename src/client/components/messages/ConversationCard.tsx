@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, UIEvent, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
@@ -38,6 +38,41 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const namespace = `/${listing.id}`;
 
   const [inputContent, setInputContent] = useState('');
+  const [isBottom, setIsBottom] = useState<boolean>();
+  const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout>();
+
+  const scrollToBottom = (): void => {
+    const messages = document.getElementById('messages');
+    if (messages) {
+      messages.scrollIntoView(false);
+      setIsBottom(true);
+
+      // Emit all delivered message to be seen
+    }
+  };
+
+  const handleScroll = (e: UIEvent) => {
+    const body = e.target as HTMLElement;
+    setIsBottom(body.scrollHeight - body.scrollTop === body.clientHeight);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+
+    return () => {
+      setInputContent('');
+      if (typingTimer) clearTimeout(typingTimer);
+    };
+  }, [props.chatroom.id]);
+
+  useEffect(() => {
+    if (isBottom) scrollToBottom();
+  }, [props.chatroom.lastMessage]);
+
+  useEffect(() => {
+    const loader = document.getElementById('typingLoader');
+    if (loader && isBottom) scrollToBottom();
+  }, [props.chatroom.typing]);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -145,7 +180,7 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const renderMessages = (): JSX.Element => {
     const msgs = Object.values(messages);
     return (
-      <ul>
+      <ul id="messages">
         {msgs.map((msg, i) => {
           const lastMsg = i === msgs.length - 1;
           if (recipient.id == msg.sender)
@@ -156,13 +191,27 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
 
           return renderSenderMessage(msg);
         })}
+        {typing && (
+          <div
+            className="messenger__conversation-card__message--left"
+            id="typingLoader"
+          >
+            <Avatar useLink user={recipient} className="avatar--chat" />
+            <div className="messenger__conversation-card__message--left__content">
+              <SyncLoader color={'rgb(82, 82, 82)'} size={6} />
+            </div>
+          </div>
+        )}
       </ul>
     );
   };
 
   const renderBody = (): JSX.Element => {
     return (
-      <div className="messenger__conversation-card__body">
+      <div
+        className="messenger__conversation-card__body"
+        onScroll={handleScroll}
+      >
         <Link
           to={`/user/profile/${recipient.id}`}
           className="messenger__conversation-card__recipient"
@@ -176,14 +225,6 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
           </div>
         </Link>
         {renderMessages()}
-        {typing && (
-          <div className="messenger__conversation-card__message--left">
-            <Avatar useLink user={recipient} className="avatar--chat" />
-            <div className="messenger__conversation-card__message--left__content">
-              <SyncLoader color={'rgb(82, 82, 82)'} size={6} />
-            </div>
-          </div>
-        )}
       </div>
     );
   };
@@ -196,12 +237,17 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
           className="messenger__conversation-card__input"
           value={inputContent}
           placeholder="Type a message..."
-          onChange={e => setInputContent(e.target.value)}
-          onKeyPress={() => {
+          onChange={e => {
+            setInputContent(e.target.value);
+            if (typingTimer) clearTimeout(typingTimer);
+
             props.sockets[namespace].emit(SocketIOEvents.Typing, id);
-          }}
-          onKeyUp={() => {
-            props.sockets[namespace].emit(SocketIOEvents.StopTyping, id);
+
+            setTypingTimer(
+              setTimeout(() => {
+                props.sockets[namespace].emit(SocketIOEvents.StopTyping, id);
+              }, 1000)
+            );
           }}
         />
         <button
