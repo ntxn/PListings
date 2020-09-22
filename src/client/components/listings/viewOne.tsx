@@ -236,16 +236,9 @@ const _Listing = (props: ListingProps): JSX.Element => {
             (props.user.id != listing.owner.id && (
               <div className="listing__mini-chatbox u-margin-top-small">
                 {props.sockets[`/${listing.id}`] ? (
-                  <Link
-                    to={`/messages/${
-                      Object.values(props.chatrooms).filter(
-                        room => room.listing.id == listing.id
-                      )[0].id
-                    }`}
-                    className="listing__mini-chatbox__title"
-                  >
+                  <Link to="/messages" className="listing__mini-chatbox__title">
                     <AiOutlineMessage />
-                    <span>Go to Conversation</span>
+                    <span>View conversations</span>
                   </Link>
                 ) : (
                   <>
