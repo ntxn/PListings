@@ -14,6 +14,7 @@ export interface ChatroomDoc extends mongoose.Document {
   buyer: UserDoc;
   seller: UserDoc;
   messages: MessageDoc[];
+  lastMessage: MessageDoc;
   deletedByBuyer: boolean;
   deletedBySeller: boolean;
 }
@@ -68,17 +69,17 @@ chatroomSchema.virtual('messages', {
   localField: '_id',
 });
 
-const listingPopulatedOption = {
+export const listingPopulatedOption = {
   path: 'listing',
   select: 'id photos title price location',
 };
 
-const sellerPopulatedOption = {
+export const sellerPopulatedOption = {
   path: 'seller',
   select: 'id name photo location',
 };
 
-const buyerPopulatedOption = {
+export const buyerPopulatedOption = {
   path: 'buyer',
   select: 'id name photo location',
 };
@@ -98,8 +99,7 @@ chatroomSchema.pre(/^find/, function (next) {
     .populate(listingPopulatedOption)
     .populate(sellerPopulatedOption)
     .populate(buyerPopulatedOption)
-    .populate('messages')
-    .sort({ 'messages.updatedAt.0': 1 });
+    .populate('messages');
 
   next();
 });
