@@ -46,9 +46,11 @@
 
 @mixin message-content {
   font-size: 1.5rem;
+  font-weight: 300;
   max-width: 50%;
   padding: 0.7rem 1.2rem;
   border-radius: var(--border-radius-small);
   margin: 0.1rem;
   line-height: 1.5;
+  color: var(--color-black);
 }

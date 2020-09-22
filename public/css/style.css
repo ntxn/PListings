@@ -715,14 +715,14 @@ body {
         overflow: hidden; }
       .messenger__info-cards__item__recipient-name {
         font-size: 1.4rem;
-        font-weight: 500;
+        font-weight: 400;
         text-transform: capitalize;
         white-space: nowrap; }
       .messenger__info-cards__item__last-msg {
-        font-size: 1.2rem;
-        font-weight: 400;
+        font-size: 1.4rem;
+        font-weight: 300;
         white-space: nowrap;
-        color: var(--color-grey-dark-2); }
+        color: var(--color-black); }
       .messenger__info-cards__item__last-sent-at {
         font-size: 1.1rem;
         line-height: 1.1;
@@ -756,6 +756,7 @@ body {
         background-color: var(--color-grey-light-1); }
   .messenger__conversation-card {
     flex: 1;
+    overflow: hidden;
     height: 100%;
     position: relative; }
     .messenger__conversation-card__header {
@@ -767,11 +768,11 @@ body {
       margin: auto 1rem;
       background-color: transparent; }
     .messenger__conversation-card__listing {
-      width: 100%;
-      display: flex;
+      flex: 1;
       overflow: hidden;
       padding: 1rem;
-      transition: background-color 0.2s; }
+      transition: background-color 0.2s;
+      display: flex; }
       .messenger__conversation-card__listing:link, .messenger__conversation-card__listing:visited {
         text-decoration: none;
         color: var(--color-grey-dark-3); }
@@ -788,13 +789,14 @@ body {
           height: 100%;
           object-fit: cover;
           border-radius: var(--border-radius-xsmall); }
-      .messenger__conversation-card__listing > p {
+      .messenger__conversation-card__listing__details > p {
         white-space: nowrap; }
     .messenger__conversation-card__body {
       width: 100%;
       padding: 0 1rem;
       height: calc( 100% - 7rem - 5rem);
-      overflow: scroll; }
+      overflow: scroll;
+      scroll-behavior: smooth; }
     .messenger__conversation-card__recipient {
       display: flex;
       flex-direction: row;
@@ -820,11 +822,13 @@ body {
         margin-bottom: 0.5rem; }
       .messenger__conversation-card__message--left__content {
         font-size: 1.5rem;
+        font-weight: 300;
         max-width: 50%;
         padding: 0.7rem 1.2rem;
         border-radius: var(--border-radius-small);
         margin: 0.1rem;
         line-height: 1.5;
+        color: var(--color-black);
         background-color: var(--color-grey-light-1);
         margin-left: 1rem;
         margin-right: 0.5rem; }
@@ -834,11 +838,13 @@ body {
       align-items: flex-end; }
       .messenger__conversation-card__message--right__content {
         font-size: 1.5rem;
+        font-weight: 300;
         max-width: 50%;
         padding: 0.7rem 1.2rem;
         border-radius: var(--border-radius-small);
         margin: 0.1rem;
         line-height: 1.5;
+        color: var(--color-black);
         background-color: var(--color-secondary-dark);
         color: var(--color-white);
         margin-left: 0.5rem;
@@ -852,7 +858,7 @@ body {
       width: 100%;
       position: absolute;
       bottom: 0;
-      padding: 0 1rem;
+      padding: 0 1rem 0.5rem 1rem;
       display: flex; }
     .messenger__conversation-card__input {
       width: 100%;
@@ -861,7 +867,9 @@ body {
       color: var(--color-grey-dark-3);
       border-radius: var(--border-raidus-large);
       background-color: var(--color-grey-light-1);
-      padding: 1rem 1.5rem; }
+      padding: 1rem 1.8rem;
+      font-size: 1.4rem;
+      font-weight: 300; }
       .messenger__conversation-card__input:focus {
         outline: none;
         box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }
