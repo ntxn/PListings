@@ -1,3 +1,4 @@
+import 'core-js/stable';
 import { app } from './app';
 
 process.on('uncaughtException', (err: Error): void => {
