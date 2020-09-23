@@ -5,7 +5,11 @@ import { MdDelete } from 'react-icons/md';
 import { BsCheck, BsCheckAll } from 'react-icons/bs';
 import SyncLoader from 'react-spinners/SyncLoader';
 
-import { deleteChatroom } from '../../actions';
+import {
+  deleteChatroom,
+  clearUnreadMsgIdsByBuyer,
+  clearUnreadMsgIdsBySeller,
+} from '../../actions';
 import {
   MessageDoc,
   MessageStatus,
@@ -30,6 +34,8 @@ interface ConversationCardProps {
 
   // from dispatch
   deleteChatroom(id: string): void;
+  clearUnreadMsgIdsByBuyer(roomId: string): void;
+  clearUnreadMsgIdsBySeller(roomId: string): void;
 }
 
 const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
@@ -41,13 +47,30 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const [isBottom, setIsBottom] = useState<boolean>();
   const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout>();
 
-  const scrollToBottom = (): void => {
-    const messages = document.getElementById('messages');
-    if (messages) {
-      messages.scrollIntoView(false);
+  const scrollToBottom = (message?: MessageDoc): void => {
+    const messagesHTMLElement = document.getElementById('messages');
+    if (messagesHTMLElement) {
+      messagesHTMLElement.scrollIntoView(false);
       setIsBottom(true);
 
+      let unreadMsgIds = props.chatroom.unreadMsgIdsBySeller;
+      let clearUnreadMsgIds = props.clearUnreadMsgIdsBySeller;
+      if (props.user!.id == props.chatroom.buyer.id) {
+        unreadMsgIds = props.chatroom.unreadMsgIdsByBuyer;
+        clearUnreadMsgIds = props.clearUnreadMsgIdsByBuyer;
+      }
       // Emit all delivered message to be seen
+      if (message && props.user!.id != message.sender)
+        props.sockets[namespace].emit(SocketIOEvents.MessageSeen, message);
+      else if (unreadMsgIds.length > 0) {
+        unreadMsgIds.forEach(id => {
+          props.sockets[namespace].emit(
+            SocketIOEvents.MessageSeen,
+            messages[id]
+          );
+        });
+        clearUnreadMsgIds(id);
+      }
     }
   };
 
@@ -66,7 +89,9 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   }, [props.chatroom.id]);
 
   useEffect(() => {
-    if (isBottom) scrollToBottom();
+    if (isBottom) {
+      scrollToBottom(props.chatroom.lastMessage);
+    }
   }, [props.chatroom.lastMessage]);
 
   useEffect(() => {
@@ -274,6 +299,8 @@ const mapStateToProps = (state: StoreState) => {
   return { user: state.user, sockets: state.sockets };
 };
 
-export const ConversationCard = connect(mapStateToProps, { deleteChatroom })(
-  _ConversationCard
-);
+export const ConversationCard = connect(mapStateToProps, {
+  deleteChatroom,
+  clearUnreadMsgIdsByBuyer,
+  clearUnreadMsgIdsBySeller,
+})(_ConversationCard);

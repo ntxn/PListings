@@ -26,8 +26,23 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
       if (roomIds.length > 0) {
         if (id && roomIds.includes(id)) setChatroom(props.chatrooms[id]);
         else {
-          setChatroom(props.chatrooms[roomIds[0]]);
-          history.push(`/messages/${roomIds[0]}`);
+          let index = -1;
+          let room: ChatroomDocClient;
+          let unreadMsgIds: string[] = [];
+
+          do {
+            index++;
+            room = props.chatrooms[roomIds[index]];
+            unreadMsgIds =
+              props.user.id == room.buyer.id
+                ? room.unreadMsgIdsByBuyer
+                : room.unreadMsgIdsBySeller;
+          } while (room && unreadMsgIds.length > 0);
+
+          if (index < roomIds.length) {
+            setChatroom(props.chatrooms[roomIds[index]]);
+            history.push(`/messages/${roomIds[index]}`);
+          } else setChatroom(undefined);
         }
       } else {
         // no chat messages, display 'No conversation'
@@ -45,16 +60,25 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
           .filter(room => room.lastMessage)
           .map(room => {
             const { id, buyer, seller, listing, lastMessage } = room;
+            let recipient = seller;
+            let unreadMsgIds = room.unreadMsgIdsByBuyer;
+
+            if (props.user!.id === seller.id) {
+              recipient = buyer;
+              unreadMsgIds = room.unreadMsgIdsBySeller;
+            }
+
             return (
               <InfoCard
                 key={id}
                 listing={listing}
                 lastMsg={lastMessage!}
-                recipient={props.user!.id == buyer.id ? seller : buyer}
+                recipient={recipient}
                 onClick={() => {
                   setChatroom(room);
                   history.push(`/messages/${id}`);
                 }}
+                unread={unreadMsgIds.length > 0}
                 active={chatroom ? id == chatroom.id : false}
               />
             );
