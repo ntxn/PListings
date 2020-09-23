@@ -219,8 +219,12 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     msg: MessageDoc,
     showAvatar: boolean
   ): JSX.Element => {
+    const className = `messenger__conversation-card__message--left ${
+      showAvatar ? 'u-margin-bottom-small' : ''
+    }`;
+
     return (
-      <li className="messenger__conversation-card__message--left" key={msg.id}>
+      <li className={className} key={msg.id}>
         <Avatar
           useLink
           user={recipient}
@@ -234,7 +238,11 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     );
   };
 
-  const renderSenderMessage = (msg: MessageDoc): JSX.Element => {
+  const renderSenderMessage = (msg: MessageDoc, end: boolean): JSX.Element => {
+    const className = `messenger__conversation-card__message--right ${
+      end ? 'u-margin-bottom-small' : ''
+    }`;
+
     const getStatus = (): JSX.Element => {
       switch (msg.status) {
         case MessageStatus.Sent:
@@ -249,7 +257,7 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     };
 
     return (
-      <li className="messenger__conversation-card__message--right" key={msg.id}>
+      <li className={className} key={msg.id}>
         {formatDate(msg.createdAt, true)}
         <div className="messenger__conversation-card__message--right__content">
           {msg.content}
@@ -273,7 +281,10 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
               lastMsg || recipient.id != msgs[i + 1].sender
             );
 
-          return renderSenderMessage(msg);
+          return renderSenderMessage(
+            msg,
+            lastMsg || recipient.id == msgs[i + 1].sender
+          );
         })}
         {listing.sold && (
           <div className="messenger__conversation-card__sold-listing">
