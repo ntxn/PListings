@@ -48,6 +48,9 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const [isBottom, setIsBottom] = useState<boolean>();
   const [scrollToBottomBtn, setScrollToBottomBtn] = useState(false);
   const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout>();
+  const [typingTimeoutTimer, setTypingTimeoutTimer] = useState<
+    NodeJS.Timeout
+  >();
 
   // if there's unread messages, socket will emit those messages are read and reset the unread messages array
   const emitMsgReadEvent = (): void => {
@@ -124,7 +127,7 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
         '.messenger__conversation-card__body'
       );
       if (body) body.classList.remove(smoothClass);
-      if (typingTimer) clearTimeout(typingTimer);
+      if (typingTimeoutTimer) clearTimeout(typingTimeoutTimer);
     };
   }, [props.chatroom.id]);
 
@@ -286,12 +289,13 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
             lastMsg || recipient.id == msgs[i + 1].sender
           );
         })}
-        {listing.sold && (
+        {listing.sold && props.user!.id != seller.id && (
           <div className="messenger__conversation-card__sold-listing">
             <div className="messenger__conversation-card__sold-listing__card">
               <h3>Item sold</h3>
               <p className="sub-heading-tertiary u-margin-top-xxsmall">
-                Item has been sold to someone
+                This item has been sold. <br /> Search for similar items on
+                plistings.
               </p>
             </div>
             <div className="messenger__conversation-card__sold-listing__icon">
@@ -338,6 +342,14 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   };
 
   const renderFooter = (): JSX.Element => {
+    const setTypingTimeout = () => {
+      setTypingTimer(
+        setTimeout(() => {
+          props.sockets[namespace].emit(SocketIOEvents.StopTyping, id);
+        }, 1000)
+      );
+    };
+
     return (
       <form className="messenger__conversation-card__form" onSubmit={onSubmit}>
         <input
@@ -347,15 +359,21 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
           placeholder="Type a message..."
           onChange={e => {
             setInputContent(e.target.value);
-            if (typingTimer) clearTimeout(typingTimer);
+            if (typingTimer) {
+              clearTimeout(typingTimer);
+              setTypingTimeout();
 
-            props.sockets[namespace].emit(SocketIOEvents.Typing, id);
-
-            setTypingTimer(
-              setTimeout(() => {
-                props.sockets[namespace].emit(SocketIOEvents.StopTyping, id);
-              }, 1000)
-            );
+              if (typingTimeoutTimer) clearTimeout(typingTimeoutTimer);
+              setTypingTimeoutTimer(
+                setTimeout(() => {
+                  clearTimeout(typingTimer);
+                  setTypingTimer(undefined);
+                }, 1200)
+              );
+            } else {
+              props.sockets[namespace].emit(SocketIOEvents.Typing, id);
+              setTypingTimeout();
+            }
           }}
         />
         <button
