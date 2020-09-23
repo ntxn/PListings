@@ -2,7 +2,7 @@ import React, { FormEvent, UIEvent, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
-import { BsCheck, BsCheckAll, BsArrowDown } from 'react-icons/bs';
+import { BsCheck, BsCheckAll, BsArrowDown, BsInfoCircle } from 'react-icons/bs';
 import SyncLoader from 'react-spinners/SyncLoader';
 
 import {
@@ -148,25 +148,43 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     if (loader && isBottom) scrollToBottom();
   }, [props.chatroom.typing]);
 
+  const renderListingInfo = (): JSX.Element => {
+    return (
+      <>
+        <div className="messenger__conversation-card__listing__photo">
+          <img src={`/img/listings/${listing.photos[0]}`} />
+        </div>
+        <div className="messenger__conversation-card__listing__details">
+          <p className="u-margin-bottom-xxsmall heading-quaternary">
+            {listing.title}
+          </p>
+          <p className="sub-heading-quaternary">
+            ${listing.price} · {getLocationStr(listing.location)}
+          </p>
+        </div>
+      </>
+    );
+  };
+
   const renderHeader = (): JSX.Element => {
     return (
       <div className="messenger__conversation-card__header">
-        <Link
-          to={`/listings/${listing.id}`}
-          className="messenger__conversation-card__listing"
-        >
-          <div className="messenger__conversation-card__listing__photo">
-            <img src={`/img/listings/${listing.photos[0]}`} />
+        {listing.active && !listing.sold ? (
+          <Link
+            to={`/listings/${listing.id}`}
+            className="messenger__conversation-card__listing"
+          >
+            {renderListingInfo()}
+          </Link>
+        ) : (
+          <div
+            className="messenger__conversation-card__listing"
+            style={{ backgroundColor: 'transparent' }}
+          >
+            {renderListingInfo()}
           </div>
-          <div className="messenger__conversation-card__listing__details">
-            <p className="u-margin-bottom-xxsmall heading-quaternary">
-              {listing.title}
-            </p>
-            <p className="sub-heading-quaternary">
-              ${listing.price} · {getLocationStr(listing.location)}
-            </p>
-          </div>
-        </Link>
+        )}
+
         <div
           className="messenger__conversation-card__delete icon"
           onClick={() => props.deleteChatroom(id)}
@@ -257,6 +275,19 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
 
           return renderSenderMessage(msg);
         })}
+        {listing.sold && (
+          <div className="messenger__conversation-card__sold-listing">
+            <div className="messenger__conversation-card__sold-listing__card">
+              <h3>Item sold</h3>
+              <p className="sub-heading-tertiary u-margin-top-xxsmall">
+                Item has been sold to someone
+              </p>
+            </div>
+            <div className="messenger__conversation-card__sold-listing__icon">
+              <BsInfoCircle />
+            </div>
+          </div>
+        )}
         {typing && (
           <div
             className="messenger__conversation-card__message--left"
@@ -327,7 +358,6 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     );
   };
 
-  console.log(scrollToBottomBtn);
   return (
     <div className="messenger__conversation-card">
       {renderHeader()}

@@ -71,7 +71,7 @@ chatroomSchema.virtual('messages', {
 
 export const listingPopulatedOption = {
   path: 'listing',
-  select: 'id photos title price location',
+  select: 'id photos title price location active sold',
 };
 
 export const sellerPopulatedOption = {
