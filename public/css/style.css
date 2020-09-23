@@ -740,10 +740,11 @@ body {
           .messenger__info-cards__item__listing-photo img:hover {
             box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }
       .messenger__info-cards__item--unread .messenger__info-cards__item__recipient-name {
-        font-weight: 700; }
+        font-weight: 500;
+        color: var(--color-black); }
       .messenger__info-cards__item--unread .messenger__info-cards__item__last-msg {
-        font-weight: 700;
-        color: var(--color-grey-dark-3); }
+        font-weight: 500;
+        color: var(--color-black); }
       .messenger__info-cards__item--unread::before {
         content: '';
         width: 6px;
@@ -794,9 +795,10 @@ body {
     .messenger__conversation-card__body {
       width: 100%;
       padding: 0 1rem;
-      height: calc( 100% - 7rem - 5rem);
-      overflow: scroll;
-      scroll-behavior: smooth; }
+      height: calc(100% - 7rem - 5rem);
+      overflow: scroll; }
+      .messenger__conversation-card__body--smooth {
+        scroll-behavior: smooth; }
     .messenger__conversation-card__recipient {
       display: flex;
       flex-direction: row;
@@ -854,6 +856,27 @@ body {
         height: 1.2rem; }
       .messenger__conversation-card__message--right__status--seen {
         color: var(--color-secondary-dark); }
+    .messenger__conversation-card__scroll-to-bottom {
+      width: 100%;
+      position: absolute;
+      bottom: 5rem;
+      display: flex;
+      justify-content: center; }
+      .messenger__conversation-card__scroll-to-bottom__btn {
+        display: flex;
+        align-items: center;
+        font-size: 1.4rem;
+        color: var(--color-primary);
+        cursor: pointer;
+        padding: 0.6rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: var(--border-radius-medium); }
+        .messenger__conversation-card__scroll-to-bottom__btn svg {
+          width: 2rem;
+          height: 2rem;
+          margin-right: 0.5rem; }
+        .messenger__conversation-card__scroll-to-bottom__btn:hover {
+          color: var(--color-secondary-dark); }
     .messenger__conversation-card__form {
       width: 100%;
       position: absolute;

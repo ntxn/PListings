@@ -74,12 +74,13 @@
 
       &--unread {
         .messenger__info-cards__item__recipient-name {
-          font-weight: 700;
+          font-weight: 500;
+          color: var(--color-black);
         }
 
         .messenger__info-cards__item__last-msg {
-          font-weight: 700;
-          color: var(--color-grey-dark-3);
+          font-weight: 500;
+          color: var(--color-black);
         }
 
         &::before {
@@ -163,11 +164,12 @@
     &__body {
       width: 100%;
       padding: 0 1rem;
-      height: calc(
-        100% - 7rem - 5rem
-      ); // TODO: get listing's height and input form's height
+      height: calc(100% - 7rem - 5rem);
       overflow: scroll;
-      scroll-behavior: smooth;
+
+      &--smooth {
+        scroll-behavior: smooth;
+      }
     }
 
     &__recipient {
@@ -238,6 +240,38 @@
           &--seen {
             color: var(--color-secondary-dark);
           }
+        }
+      }
+    }
+
+    &__scroll-to-bottom {
+      width: 100%;
+      position: absolute;
+      bottom: 5rem;
+
+      display: flex;
+      justify-content: center;
+
+      &__btn {
+        display: flex;
+        align-items: center;
+
+        font-size: 1.4rem;
+        color: var(--color-primary);
+
+        cursor: pointer;
+        padding: 0.6rem 1.5rem;
+        background-color: rgba($color: #fff, $alpha: 0.7);
+        border-radius: var(--border-radius-medium);
+
+        svg {
+          width: 2rem;
+          height: 2rem;
+          margin-right: 0.5rem;
+        }
+
+        &:hover {
+          color: var(--color-secondary-dark);
         }
       }
     }

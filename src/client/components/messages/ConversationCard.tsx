@@ -2,7 +2,7 @@ import React, { FormEvent, UIEvent, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { MdDelete } from 'react-icons/md';
-import { BsCheck, BsCheckAll } from 'react-icons/bs';
+import { BsCheck, BsCheckAll, BsArrowDown } from 'react-icons/bs';
 import SyncLoader from 'react-spinners/SyncLoader';
 
 import {
@@ -42,63 +42,64 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const { listing, messages, buyer, seller, id, typing } = props.chatroom;
   const recipient = props.user!.id == buyer.id ? seller : buyer;
   const namespace = `/${listing.id}`;
+  const smoothClass = 'messenger__conversation-card__body--smooth';
 
   const [inputContent, setInputContent] = useState('');
   const [isBottom, setIsBottom] = useState<boolean>();
+  const [scrollToBottomBtn, setScrollToBottomBtn] = useState(false);
   const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout>();
 
-  const scrollToBottom = (message?: MessageDoc): void => {
-    const messagesHTMLElement = document.getElementById('messages');
+  // if there's unread messages, socket will emit those messages are read and reset the unread messages array
+  const emitMsgReadEvent = (): void => {
+    let unreadMsgIds = props.chatroom.unreadMsgIdsBySeller;
+    let clearUnreadMsgIds = props.clearUnreadMsgIdsBySeller;
+    if (props.user!.id == props.chatroom.buyer.id) {
+      unreadMsgIds = props.chatroom.unreadMsgIdsByBuyer;
+      clearUnreadMsgIds = props.clearUnreadMsgIdsByBuyer;
+    }
+
+    if (unreadMsgIds.length > 0) {
+      unreadMsgIds.forEach(id => {
+        props.sockets[namespace].emit(SocketIOEvents.MessageSeen, messages[id]);
+      });
+      clearUnreadMsgIds(id);
+    }
+  };
+
+  // scroll the body down to the latest messages
+  const scrollToBottom = (smooth?: boolean): void => {
+    const messagesHTMLElement = document.querySelector(
+      '.messenger__conversation-card__messages'
+    );
+
     if (messagesHTMLElement) {
+      if (smooth) {
+        const body = document.querySelector(
+          '.messenger__conversation-card__body'
+        );
+        if (body) body.classList.add(smoothClass);
+      }
+
       messagesHTMLElement.scrollIntoView(false);
       setIsBottom(true);
-
-      let unreadMsgIds = props.chatroom.unreadMsgIdsBySeller;
-      let clearUnreadMsgIds = props.clearUnreadMsgIdsBySeller;
-      if (props.user!.id == props.chatroom.buyer.id) {
-        unreadMsgIds = props.chatroom.unreadMsgIdsByBuyer;
-        clearUnreadMsgIds = props.clearUnreadMsgIdsByBuyer;
-      }
-      // Emit all delivered message to be seen
-      if (message && props.user!.id != message.sender)
-        props.sockets[namespace].emit(SocketIOEvents.MessageSeen, message);
-      else if (unreadMsgIds.length > 0) {
-        unreadMsgIds.forEach(id => {
-          props.sockets[namespace].emit(
-            SocketIOEvents.MessageSeen,
-            messages[id]
-          );
-        });
-        clearUnreadMsgIds(id);
-      }
     }
   };
 
+  // Function to handle scrolling on the body, signalling if it reaches the bottom.
+  // If it is at the bottom and there's unread messages, it'll send out message read signal
   const handleScroll = (e: UIEvent) => {
     const body = e.target as HTMLElement;
-    setIsBottom(body.scrollHeight - body.scrollTop === body.clientHeight);
+    const bottom = body.scrollHeight - body.scrollTop === body.clientHeight;
+    setIsBottom(bottom);
+
+    if (bottom) {
+      emitMsgReadEvent();
+      setScrollToBottomBtn(false);
+    }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-
-    return () => {
-      setInputContent('');
-      if (typingTimer) clearTimeout(typingTimer);
-    };
-  }, [props.chatroom.id]);
-
-  useEffect(() => {
-    if (isBottom) {
-      scrollToBottom(props.chatroom.lastMessage);
-    }
-  }, [props.chatroom.lastMessage]);
-
-  useEffect(() => {
-    const loader = document.getElementById('typingLoader');
-    if (loader && isBottom) scrollToBottom();
-  }, [props.chatroom.typing]);
-
+  // Function to handle submiting the messaging input form
+  // It'll emit Message event with the message and reset the input form
   const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
@@ -106,6 +107,46 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
 
     setInputContent('');
   };
+
+  const onClickScrollToBottomBtn = () => {
+    scrollToBottom(true);
+    setScrollToBottomBtn(false);
+  };
+
+  // When ConversationCard receive a new chatroom Id, it'll scroll to bottom and send msg read signal if needed
+  useEffect(() => {
+    scrollToBottom();
+    emitMsgReadEvent();
+
+    return () => {
+      setInputContent('');
+      const body = document.querySelector(
+        '.messenger__conversation-card__body'
+      );
+      if (body) body.classList.remove(smoothClass);
+      if (typingTimer) clearTimeout(typingTimer);
+    };
+  }, [props.chatroom.id]);
+
+  // When there's a new msg received, if the user's view is at the bottom, then scroll down to the latest msg, and send msg read event
+  // if not, display a button to let user know there's a new message
+  useEffect(() => {
+    const message = props.chatroom.lastMessage;
+    const isRecipient = message && props.user!.id != message.sender;
+    const unseenMsg = message && message.status !== MessageStatus.Seen;
+
+    if (isBottom) {
+      scrollToBottom();
+      if (isRecipient && unseenMsg)
+        props.sockets[namespace].emit(SocketIOEvents.MessageSeen, message);
+    } else if (isRecipient && unseenMsg) setScrollToBottomBtn(true);
+  }, [props.chatroom.lastMessage]);
+
+  // if user's view is at the bottom and typing loader is displayed, scroll to the bottom so they can see it
+  useEffect(() => {
+    const loader = document.getElementById('typingLoader');
+    if (loader && isBottom) scrollToBottom();
+  }, [props.chatroom.typing]);
 
   const renderHeader = (): JSX.Element => {
     return (
@@ -205,7 +246,7 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const renderMessages = (): JSX.Element => {
     const msgs = Object.values(messages);
     return (
-      <ul id="messages">
+      <ul className="messenger__conversation-card__messages">
         {msgs.map((msg, i) => {
           const lastMsg = i === msgs.length - 1;
           if (recipient.id == msg.sender)
@@ -286,10 +327,22 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     );
   };
 
+  console.log(scrollToBottomBtn);
   return (
     <div className="messenger__conversation-card">
       {renderHeader()}
       {renderBody()}
+      {scrollToBottomBtn && (
+        <div
+          className="messenger__conversation-card__scroll-to-bottom"
+          onClick={onClickScrollToBottomBtn}
+        >
+          <div className="messenger__conversation-card__scroll-to-bottom__btn">
+            <BsArrowDown />
+            <span>View new messages</span>
+          </div>
+        </div>
+      )}
       {renderFooter()}
     </div>
   );
