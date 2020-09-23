@@ -154,6 +154,21 @@ export interface UpdateMessageAction {
   payload: MessageDoc;
 }
 
+export interface AddUnreadMsgIdAction {
+  type: ActionTypes.addUnreadMsgId;
+  payload: MessageDoc;
+}
+
+export interface ClearUnreadMsgIdsByBuyerAction {
+  type: ActionTypes.clearUnreadMsgIdsByBuyer;
+  payload: string;
+}
+
+export interface ClearUnreadMsgIdsBySellerAction {
+  type: ActionTypes.clearUnreadMsgIdsBySeller;
+  payload: string;
+}
+
 export interface TypingAction {
   type: ActionTypes.typing;
   payload: string;
@@ -194,7 +209,10 @@ export type Action =
   | UpdateMessageAction
   | DeleteChatroomAction
   | TypingAction
-  | StopTypingAction;
+  | StopTypingAction
+  | ClearUnreadMsgIdsByBuyerAction
+  | ClearUnreadMsgIdsBySellerAction
+  | AddUnreadMsgIdAction;
 
 // Store State
 export interface StoreState {
@@ -301,4 +319,6 @@ export interface ChatroomDocClient {
   messages: Record<string, MessageDoc>;
   lastMessage?: MessageDoc;
   typing: boolean;
+  unreadMsgIdsByBuyer: string[];
+  unreadMsgIdsBySeller: string[];
 }

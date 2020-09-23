@@ -42,6 +42,9 @@ export enum ActionTypes {
   deleteChatroom,
   insertMessage,
   updateMessage,
+  addUnreadMsgId,
+  clearUnreadMsgIdsByBuyer,
+  clearUnreadMsgIdsBySeller,
   typing,
   stopTyping,
 }

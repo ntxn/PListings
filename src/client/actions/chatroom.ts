@@ -8,6 +8,9 @@ import {
   DeleteChatroomAction,
   InsertMessageAction,
   UpdateMessageAction,
+  ClearUnreadMsgIdsByBuyerAction,
+  ClearUnreadMsgIdsBySellerAction,
+  AddUnreadMsgIdAction,
   TypingAction,
   StopTypingAction,
   ActionTypes,
@@ -100,6 +103,31 @@ export const insertMessage = (message: MessageDoc): InsertMessageAction => {
 export const updateMessage = (message: MessageDoc): UpdateMessageAction => {
   return {
     type: ActionTypes.updateMessage,
+    payload: message,
+  };
+};
+
+export const clearUnreadMsgIdsByBuyer = (roomId: string) => (
+  dispatch: Dispatch
+): void => {
+  dispatch<ClearUnreadMsgIdsByBuyerAction>({
+    type: ActionTypes.clearUnreadMsgIdsByBuyer,
+    payload: roomId,
+  });
+};
+
+export const clearUnreadMsgIdsBySeller = (roomId: string) => (
+  dispatch: Dispatch
+): void => {
+  dispatch<ClearUnreadMsgIdsBySellerAction>({
+    type: ActionTypes.clearUnreadMsgIdsBySeller,
+    payload: roomId,
+  });
+};
+
+export const addUnreadMsgId = (message: MessageDoc): AddUnreadMsgIdAction => {
+  return {
+    type: ActionTypes.addUnreadMsgId,
     payload: message,
   };
 };

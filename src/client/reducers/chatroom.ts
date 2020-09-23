@@ -13,7 +13,7 @@ export const chatroomReducer = (
   let roomId: string;
   let room: ChatroomDocClient;
 
-  const copyRoomAndInsertMessage = (
+  const copyRoomAndChangeMessages = (
     action: InsertMessageAction | UpdateMessageAction
   ): [string, ChatroomDocClient] => {
     const id = `${action.payload.roomId}`;
@@ -23,8 +23,6 @@ export const chatroomReducer = (
       ...chatroom.messages,
       [action.payload.id]: action.payload,
     };
-
-    delete state[id];
 
     return [id, chatroom];
   };
@@ -41,15 +39,31 @@ export const chatroomReducer = (
       delete rooms[action.payload];
       return rooms;
     case ActionTypes.insertMessage:
-      [roomId, room] = copyRoomAndInsertMessage(action);
+      [roomId, room] = copyRoomAndChangeMessages(action);
+      delete state[roomId];
 
       // Set last message
       room.lastMessage = action.payload;
 
       return { [roomId]: room, ...state };
     case ActionTypes.updateMessage:
-      [roomId, room] = copyRoomAndInsertMessage(action);
-      return { [roomId]: room, ...state };
+      [roomId, room] = copyRoomAndChangeMessages(action);
+      return { ...state, [roomId]: room };
+    case ActionTypes.addUnreadMsgId:
+      const msg = action.payload;
+      roomId = (msg.roomId as unknown) as string;
+      room = { ...state[roomId] };
+      if (msg.sender == room.buyer.id) room.unreadMsgIdsBySeller.push(msg.id);
+      else room.unreadMsgIdsByBuyer.push(msg.id);
+      return { ...state, [roomId]: room };
+    case ActionTypes.clearUnreadMsgIdsByBuyer:
+      room = { ...state[action.payload] };
+      room.unreadMsgIdsByBuyer = [];
+      return { ...state, [action.payload]: room };
+    case ActionTypes.clearUnreadMsgIdsBySeller:
+      room = { ...state[action.payload] };
+      room.unreadMsgIdsBySeller = [];
+      return { ...state, [action.payload]: room };
     case ActionTypes.typing:
       room = { ...state[action.payload] };
       room.typing = true;
