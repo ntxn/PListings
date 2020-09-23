@@ -9,4 +9,5 @@ export enum SocketIOEvents {
   Message = 'Message',
   MessageSent = 'Message sent',
   MessageReceived = 'Message received',
+  MessageSeen = 'Message seen',
 }

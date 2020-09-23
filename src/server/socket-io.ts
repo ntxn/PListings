@@ -69,15 +69,25 @@ io.on('connection', socket => {
         socket.on(SocketIOEvents.MessageReceived, async (msg: MessageDoc) => {
           const message = await Message.findByIdAndUpdate(
             msg.id,
-            {
-              status: MessageStatus.Delivered,
-            },
+            { status: MessageStatus.Delivered },
             { new: true }
           );
 
           namespace
             .to(`${msg.roomId}`)
             .emit(SocketIOEvents.MessageReceived, message);
+        });
+
+        socket.on(SocketIOEvents.MessageSeen, async (msg: MessageDoc) => {
+          const message = await Message.findByIdAndUpdate(
+            msg.id,
+            { status: MessageStatus.Seen },
+            { new: true }
+          );
+
+          namespace
+            .to(`${msg.roomId}`)
+            .emit(SocketIOEvents.MessageSeen, message);
         });
 
         socket.on(SocketIOEvents.Typing, (roomId: string) => {

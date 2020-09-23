@@ -15,6 +15,7 @@ import {
   updateMessage,
   typing,
   stopTyping,
+  addUnreadMsgId,
 } from '../actions';
 import { StoreState, ChatroomDocClient } from './interfaces';
 
@@ -23,6 +24,8 @@ const getChatroomDocClient = (
   socket?: SocketIOClient.Socket
 ): ChatroomDocClient => {
   const messages: Record<string, MessageDoc> = {};
+  const unreadMsgIdsBySeller: string[] = [];
+  const unreadMsgIdsByBuyer: string[] = [];
   if (chatroom.messages && chatroom.messages.length > 0) {
     chatroom.messages.forEach(msg => {
       if (!msg.id) msg.id = msg._id;
@@ -31,6 +34,10 @@ const getChatroomDocClient = (
       messages[msg.id] = msg;
       if (msg.status === MessageStatus.Sent && socket)
         socket.emit(SocketIOEvents.MessageReceived, msg);
+      else if (msg.status === MessageStatus.Delivered) {
+        if (chatroom.buyer.id == msg.sender) unreadMsgIdsBySeller.push(msg.id);
+        else unreadMsgIdsByBuyer.push(msg.id);
+      }
     });
   }
 
@@ -40,6 +47,8 @@ const getChatroomDocClient = (
     buyer: chatroom.buyer,
     seller: chatroom.seller,
     lastMessage: chatroom.lastMessage,
+    unreadMsgIdsByBuyer,
+    unreadMsgIdsBySeller,
     messages,
     typing: false,
   };
@@ -81,6 +90,13 @@ const initializeNamespaceSocket = (
 
   socket.on(SocketIOEvents.MessageReceived, (message: MessageDoc) => {
     // update this message with the one saved before
+    dispatch(updateMessage(message));
+
+    // update the unreadMsgIds with this new message
+    dispatch(addUnreadMsgId(message));
+  });
+
+  socket.on(SocketIOEvents.MessageSeen, (message: MessageDoc) => {
     dispatch(updateMessage(message));
   });
 
