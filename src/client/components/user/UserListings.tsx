@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 
 import { UserPageLayout, NavItem } from './UserPageLayout';
-import { AuthRequired } from '../AuthRequired';
-import { StoreState, calcDistanceBetweenTwoPoints } from '../../utilities';
+import { calcDistanceBetweenTwoPoints } from '../../utilities';
 import { Loader } from '../Modal';
 import { ListingCardPublic, ListingCardPrivate } from '../ListingCard';
 import {
@@ -16,7 +15,7 @@ import {
 import { showAlert, AlertType } from '../alert';
 
 interface UserListingsProps {
-  user: UserDoc | null;
+  user: UserDoc;
 }
 
 const _UserListings = (props: UserListingsProps): JSX.Element => {
@@ -99,7 +98,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
       case MyListingsTypes.Saved:
         element = listings[MyListingsTypes.Saved].map(listing => {
           const [lng2, lat2] = listing.location.coordinates;
-          const [lng1, lat1] = props.user!.location.coordinates;
+          const [lng1, lat1] = props.user.location.coordinates;
           return (
             <ListingCardPublic
               key={listing.id}
@@ -186,23 +185,15 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
 
   return (
     <>
-      {props.user ? (
-        <UserPageLayout
-          header={renderHeader()}
-          body={renderListings()}
-          navList={navList}
-          active={MyListingsTypes.Selling}
-        />
-      ) : (
-        <AuthRequired route="Your listings" />
-      )}
+      <UserPageLayout
+        header={renderHeader()}
+        body={renderListings()}
+        navList={navList}
+        active={MyListingsTypes.Selling}
+      />
       {showLoader && <Loader />}
     </>
   );
 };
 
-const mapStateToProps = (state: StoreState) => {
-  return { user: state.user };
-};
-
-export const UserListings = connect(mapStateToProps)(_UserListings);
+export const UserListings = connect(null)(_UserListings);

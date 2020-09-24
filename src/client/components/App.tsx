@@ -7,7 +7,7 @@ import { fetchCurrentUser, getLocationByIP } from '../actions';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { NotFound } from './NotFound';
-import { SignUp, LogIn } from './auth';
+import { withAuth, SignUp, LogIn } from './auth';
 import { AccountSettings, UserListings, Profile } from './user';
 import { NewListing, EditListing, Listings, Listing } from './listings';
 import { Messenger } from './messages';
@@ -31,20 +31,44 @@ const _App = (props: AppProps): JSX.Element => {
           <div className="main">
             <Switch>
               <Route path="/" exact component={Listings} />
-              <Route path="/auth/SignUp" exact component={SignUp} />
-              <Route path="/auth/LogIn" exact component={LogIn} />
-              <Route path="/messages" exact component={Messenger} />
-              <Route path="/messages/:id" exact component={Messenger} />
-              <Route path="/user/listings" exact component={UserListings} />
+              <Route
+                path="/auth/SignUp"
+                exact
+                component={withAuth(SignUp, true)}
+              />
+              <Route
+                path="/auth/LogIn"
+                exact
+                component={withAuth(LogIn, true)}
+              />
+              <Route path="/messages" exact component={withAuth(Messenger)} />
+              <Route
+                path="/messages/:id"
+                exact
+                component={withAuth(Messenger)}
+              />
+              <Route
+                path="/user/listings"
+                exact
+                component={withAuth(UserListings)}
+              />
               <Route
                 path="/user/account-settings"
                 exact
-                component={AccountSettings}
+                component={withAuth(AccountSettings)}
               />
               <Route path="/user/profile/:id" exact component={Profile} />
               <Route path="/listings" exact component={Listings} />
-              <Route path="/listings/create" exact component={NewListing} />
-              <Route path="/listings/edit/:id" exact component={EditListing} />
+              <Route
+                path="/listings/create"
+                exact
+                component={withAuth(NewListing)}
+              />
+              <Route
+                path="/listings/edit/:id"
+                exact
+                component={withAuth(EditListing)}
+              />
               <Route path="/listings/:id" exact component={Listing} />
               <Route component={NotFound} />
             </Switch>

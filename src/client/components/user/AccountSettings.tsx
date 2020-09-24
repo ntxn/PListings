@@ -4,25 +4,15 @@ import { FiMenu } from 'react-icons/fi';
 import { MdPersonPin, MdNotifications } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
 
-import {
-  StoreState,
-  UpdatePasswordAttrs,
-  formFieldValues,
-} from '../../utilities';
+import { UpdatePasswordAttrs, formFieldValues } from '../../utilities';
 import { UserDoc } from '../../../common';
-import { AuthRequired } from '../AuthRequired';
 import { UpdatePasswordForm, UpdateProfileForm } from '../forms';
 import { updatePassword } from '../../actions';
 
-interface StateProps {
-  user: UserDoc | null;
-}
-
-interface DispatchProps {
+interface AccountSettingsProps {
+  user: UserDoc;
   updatePassword(formValue: UpdatePasswordAttrs): void;
 }
-
-type AccountSettingsProps = StateProps & DispatchProps;
 
 enum FormIds {
   profile = 'update-profile-form',
@@ -85,55 +75,39 @@ const _AccountSettings = (props: AccountSettingsProps): JSX.Element => {
     );
   };
 
-  const renderSettings = (): JSX.Element => {
-    return (
-      <div className="settings">
-        <div className="settings__dropdown">
-          <FiMenu className="settings__dropdown__btn" />
-          <div className="settings__dropdown__content">
-            <div
-              className="settings__dropdown__option settings__dropdown__option__active"
-              onClick={() => showForm(FormIds.profile)}
-            >
-              <MdPersonPin />
-              <span>Profile</span>
-            </div>
-            <div
-              className="settings__dropdown__option"
-              onClick={() => showForm(FormIds.password)}
-            >
-              <RiLockPasswordLine />
-              <span>Password</span>
-            </div>
-            <div className="settings__dropdown__option">
-              <MdNotifications />
-              <span>Notifications</span>
-            </div>
+  return (
+    <div className="settings">
+      <div className="settings__dropdown">
+        <FiMenu className="settings__dropdown__btn" />
+        <div className="settings__dropdown__content">
+          <div
+            className="settings__dropdown__option settings__dropdown__option__active"
+            onClick={() => showForm(FormIds.profile)}
+          >
+            <MdPersonPin />
+            <span>Profile</span>
+          </div>
+          <div
+            className="settings__dropdown__option"
+            onClick={() => showForm(FormIds.password)}
+          >
+            <RiLockPasswordLine />
+            <span>Password</span>
+          </div>
+          <div className="settings__dropdown__option">
+            <MdNotifications />
+            <span>Notifications</span>
           </div>
         </div>
-        <div className="settings__content">
-          {renderUpdateProfileForm()}
-          {renderUpdatePasswordForm()}
-        </div>
       </div>
-    );
-  };
-
-  return (
-    <>
-      {props.user ? (
-        renderSettings()
-      ) : (
-        <AuthRequired route="Account Settings" />
-      )}
-    </>
+      <div className="settings__content">
+        {renderUpdateProfileForm()}
+        {renderUpdatePasswordForm()}
+      </div>
+    </div>
   );
 };
 
-const mapStateToProps = (state: StoreState): StateProps => {
-  return { user: state.user };
-};
-
-export const AccountSettings = connect(mapStateToProps, {
-  updatePassword,
-})(_AccountSettings);
+export const AccountSettings = connect(null, { updatePassword })(
+  _AccountSettings
+);

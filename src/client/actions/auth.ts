@@ -45,27 +45,35 @@ export const fetchCurrentUser = () => async (
   }
 };
 
-export const signUp = (formValues: UserAttrs): FunctionalAction<SignUpAction> =>
+export const signUp = (
+  formValues: UserAttrs,
+  nextRoute = '/'
+): FunctionalAction<SignUpAction> =>
   catchSubmissionError(async (dispatch, getState) => {
     const { data } = await axios.post(ApiRoutes.SignUp, {
       ...formValues,
       location: getState!().currentLocation,
     });
 
+    history.push(nextRoute);
+
     dispatch({
       type: ActionTypes.signUp,
       payload: data.data,
     });
-
-    history.push('/');
   });
 
-export const logIn = (formValue: {
-  email: string;
-  password: string;
-}): ((dispatch: Dispatch, getState: () => StoreState) => Promise<void>) =>
+export const logIn = (
+  formValue: {
+    email: string;
+    password: string;
+  },
+  nextRoute = '/'
+): ((dispatch: Dispatch, getState: () => StoreState) => Promise<void>) =>
   catchSubmissionError(async (dispatch, getState) => {
     const { data } = await axios.post(ApiRoutes.LogIn, formValue);
+
+    history.push(nextRoute);
 
     dispatch<LogInAction>({
       type: ActionTypes.logIn,
@@ -77,7 +85,6 @@ export const logIn = (formValue: {
     await fetchChatrooms(dispatch, reduxStore, data.data);
 
     showAlert(AlertType.Success, 'Logged in successfully');
-    history.push('/');
   });
 
 export const logOut = (nextRoute = '/') => async (
