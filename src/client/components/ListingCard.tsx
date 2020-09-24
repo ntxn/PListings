@@ -17,6 +17,7 @@ interface ListingCardProps {
   // from Parent component
   listing: ListingDoc;
   renderInfoContent(): JSX.Element;
+  replaceListing(): void;
 
   // Props for public card
   showSavedBtn?: boolean;
@@ -84,7 +85,10 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
     return (
       <>
         {props.user && props.user.id === props.listing.owner.id && (
-          <Link to={`/listings/edit/${props.listing.id}`}>
+          <Link
+            to={`/listings/edit/${props.listing.id}`}
+            onClick={props.replaceListing}
+          >
             <div className="listing-card__icon-btn listing-card__icon-btn--edit">
               <FaEdit title="Edit your listing" />
             </div>
@@ -123,6 +127,7 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
             backgroundSize="cover"
             bordered
             squared
+            onClick={props.replaceListing}
           />
         )}
       </div>
@@ -155,6 +160,7 @@ interface ListingCardPublicProps {
   listing: ListingDoc;
   distanceDiff: number;
   saved: boolean;
+  replaceListing(): void;
   clickable?: boolean;
 }
 
@@ -171,6 +177,7 @@ export const ListingCardPublic = (
           <Link
             to={`/listings/${props.listing.id}`}
             className="listing-card__info__title heading-tertiary u-margin-top-xxsmall"
+            onClick={props.replaceListing}
           >
             {props.listing.title}
           </Link>
@@ -193,6 +200,7 @@ export const ListingCardPublic = (
       showSavedBtn={props.clickable}
       saved={props.saved}
       clickable={props.clickable}
+      replaceListing={props.replaceListing}
     />
   );
 };
@@ -203,6 +211,7 @@ interface ListingCardPrivateProps {
   btnText: string;
   btnAction(): void;
   onDelete(): void;
+  replaceListing(): void;
 }
 
 export const ListingCardPrivate = (
@@ -214,6 +223,7 @@ export const ListingCardPrivate = (
         <Link
           to={`/listings/${props.listing.id}`}
           className="listing-card__info__title heading-quaternary"
+          onClick={props.replaceListing}
         >
           {props.listing.title}
         </Link>
@@ -236,6 +246,7 @@ export const ListingCardPrivate = (
       showEditBtn={props.showEditBtn ? true : false}
       showDeleteBtn
       onDelete={props.onDelete}
+      replaceListing={props.replaceListing}
     />
   );
 };

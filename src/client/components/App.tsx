@@ -11,6 +11,7 @@ import { withAuth, SignUp, LogIn } from './auth';
 import { AccountSettings, UserListings, Profile } from './user';
 import { NewListing, EditListing, Listings, Listing } from './listings';
 import { Messenger } from './messages';
+import { withLoadingData, DataType } from '../utilities';
 
 interface AppProps {
   fetchCurrentUser(): Promise<void>;
@@ -67,9 +68,16 @@ const _App = (props: AppProps): JSX.Element => {
               <Route
                 path="/listings/edit/:id"
                 exact
-                component={withAuth(EditListing)}
+                component={withLoadingData(
+                  withAuth(EditListing),
+                  DataType.Listing
+                )}
               />
-              <Route path="/listings/:id" exact component={Listing} />
+              <Route
+                path="/listings/:id"
+                exact
+                component={withLoadingData(Listing, DataType.Listing)}
+              />
               <Route component={NotFound} />
             </Switch>
           </div>

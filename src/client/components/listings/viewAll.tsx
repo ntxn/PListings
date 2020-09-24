@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
-import { fetchListings, clearListings } from '../../actions';
+import { fetchListings, clearListings, replaceListing } from '../../actions';
 import { ListingCardPublic } from '../ListingCard';
 import { Loader } from '../Modal';
 import {
@@ -19,6 +19,7 @@ interface StateProps {
   listings: ListingDoc[];
   user: UserDoc | null;
   savedListingIds: Record<string, string>;
+  replaceListing(listing: ListingDoc): void;
 }
 
 interface DispatchProps {
@@ -90,6 +91,7 @@ const AllListings = (props: AllListingsProps): JSX.Element => {
                 lat2,
                 lng2
               )}
+              replaceListing={() => props.replaceListing(listing)}
             />
           );
         })}
@@ -111,7 +113,5 @@ const mapStateToProps = (state: StoreState) => {
 export const Listings = connect(mapStateToProps, {
   fetchListings,
   clearListings,
-})(
-  //@ts-ignore
-  AllListings
-);
+  replaceListing,
+})(AllListings);

@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { history } from '../../history';
-import { UserDoc } from '../../../common';
+import { UserDoc, ListingDoc } from '../../../common';
 import { StoreState, ChatroomDocClient } from '../../utilities';
 import { InfoCard } from './InfoCard';
 import { ConversationCard } from './ConversationCard';
+import { replaceListing } from '../../actions';
 
 interface MessengerProps {
   user: UserDoc;
   chatrooms: Record<string, ChatroomDocClient>;
+
+  replaceListing(listing: ListingDoc): void;
 
   match: { params: { id?: string } };
 }
@@ -77,6 +80,7 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
                 }}
                 unread={unreadMsgIds.length > 0}
                 active={chatroom ? id == chatroom.id : false}
+                replaceListing={() => props.replaceListing(listing)}
               />
             );
           })}
@@ -96,4 +100,6 @@ const mapStateToProps = (state: StoreState) => {
   return { chatrooms: state.chatrooms };
 };
 
-export const Messenger = connect(mapStateToProps)(_Messenger);
+export const Messenger = connect(mapStateToProps, { replaceListing })(
+  _Messenger
+);

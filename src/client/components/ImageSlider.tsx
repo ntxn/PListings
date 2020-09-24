@@ -12,6 +12,7 @@ interface ImageSliderProps {
   autoPlay?: boolean;
   autoPlayInterval?: number;
   linkTo?: string;
+  onClick?(): void;
   backgroundSize?: string;
   bordered?: boolean;
   squared?: boolean;
@@ -284,7 +285,9 @@ export const ImageSlider = (props: ImageSliderProps): JSX.Element => {
          * otherwise, render the content by itself
          */}
         {props.linkTo ? (
-          <Link to={props.linkTo}>{renderImageSliderContent()}</Link>
+          <Link to={props.linkTo} onClick={props.onClick}>
+            {renderImageSliderContent()}
+          </Link>
         ) : (
           renderImageSliderContent()
         )}

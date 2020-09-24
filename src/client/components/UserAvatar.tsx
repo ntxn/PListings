@@ -33,7 +33,13 @@ export const Avatar = (props: AvatarProps): JSX.Element => {
   return (
     <>
       {props.useLink ? (
-        <Link to={`/user/profile/${props.user.id}`} className="avatar--link">
+        <Link
+          to={`/user/profile/${props.user.id}`}
+          className="avatar--link"
+          onClick={event => {
+            event.stopPropagation();
+          }}
+        >
           {renderAvatar()}
         </Link>
       ) : (

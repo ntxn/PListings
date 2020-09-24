@@ -11,9 +11,12 @@ interface InfoCardProps {
   onClick(): void;
   active: boolean;
   unread?: boolean;
+  replaceListing(): void;
 }
 
 export const InfoCard = (props: InfoCardProps): JSX.Element => {
+  const clickable = props.listing.active && !props.listing.sold;
+
   return (
     <div
       className={`messenger__info-cards__item ${
@@ -35,8 +38,18 @@ export const InfoCard = (props: InfoCardProps): JSX.Element => {
         </p>
       </div>
       <Link
-        className="messenger__info-cards__item__listing-photo"
+        className={`messenger__info-cards__item__listing-photo ${
+          !clickable
+            ? 'messenger__info-cards__item__listing-photo--disabled'
+            : ''
+        }`}
         to={`/listings/${props.listing.id}`}
+        onClick={event => {
+          if (clickable) {
+            event.stopPropagation();
+            props.replaceListing();
+          }
+        }}
       >
         <img src={`/img/listings/${props.listing.photos[0]}`} />
       </Link>

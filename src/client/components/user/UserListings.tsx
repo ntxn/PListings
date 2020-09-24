@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
+import { replaceListing } from '../../actions';
 import { UserPageLayout, NavItem } from './UserPageLayout';
 import { calcDistanceBetweenTwoPoints } from '../../utilities';
 import { Loader } from '../Modal';
@@ -11,11 +12,14 @@ import {
   DEFAULT_MY_LISTINGS,
   UserDoc,
   ApiRoutes,
+  ListingDoc,
 } from '../../../common';
 import { showAlert, AlertType } from '../alert';
 
 interface UserListingsProps {
   user: UserDoc;
+
+  replaceListing(listing: ListingDoc): void;
 }
 
 const _UserListings = (props: UserListingsProps): JSX.Element => {
@@ -111,6 +115,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
                 lat2,
                 lng2
               )}
+              replaceListing={() => props.replaceListing(listing)}
             />
           );
         });
@@ -125,6 +130,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
               btnText="Mark as Sold"
               btnAction={() => markAsSold(i)}
               showEditBtn
+              replaceListing={() => props.replaceListing(listing)}
             />
           );
         });
@@ -138,6 +144,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
               onDelete={() => removeListing(i, MyListingsTypes.Expired)}
               btnText="Renew Listing"
               btnAction={() => renewListing(i, MyListingsTypes.Expired)}
+              replaceListing={() => props.replaceListing(listing)}
             />
           );
         });
@@ -151,6 +158,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
               onDelete={() => removeListing(i, MyListingsTypes.Sold)}
               btnText="Sell Item Again"
               btnAction={() => renewListing(i, MyListingsTypes.Sold)}
+              replaceListing={() => props.replaceListing(listing)}
             />
           );
         });
@@ -196,4 +204,4 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
   );
 };
 
-export const UserListings = connect(null)(_UserListings);
+export const UserListings = connect(null, { replaceListing })(_UserListings);

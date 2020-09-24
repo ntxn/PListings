@@ -9,12 +9,14 @@ import {
   deleteChatroom,
   clearUnreadMsgIdsByBuyer,
   clearUnreadMsgIdsBySeller,
+  replaceListing,
 } from '../../actions';
 import {
   MessageDoc,
   MessageStatus,
   SocketIOEvents,
   UserDoc,
+  ListingDoc,
 } from '../../../common';
 import { Avatar } from '../UserAvatar';
 import {
@@ -36,6 +38,7 @@ interface ConversationCardProps {
   deleteChatroom(id: string): void;
   clearUnreadMsgIdsByBuyer(roomId: string): void;
   clearUnreadMsgIdsBySeller(roomId: string): void;
+  replaceListing(listing: ListingDoc): void;
 }
 
 const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
@@ -172,21 +175,17 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
   const renderHeader = (): JSX.Element => {
     return (
       <div className="messenger__conversation-card__header">
-        {listing.active && !listing.sold ? (
-          <Link
-            to={`/listings/${listing.id}`}
-            className="messenger__conversation-card__listing"
-          >
-            {renderListingInfo()}
-          </Link>
-        ) : (
-          <div
-            className="messenger__conversation-card__listing"
-            style={{ backgroundColor: 'transparent' }}
-          >
-            {renderListingInfo()}
-          </div>
-        )}
+        <Link
+          to={`/listings/${listing.id}`}
+          className={`messenger__conversation-card__listing ${
+            listing.active && !listing.sold
+              ? ''
+              : 'messenger__conversation-card__listing--link-disabled'
+          }`}
+          onClick={() => props.replaceListing(listing)}
+        >
+          {renderListingInfo()}
+        </Link>
 
         <div
           className="messenger__conversation-card__delete icon"
@@ -415,4 +414,5 @@ export const ConversationCard = connect(mapStateToProps, {
   deleteChatroom,
   clearUnreadMsgIdsByBuyer,
   clearUnreadMsgIdsBySeller,
+  replaceListing,
 })(_ConversationCard);

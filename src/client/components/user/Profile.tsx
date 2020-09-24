@@ -8,18 +8,21 @@ import { Loader } from '../Modal';
 import { Avatar } from '../UserAvatar';
 import { calcDistanceBetweenTwoPoints, StoreState } from '../../utilities';
 import { ApiRoutes, UserDoc, ListingDoc, GeoLocation } from '../../../common';
-import { fetchSavedListingIds, clearSavedListingIds } from '../../actions';
+import {
+  fetchSavedListingIds,
+  clearSavedListingIds,
+  replaceListing,
+} from '../../actions';
 
 interface ProfileProps {
   user: UserDoc | null;
   currentLocation: GeoLocation;
   savedListingIds: Record<string, string>;
-  match: {
-    params: { id: string };
-  };
+  match: { params: { id: string } };
 
   fetchSavedListingIds(listingIds: string[]): void;
   clearSavedListingIds(): void;
+  replaceListing(listing: ListingDoc): void;
 }
 
 const _Profile = (props: ProfileProps): JSX.Element => {
@@ -112,6 +115,7 @@ const _Profile = (props: ProfileProps): JSX.Element => {
                 lat2,
                 lng2
               )}
+              replaceListing={() => props.replaceListing(listing)}
             />
           );
         })}
@@ -160,4 +164,5 @@ const mapStateToProps = (state: StoreState) => {
 export const Profile = connect(mapStateToProps, {
   fetchSavedListingIds,
   clearSavedListingIds,
+  replaceListing,
 })(_Profile);

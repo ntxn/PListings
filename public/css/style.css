@@ -189,6 +189,8 @@ body {
     cursor: pointer; }
     .avatar--link:link, .avatar--link:visited {
       color: var(--color-grey-dark-3); }
+  .avatar--link-disabled {
+    pointer-events: none; }
   .avatar--icon {
     cursor: pointer;
     background-color: var(--color-grey-light-2);
@@ -739,6 +741,10 @@ body {
           transition: box-shadow 0.2s; }
           .messenger__info-cards__item__listing-photo img:hover {
             box-shadow: 0 0 0 1px var(--color-secondary-light), 0 2px 4px 0 rgba(126, 213, 111, 0.2), 0 1px 1.5px 0 rgba(126, 213, 111, 0.1); }
+        .messenger__info-cards__item__listing-photo--disabled {
+          pointer-events: none; }
+          .messenger__info-cards__item__listing-photo--disabled img:hover {
+            box-shadow: none; }
       .messenger__info-cards__item--unread .messenger__info-cards__item__recipient-name {
         font-weight: 500;
         color: var(--color-black); }
@@ -794,6 +800,10 @@ body {
           border-radius: var(--border-radius-xsmall); }
       .messenger__conversation-card__listing__details > p {
         white-space: nowrap; }
+      .messenger__conversation-card__listing--link-disabled {
+        pointer-events: none; }
+        .messenger__conversation-card__listing--link-disabled:hover {
+          background-color: transparent; }
     .messenger__conversation-card__body {
       width: 100%;
       padding: 0 1rem;
@@ -1195,6 +1205,8 @@ main {
       display: flex;
       flex-direction: row;
       justify-content: space-between; }
+      .listing__info__title h1 {
+        margin-right: 1rem; }
       .listing__info__title svg {
         width: 2.8rem;
         height: 2.8rem; }
