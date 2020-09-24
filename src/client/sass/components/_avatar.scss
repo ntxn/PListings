@@ -26,6 +26,10 @@
     }
   }
 
+  &--link-disabled {
+    pointer-events: none;
+  }
+
   &--icon {
     @include icon-like-common-styles;
   }

@@ -70,6 +70,14 @@
             box-shadow: $shadow-green;
           }
         }
+
+        &--disabled {
+          pointer-events: none;
+
+          img:hover {
+            box-shadow: none;
+          }
+        }
       }
 
       &--unread {
@@ -160,6 +168,14 @@
       &__details {
         & > p {
           white-space: nowrap;
+        }
+      }
+
+      &--link-disabled {
+        pointer-events: none;
+
+        &:hover {
+          background-color: transparent;
         }
       }
     }
