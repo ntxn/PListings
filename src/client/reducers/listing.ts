@@ -8,7 +8,7 @@ export const listingReducer = (
   switch (action.type) {
     case ActionTypes.createListing:
       return action.payload;
-    case ActionTypes.fetchListing:
+    case ActionTypes.replaceListing:
       return action.payload;
     case ActionTypes.clearListing:
       return null;

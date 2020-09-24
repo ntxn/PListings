@@ -70,8 +70,8 @@ export interface CreateListingAction {
   payload: ListingDoc;
 }
 
-export interface FetchListingAction {
-  type: ActionTypes.fetchListing;
+export interface ReplaceListingAction {
+  type: ActionTypes.replaceListing;
   payload: ListingDoc;
 }
 
@@ -191,7 +191,7 @@ export type Action =
   | SearchLocationAction
   | SetBtnLoaderAction
   | CreateListingAction
-  | FetchListingAction
+  | ReplaceListingAction
   | ClearListingAction
   | FetchListingsAction
   | ClearListingsAction

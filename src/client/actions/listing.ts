@@ -9,7 +9,7 @@ import {
   EditListingAction,
   FunctionalAction,
   ListingImagesParams,
-  FetchListingAction,
+  ReplaceListingAction,
   ClearListingAction,
   FetchListingsAction,
   ClearListingsAction,
@@ -19,33 +19,10 @@ import {
   processFormValuesToFormData,
   SaveListingAction,
   UnsaveListingAction,
+  catchAsync,
 } from '../utilities';
 import { ApiRoutes, ListingAttrs, UserDoc, ListingDoc } from '../../common';
 import { AlertType, showAlert } from '.././components/alert';
-
-export const fetchListing = (
-  id: string
-): FunctionalAction<FetchListingAction> => async dispatch => {
-  try {
-    const { data } = await axios.get(`${ApiRoutes.Listings}/${id}`);
-    dispatch({
-      type: ActionTypes.fetchListing,
-      payload: data.data,
-    });
-
-    const response = await axios.get(`${ApiRoutes.Favorites}/${id}`);
-    dispatch({
-      //@ts-ignore
-      type: response.data.data
-        ? ActionTypes.saveListing
-        : ActionTypes.unsaveListing,
-      payload: data.data,
-    });
-  } catch (err) {
-    console.log(err);
-    showAlert(AlertType.Error, 'Cannot load listing with this id');
-  }
-};
 
 export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
   dispatch: Dispatch
@@ -89,6 +66,20 @@ export const fetchSavedListingIds = (listingIds: string[]) => async (
     console.log(err);
     showAlert(AlertType.Error, `Issue with fetching saved listing IDs`);
   }
+};
+
+export const fetchListingFavStatusByUser = (listing: ListingDoc) => async (
+  dispatch: Dispatch
+): Promise<void> => {
+  catchAsync(async () => {
+    const response = await axios.get(`${ApiRoutes.Favorites}/${listing.id}`);
+    dispatch({
+      type: response.data.data
+        ? ActionTypes.saveListing
+        : ActionTypes.unsaveListing,
+      payload: listing,
+    });
+  })();
 };
 
 export const createListing = (
@@ -161,10 +152,17 @@ export const editListing = (
     history.replace(`/listings/edit/${response.data.data.id}`);
   });
 
+export const replaceListing = (listing: ListingDoc): ReplaceListingAction => {
+  return {
+    type: ActionTypes.replaceListing,
+    payload: listing,
+  };
+};
+
 export const saveListing = (
   listingId: string
 ): FunctionalAction<SaveListingAction> => async dispatch => {
-  try {
+  catchAsync(async () => {
     const { data } = await axios.post(ApiRoutes.Favorites, { listingId });
     dispatch({
       type: ActionTypes.saveListing,
@@ -172,24 +170,20 @@ export const saveListing = (
     });
 
     showAlert(AlertType.Success, 'Listing saved successfully');
-  } catch (err) {
-    showAlert(AlertType.Error, err.message);
-  }
+  })();
 };
 
 export const unsaveListing = (
   listingId: string
 ): FunctionalAction<UnsaveListingAction> => async dispatch => {
-  try {
+  catchAsync(async () => {
     const { data } = await axios.delete(`${ApiRoutes.Favorites}/${listingId}`);
     dispatch({
       type: ActionTypes.unsaveListing,
       payload: data.data,
     });
     showAlert(AlertType.Success, 'Listing unsaved successfully');
-  } catch (err) {
-    showAlert(AlertType.Error, err.message);
-  }
+  })();
 };
 
 export const clearListing = (): ClearListingAction => {

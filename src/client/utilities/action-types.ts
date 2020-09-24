@@ -18,7 +18,7 @@ export enum ActionTypes {
   setBtnLoader,
 
   // listings
-  fetchListing,
+  replaceListing,
   clearListing,
   fetchListings,
   clearListings,
