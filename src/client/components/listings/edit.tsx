@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import { StoreState, ListingImagesParams } from '../../utilities';
-import { fetchListing, editListing } from '../../actions';
+import { editListing, clearListing } from '../../actions';
 import { ListingDoc, UserDoc, ListingAttrs } from '../../../common';
 import { Unauthorized } from '../Unauthorized';
 import { ListingForm } from '../forms';
@@ -12,7 +12,7 @@ interface EditListingProps {
 
   listing: ListingDoc | null;
 
-  fetchListing(id: string): void;
+  clearListing(): void;
   editListing(
     formValues: ListingAttrs,
     imagesParams: ListingImagesParams,
@@ -24,10 +24,9 @@ interface EditListingProps {
 
 const _EditListing = (props: EditListingProps): JSX.Element => {
   useEffect(() => {
-    const fetchData = async () =>
-      await props.fetchListing(props.match.params.id);
-
-    fetchData();
+    return () => {
+      if (props.listing) props.clearListing();
+    };
   }, []);
 
   const renderEditListingForm = (): JSX.Element => {
@@ -45,7 +44,7 @@ const _EditListing = (props: EditListingProps): JSX.Element => {
 
   return (
     <>
-      {props.listing && props.user.id === props.listing.owner.id ? (
+      {props.user.id === props.listing!.owner.id ? (
         renderEditListingForm()
       ) : (
         <Unauthorized />
@@ -59,6 +58,6 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 export const EditListing = connect(mapStateToProps, {
-  fetchListing,
+  clearListing,
   editListing,
 })(_EditListing);
