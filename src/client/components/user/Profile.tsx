@@ -37,46 +37,64 @@ const _Profile = (props: ProfileProps): JSX.Element => {
   const [showContent, setShowContent] = useState(false);
   const [active, setActive] = useState('selling');
   const [center, setCenter] = useState<[number, number]>();
+  const [authTimer, setAuthTimer] = useState<NodeJS.Timeout>();
+
+  const fetchData = async () =>
+    catchAsync(async () => {
+      setLoader(true);
+
+      const { id } = props.match.params;
+      let profileUser: UserDoc;
+
+      if (props.user && props.user.id == id) profileUser = props.user;
+      else {
+        const response = await axios.get(`${ApiRoutes.Users}/${id}`);
+        profileUser = response.data.data as UserDoc;
+
+        // fetch saved listing ids
+        if (props.user && props.user.id != id)
+          props.fetchSavedListingIds(
+            profileUser.listings.map(listing => listing.id)
+          );
+      }
+      setUser(profileUser);
+
+      // spliting listings into selling & sold
+      const { listings } = profileUser;
+
+      const sellingItems: ListingDoc[] = [];
+      const soldItems: ListingDoc[] = [];
+      listings.forEach(listing => {
+        if (listing.sold) soldItems.push(listing);
+        else sellingItems.push(listing);
+      });
+      setSold(soldItems);
+      setSelling(sellingItems);
+
+      // find the center
+      if (props.user) setCenter(props.user.location.coordinates);
+      else setCenter(props.currentLocation.coordinates);
+
+      setLoader(false);
+      setShowContent(true);
+    })({ clearLoader: () => setLoader(false) });
 
   useEffect(() => {
     setLoader(true);
 
-    const fetchData = async () =>
-      catchAsync(async () => {
-        const response = await axios.get(
-          `${ApiRoutes.Users}/${props.match.params.id}`
-        );
-        const user = response.data.data as UserDoc;
-        setUser(user);
+    if (authTimer) clearTimeout(authTimer);
 
-        // spliting listings into selling & sold
-        const { listings } = user;
+    setAuthTimer(
+      setTimeout(() => {
+        fetchData();
+      }, 500)
+    );
 
-        const sellingItems: ListingDoc[] = [];
-        const soldItems: ListingDoc[] = [];
-        listings.forEach(listing => {
-          if (listing.sold) soldItems.push(listing);
-          else sellingItems.push(listing);
-        });
-        setSold(soldItems);
-        setSelling(sellingItems);
-
-        // find the center
-        if (props.user) setCenter(props.user.location.coordinates);
-        else setCenter(props.currentLocation.coordinates);
-
-        // fetch saved listing ids
-        if (props.user)
-          props.fetchSavedListingIds(listings.map(listing => listing.id));
-
-        setLoader(false);
-        setShowContent(true);
-      })({ clearLoader: () => setLoader(false) });
-
-    if (props.user || props.currentLocation) fetchData();
-
-    return () => props.clearSavedListingIds();
-  }, [props.user, props.currentLocation]);
+    return () => {
+      props.clearSavedListingIds();
+      if (authTimer) clearTimeout(authTimer);
+    };
+  }, [props.user, props.match.params.id]);
 
   const renderHeader = (): JSX.Element => {
     const { name, location, createdAt } = user!;
