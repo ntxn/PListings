@@ -20,14 +20,16 @@ import {
   SaveListingAction,
   UnsaveListingAction,
   catchAsync,
+  catchAsyncAction,
 } from '../utilities';
 import { ApiRoutes, ListingAttrs, UserDoc, ListingDoc } from '../../common';
 import { AlertType, showAlert } from '.././components/alert';
 
-export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
-  dispatch: Dispatch
-): Promise<void> => {
-  try {
+export const fetchListings = (
+  queryStr: string,
+  user: UserDoc | null
+): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
     const response = await axios.get(`${ApiRoutes.Listings}/?${queryStr}`);
     const listings = response.data.data as ListingDoc[];
 
@@ -45,16 +47,10 @@ export const fetchListings = (queryStr: string, user: UserDoc | null) => async (
         payload: data.data,
       });
     }
-  } catch (err) {
-    console.log(err);
-    showAlert(AlertType.Error, `There's an issue loading listings`);
-  }
-};
+  });
 
-export const fetchSavedListingIds = (listingIds: string[]) => async (
-  dispatch: Dispatch
-): Promise<void> => {
-  try {
+export const fetchSavedListingIds = (listingIds: string[]): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
     const { data } = await axios.post(ApiRoutes.FilterListingsSavedByUser, {
       listingIds,
     });
@@ -62,16 +58,12 @@ export const fetchSavedListingIds = (listingIds: string[]) => async (
       type: ActionTypes.fetchSavedListingIds,
       payload: data.data,
     });
-  } catch (err) {
-    console.log(err);
-    showAlert(AlertType.Error, `Issue with fetching saved listing IDs`);
-  }
-};
+  });
 
-export const fetchListingFavStatusByUser = (listing: ListingDoc) => async (
-  dispatch: Dispatch
-): Promise<void> => {
-  catchAsync(async () => {
+export const fetchListingFavStatusByUser = (
+  listing: ListingDoc
+): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
     const response = await axios.get(`${ApiRoutes.Favorites}/${listing.id}`);
     dispatch({
       type: response.data.data
@@ -79,13 +71,12 @@ export const fetchListingFavStatusByUser = (listing: ListingDoc) => async (
         : ActionTypes.unsaveListing,
       payload: listing,
     });
-  })();
-};
+  });
 
 export const createListing = (
   formValues: ListingAttrs,
   imagesParams: ListingImagesParams
-): FunctionalAction<CreateListingAction> =>
+): FunctionalAction =>
   catchSubmissionError(async dispatch => {
     const { newImages } = imagesParams;
 
@@ -99,7 +90,7 @@ export const createListing = (
 
     const { data } = await axios.post(ApiRoutes.Listings, formData);
 
-    dispatch({
+    dispatch<CreateListingAction>({
       type: ActionTypes.createListing,
       payload: data.data,
     });
@@ -114,7 +105,7 @@ export const editListing = (
   formValues: ListingAttrs,
   imagesParams: ListingImagesParams,
   listingId: string
-): FunctionalAction<EditListingAction> =>
+): FunctionalAction =>
   catchSubmissionError(async dispatch => {
     const url = `${ApiRoutes.Listings}/${listingId}`;
     const { newImages, existingImages, deletedImages } = imagesParams;
@@ -144,7 +135,7 @@ export const editListing = (
 
     showAlert(AlertType.Success, 'Listing updated successfully');
 
-    dispatch({
+    dispatch<EditListingAction>({
       type: ActionTypes.editListing,
       payload: response.data.data,
     });
@@ -159,32 +150,26 @@ export const replaceListing = (listing: ListingDoc): ReplaceListingAction => {
   };
 };
 
-export const saveListing = (
-  listingId: string
-): FunctionalAction<SaveListingAction> => async dispatch => {
-  catchAsync(async () => {
+export const saveListing = (listingId: string): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
     const { data } = await axios.post(ApiRoutes.Favorites, { listingId });
-    dispatch({
+    dispatch<SaveListingAction>({
       type: ActionTypes.saveListing,
       payload: data.data,
     });
 
     showAlert(AlertType.Success, 'Listing saved successfully');
-  })();
-};
+  });
 
-export const unsaveListing = (
-  listingId: string
-): FunctionalAction<UnsaveListingAction> => async dispatch => {
-  catchAsync(async () => {
+export const unsaveListing = (listingId: string): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
     const { data } = await axios.delete(`${ApiRoutes.Favorites}/${listingId}`);
-    dispatch({
+    dispatch<UnsaveListingAction>({
       type: ActionTypes.unsaveListing,
       payload: data.data,
     });
     showAlert(AlertType.Success, 'Listing unsaved successfully');
-  })();
-};
+  });
 
 export const clearListing = (): ClearListingAction => {
   return { type: ActionTypes.clearListing };

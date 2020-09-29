@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import { replaceListing } from '../../actions';
 import { UserPageLayout, NavItem } from './UserPageLayout';
-import { calcDistanceBetweenTwoPoints } from '../../utilities';
+import { calcDistanceBetweenTwoPoints, catchAsync } from '../../utilities';
 import { Loader } from '../Modal';
 import { ListingCardPublic, ListingCardPrivate } from '../ListingCard';
 import {
@@ -14,7 +14,6 @@ import {
   ApiRoutes,
   ListingDoc,
 } from '../../../common';
-import { showAlert, AlertType } from '../alert';
 
 interface UserListingsProps {
   user: UserDoc;
@@ -24,12 +23,13 @@ interface UserListingsProps {
 
 const _UserListings = (props: UserListingsProps): JSX.Element => {
   useEffect(() => {
-    setShowLoader(true);
-    const fetchListings = async () => {
-      const { data } = await axios.get(ApiRoutes.MyListings);
-      if (data) setListings(data.data);
-      setShowLoader(false);
-    };
+    setLoader(true);
+    const fetchListings = async () =>
+      catchAsync(async () => {
+        const { data } = await axios.get(ApiRoutes.MyListings);
+        if (data) setListings(data.data);
+        setLoader(false);
+      })({ clearLoader: () => setLoader(false) });
 
     fetchListings();
   }, []);
@@ -38,7 +38,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
     MyListingsTypes.Selling
   );
   const [listings, setListings] = useState(DEFAULT_MY_LISTINGS);
-  const [showLoader, setShowLoader] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const removeListing = (index: number, listingType: MyListingsTypes): void => {
     setListings({
@@ -47,8 +47,8 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
     });
   };
 
-  const markAsSold = async (index: number): Promise<void> => {
-    try {
+  const markAsSold = async (index: number): Promise<void> =>
+    catchAsync(async () => {
       const selling = listings[MyListingsTypes.Selling];
 
       const { data } = await axios.patch(
@@ -60,20 +60,16 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         [MyListingsTypes.Selling]: selling.filter((l, i) => i !== index),
         [MyListingsTypes.Sold]: [data.data, ...listings[MyListingsTypes.Sold]],
       });
-    } catch (err) {
-      showAlert(
-        AlertType.Error,
-        'Having issue with marking this listing as sold. Please try again later.'
-      );
-      console.log(err);
-    }
-  };
+    })({
+      msg:
+        'Having issue with marking this listing as sold. Please try again later.',
+    });
 
   const renewListing = async (
     index: number,
     listingType: MyListingsTypes
-  ): Promise<void> => {
-    try {
+  ): Promise<void> =>
+    catchAsync(async () => {
       const { data } = await axios.patch(
         `${ApiRoutes.ListingRenew}/${listings[listingType][index].id}`
       );
@@ -86,14 +82,9 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
           ...listings[MyListingsTypes.Selling],
         ],
       });
-    } catch (err) {
-      showAlert(
-        AlertType.Error,
-        'Having issue with renewing your listing. Please try again later.'
-      );
-      console.log(err);
-    }
-  };
+    })({
+      msg: 'Having issue with renewing your listing. Please try again later.',
+    });
 
   const renderListings = (): JSX.Element => {
     let element: JSX.Element[] = [];
@@ -199,7 +190,7 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         navList={navList}
         active={MyListingsTypes.Selling}
       />
-      {showLoader && <Loader />}
+      {loader && <Loader />}
     </>
   );
 };

@@ -18,6 +18,9 @@ import {
   StoreState,
   ChatroomDocClient,
   createChatroomAndSendMessageByBuyer,
+  catchAsync,
+  catchAsyncAction,
+  FunctionalAction,
 } from '../utilities';
 import { AlertType, showAlert } from '../components/alert';
 import { ApiRoutes, ChatroomDoc, MessageDoc, UserDoc } from '../../common';
@@ -38,10 +41,8 @@ export const addNewChatroom = (
 /**
  * Delete chatroom with the provided Id from db and remove it from redux store
  */
-export const deleteChatroom = (id: string) => async (
-  dispatch: Dispatch
-): Promise<void> => {
-  try {
+export const deleteChatroom = (id: string): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
     await axios.delete(`${ApiRoutes.Chatrooms}/${id}`);
 
     dispatch<DeleteChatroomAction>({
@@ -50,11 +51,7 @@ export const deleteChatroom = (id: string) => async (
     });
 
     showAlert(AlertType.Success, 'Deleted conversation successfully');
-  } catch (err) {
-    console.log(err);
-    showAlert(AlertType.Error, 'Issue with deleting this conversation');
-  }
-};
+  });
 
 /**
  * Action creator to reset chatrooms from redux store
@@ -81,17 +78,18 @@ export const fetchChatrooms = async (
   dispatch: Dispatch,
   reduxStore: StoreState,
   user: UserDoc
-): Promise<void> => {
-  const response = await axios.get(ApiRoutes.ChatroomsByUser);
-  const chatroomDocs = response.data.data as ChatroomDoc[];
+): Promise<void> =>
+  catchAsync(async () => {
+    const response = await axios.get(ApiRoutes.ChatroomsByUser);
+    const chatroomDocs = response.data.data as ChatroomDoc[];
 
-  const chatrooms = rejoinChatrooms(dispatch, reduxStore, user, chatroomDocs);
+    const chatrooms = rejoinChatrooms(dispatch, reduxStore, user, chatroomDocs);
 
-  dispatch<FetchChatroomsAction>({
-    type: ActionTypes.fetchChatrooms,
-    payload: chatrooms,
-  });
-};
+    dispatch<FetchChatroomsAction>({
+      type: ActionTypes.fetchChatrooms,
+      payload: chatrooms,
+    });
+  })();
 
 export const insertMessage = (message: MessageDoc): InsertMessageAction => {
   return {

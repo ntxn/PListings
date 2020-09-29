@@ -238,8 +238,8 @@ export interface SearchedLocation {
 }
 
 //
-export type FunctionalAction<A extends ReduxAction> = (
-  dispatch: Dispatch<A>,
+export type FunctionalAction = (
+  dispatch: Dispatch,
   getState?: () => StoreState
 ) => Promise<void>;
 

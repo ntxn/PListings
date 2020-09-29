@@ -8,9 +8,8 @@ import { MdDelete } from 'react-icons/md';
 
 import { ListingDoc, UserDoc, ApiRoutes } from '../../common';
 import { ImageSlider } from './ImageSlider';
-import { showAlert, AlertType } from './alert';
 import { promptUserToLogInToSaveListing } from './Modal';
-import { StoreState } from '../utilities';
+import { StoreState, catchAsync } from '../utilities';
 import { unsaveListing, saveListing } from '../actions';
 
 interface ListingCardProps {
@@ -46,18 +45,11 @@ const _ListingCard = (props: ListingCardProps): JSX.Element => {
     return () => clearTimeout(imageSliderTimeout);
   }, []);
 
-  const deleteListing = async (id: string): Promise<void> => {
-    try {
+  const deleteListing = async (id: string): Promise<void> =>
+    catchAsync(async () => {
       await axios.delete(`${ApiRoutes.Listings}/${id}`);
       props.onDelete!();
-    } catch (err) {
-      showAlert(
-        AlertType.Error,
-        'Having issue deleting this listing. Please try again later'
-      );
-      console.log(err);
-    }
-  };
+    })({ msg: 'Having issue deleting this listing. Please try again later' });
 
   const renderSaveBtn = (): JSX.Element => {
     return (

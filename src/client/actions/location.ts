@@ -9,6 +9,8 @@ import {
   SearchedLocation,
   StoreState,
   SetDefaultFiltersAction,
+  catchAsyncAction,
+  FunctionalAction,
 } from '../utilities';
 
 export const getLocationWithPermission = (): GetLocationWithPermissionAction => {
@@ -31,11 +33,8 @@ export const getLocationWithPermission = (): GetLocationWithPermissionAction => 
   };
 };
 
-export const getLocationByIP = () => {
-  return async (
-    dispatch: Dispatch,
-    getState: () => StoreState
-  ): Promise<void> => {
+export const getLocationByIP = (): FunctionalAction =>
+  catchAsyncAction(async (dispatch, getState) => {
     const { data } = await axios.get(
       `https://geolocation-db.com/json/${process.env.GEOLOCATION_DB_KEY}`
     );
@@ -53,33 +52,29 @@ export const getLocationByIP = () => {
       payload: location,
     });
 
-    if (!getState().user)
+    if (!getState!().user)
       dispatch<SetDefaultFiltersAction>({
         type: ActionTypes.setDefaultFilters,
         payload: location,
       });
-  };
-};
+  });
 
-export const searchLocation = (searchTerm = '') => {
-  return async (dispatch: Dispatch): Promise<void> => {
-    try {
-      let payload: SearchedLocation[] = [];
+export const searchLocation = (searchTerm = ''): FunctionalAction =>
+  catchAsyncAction(async dispatch => {
+    let payload: SearchedLocation[] = [];
 
-      if (searchTerm !== '') {
-        const response = await axios.get(
-          `https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=${encodeURI(
-            searchTerm
-          )}&rows=6`,
-          { headers: { Authorization: process.env.OPEN_DATA_SOFT_KEY } }
-        );
-        payload = response.data.records;
-      }
+    if (searchTerm !== '') {
+      const response = await axios.get(
+        `https://public.opendatasoft.com/api/records/1.0/search/?dataset=us-zip-code-latitude-and-longitude&q=${encodeURI(
+          searchTerm
+        )}&rows=6`,
+        { headers: { Authorization: process.env.OPEN_DATA_SOFT_KEY } }
+      );
+      payload = response.data.records;
+    }
 
-      dispatch<SearchLocationAction>({
-        type: ActionTypes.searchLocation,
-        payload,
-      });
-    } catch (err) {}
-  };
-};
+    dispatch<SearchLocationAction>({
+      type: ActionTypes.searchLocation,
+      payload,
+    });
+  });

@@ -6,7 +6,11 @@ import { UserPageLayout, NavItem } from './UserPageLayout';
 import { ListingCardPublic } from '../ListingCard';
 import { Loader } from '../Modal';
 import { Avatar } from '../UserAvatar';
-import { calcDistanceBetweenTwoPoints, StoreState } from '../../utilities';
+import {
+  calcDistanceBetweenTwoPoints,
+  StoreState,
+  catchAsync,
+} from '../../utilities';
 import { ApiRoutes, UserDoc, ListingDoc, GeoLocation } from '../../../common';
 import {
   fetchSavedListingIds,
@@ -37,36 +41,37 @@ const _Profile = (props: ProfileProps): JSX.Element => {
   useEffect(() => {
     setLoader(true);
 
-    const fetchData = async () => {
-      const response = await axios.get(
-        `${ApiRoutes.Users}/${props.match.params.id}`
-      );
-      const user = response.data.data as UserDoc;
-      setUser(user);
+    const fetchData = async () =>
+      catchAsync(async () => {
+        const response = await axios.get(
+          `${ApiRoutes.Users}/${props.match.params.id}`
+        );
+        const user = response.data.data as UserDoc;
+        setUser(user);
 
-      // spliting listings into selling & sold
-      const { listings } = user;
+        // spliting listings into selling & sold
+        const { listings } = user;
 
-      const sellingItems: ListingDoc[] = [];
-      const soldItems: ListingDoc[] = [];
-      listings.forEach(listing => {
-        if (listing.sold) soldItems.push(listing);
-        else sellingItems.push(listing);
-      });
-      setSold(soldItems);
-      setSelling(sellingItems);
+        const sellingItems: ListingDoc[] = [];
+        const soldItems: ListingDoc[] = [];
+        listings.forEach(listing => {
+          if (listing.sold) soldItems.push(listing);
+          else sellingItems.push(listing);
+        });
+        setSold(soldItems);
+        setSelling(sellingItems);
 
-      // find the center
-      if (props.user) setCenter(props.user.location.coordinates);
-      else setCenter(props.currentLocation.coordinates);
+        // find the center
+        if (props.user) setCenter(props.user.location.coordinates);
+        else setCenter(props.currentLocation.coordinates);
 
-      // fetch saved listing ids
-      if (props.user)
-        props.fetchSavedListingIds(listings.map(listing => listing.id));
+        // fetch saved listing ids
+        if (props.user)
+          props.fetchSavedListingIds(listings.map(listing => listing.id));
 
-      setLoader(false);
-      setShowContent(true);
-    };
+        setLoader(false);
+        setShowContent(true);
+      })({ clearLoader: () => setLoader(false) });
 
     if (props.user || props.currentLocation) fetchData();
 

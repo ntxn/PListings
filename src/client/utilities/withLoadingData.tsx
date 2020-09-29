@@ -27,11 +27,11 @@ export const withLoadingData = (Component: any, dataType: string) => {
   const LoadingData = (props: LoadingData): JSX.Element => {
     const isListing = dataType === DataType.Listing;
     const [data, setData] = useState(isListing ? props.listing : props.user);
-    const [showLoader, setShowLoader] = useState(false);
+    const [loader, setLoader] = useState(false);
 
     useEffect(() => {
       const fetchData = async () => {
-        setShowLoader(true);
+        setLoader(true);
         catchAsync(async () => {
           const { id } = props.match.params;
           const { data } = await axios.get(
@@ -44,8 +44,8 @@ export const withLoadingData = (Component: any, dataType: string) => {
           }
 
           setData(data.data);
-          setShowLoader(false);
-        })({ clearLoader: () => setShowLoader(false) });
+          setLoader(false);
+        })({ clearLoader: () => setLoader(false) });
       };
 
       if (!data) fetchData();
@@ -54,7 +54,7 @@ export const withLoadingData = (Component: any, dataType: string) => {
     return (
       <>
         {data && <Component {...props} />}
-        {showLoader && <Loader />}
+        {loader && <Loader />}
       </>
     );
   };
