@@ -17,6 +17,7 @@ import {
   saveListing,
   unsaveListing,
   initiateConversation,
+  fetchListingFavStatusByUser,
 } from '../../actions';
 import { ListingDoc, UserDoc } from '../../../common';
 import { ImageSlider } from '../ImageSlider';
@@ -35,6 +36,7 @@ interface ListingProps {
   saveListing(listingId: string): void;
   unsaveListing(listingId: string): void;
   initiateConversation(msg: string): void;
+  fetchListingFavStatusByUser(listing: ListingDoc): void;
 }
 
 const _Listing = (props: ListingProps): JSX.Element => {
@@ -45,6 +47,8 @@ const _Listing = (props: ListingProps): JSX.Element => {
   const [chatboxContent, setChatboxContent] = useState('');
 
   useEffect(() => {
+    props.fetchListingFavStatusByUser(props.listing!);
+
     return () => {
       if (props.listing) props.clearListing();
     };
@@ -286,4 +290,5 @@ export const Listing = connect(mapStateToProps, {
   saveListing,
   unsaveListing,
   initiateConversation,
+  fetchListingFavStatusByUser,
 })(_Listing);

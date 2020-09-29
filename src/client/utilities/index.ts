@@ -11,4 +11,3 @@ export * from './distance-between-two-points';
 export * from './socket-io';
 export * from './get-date-time';
 export * from './catch-async';
-export * from './withLoadingData';
