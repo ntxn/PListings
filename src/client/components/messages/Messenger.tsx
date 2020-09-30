@@ -46,44 +46,46 @@ const _Messenger = (props: MessengerProps): JSX.Element => {
         } else setChatroom(undefined);
       }
     } else {
-      // no chat messages, display 'No conversation'
-      console.log('No conversations found');
       setChatroom(undefined);
-      history.push('/messages');
+      if (id) history.push('/messages');
     }
   }, [props.chatrooms]);
 
   const renderInfoCards = (): JSX.Element => {
+    const rooms = Object.values(props.chatrooms).filter(
+      room => room.lastMessage
+    );
     return (
       <div className="messenger__info-cards">
-        {Object.values(props.chatrooms)
-          .filter(room => room.lastMessage)
-          .map(room => {
-            const { id, buyer, seller, listing, lastMessage } = room;
-            let recipient = seller;
-            let unreadMsgIds = room.unreadMsgIdsByBuyer;
+        {rooms.length === 0 && (
+          <div className="messenger__info-cards__no-msg">No messages found</div>
+        )}
+        {rooms.map(room => {
+          const { id, buyer, seller, listing, lastMessage } = room;
+          let recipient = seller;
+          let unreadMsgIds = room.unreadMsgIdsByBuyer;
 
-            if (props.user.id === seller.id) {
-              recipient = buyer;
-              unreadMsgIds = room.unreadMsgIdsBySeller;
-            }
+          if (props.user.id === seller.id) {
+            recipient = buyer;
+            unreadMsgIds = room.unreadMsgIdsBySeller;
+          }
 
-            return (
-              <InfoCard
-                key={id}
-                listing={listing}
-                lastMsg={lastMessage!}
-                recipient={recipient}
-                onClick={() => {
-                  setChatroom(room);
-                  history.push(`/messages/${id}`);
-                }}
-                unread={unreadMsgIds.length > 0}
-                active={chatroom ? id == chatroom.id : false}
-                replaceListing={() => props.replaceListing(listing)}
-              />
-            );
-          })}
+          return (
+            <InfoCard
+              key={id}
+              listing={listing}
+              lastMsg={lastMessage!}
+              recipient={recipient}
+              onClick={() => {
+                setChatroom(room);
+                history.push(`/messages/${id}`);
+              }}
+              unread={unreadMsgIds.length > 0}
+              active={chatroom ? id == chatroom.id : false}
+              replaceListing={() => props.replaceListing(listing)}
+            />
+          );
+        })}
       </div>
     );
   };
