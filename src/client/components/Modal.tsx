@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import { IconType } from 'react-icons';
 import { BsListNested } from 'react-icons/bs';
-import { AiFillSetting } from 'react-icons/ai';
+import { AiFillSetting, AiOutlineMessage } from 'react-icons/ai';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
 import { IoIosArrowForward, IoIosClose } from 'react-icons/io';
 import { MdClose } from 'react-icons/md';
@@ -125,6 +126,30 @@ export const promptUserToLogInToSaveListing = (
  * A modal to display menu options for authenticated user: settings, listings, logout
  */
 export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
+  const renderMenuItemWithLink = (
+    url: string,
+    title: string,
+    Icon: IconType
+  ): JSX.Element => {
+    return (
+      <div className="user-menu__option">
+        <Link
+          to={url}
+          className="user-menu__option__hover"
+          onClick={props.closeUserMenu}
+        >
+          <div className="user-menu__option__icon icon">
+            <Icon />
+          </div>
+          <div className="user-menu__option__content">
+            <span className="heading-quaternary">{title}</span>
+            <IoIosArrowForward />
+          </div>
+        </Link>
+      </div>
+    );
+  };
+
   return ReactDOM.createPortal(
     <div className="user-menu" onClick={props.closeUserMenu}>
       <div
@@ -147,36 +172,13 @@ export const UserMenuModal = (props: UserMenuModalProps): JSX.Element => {
           </Link>
         </div>
         <hr className="u-divider" />
-        <div className="user-menu__option">
-          <Link
-            to="/user/account-settings"
-            className="user-menu__option__hover"
-            onClick={props.closeUserMenu}
-          >
-            <div className="user-menu__option__icon icon">
-              <AiFillSetting />
-            </div>
-            <div className="user-menu__option__content">
-              <span className="heading-quaternary">Settings</span>
-              <IoIosArrowForward />
-            </div>
-          </Link>
-        </div>
-        <div className="user-menu__option">
-          <Link
-            to="/user/listings"
-            className="user-menu__option__hover"
-            onClick={props.closeUserMenu}
-          >
-            <div className="user-menu__option__icon icon">
-              <BsListNested />
-            </div>
-            <div className="user-menu__option__content">
-              <span className="heading-quaternary">Listings</span>
-              <IoIosArrowForward />
-            </div>
-          </Link>
-        </div>
+        {renderMenuItemWithLink(
+          '/user/account-settings',
+          'Settings',
+          AiFillSetting
+        )}
+        {renderMenuItemWithLink('/user/listings', 'Listings', BsListNested)}
+        {renderMenuItemWithLink('/messages', 'Messages', AiOutlineMessage)}
         <div className="user-menu__option">
           <div
             className="user-menu__option__hover"
