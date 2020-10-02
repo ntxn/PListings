@@ -1370,6 +1370,19 @@ main {
   grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
   grid-gap: 0.8rem; }
 
+.page-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80%; }
+  .page-not-found__header {
+    font-size: 8rem;
+    line-height: 8rem;
+    color: var(--color-primary); }
+  .page-not-found__subheader {
+    color: var(--color-grey-dark-1); }
+
 .profile__header {
   width: 100%;
   display: flex;

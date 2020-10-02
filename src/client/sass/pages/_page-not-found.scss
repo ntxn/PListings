@@ -1,0 +1,17 @@
+.page-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80%;
+
+  &__header {
+    font-size: 8rem;
+    line-height: 8rem;
+    color: var(--color-primary);
+  }
+
+  &__subheader {
+    color: var(--color-grey-dark-1);
+  }
+}
