@@ -11,8 +11,7 @@ export const Footer = (): JSX.Element => {
           </Link>
         </div>
         <div className="footer__navigation">
-          <Link to="/about">About</Link>
-          <Link to="/contact-us">Contact Me</Link>
+          <Link to="/about">About plistings</Link>
         </div>
       </div>
     </footer>
