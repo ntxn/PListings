@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import { RiMailSendLine } from 'react-icons/ri';
 
