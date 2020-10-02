@@ -77,16 +77,12 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     const messagesHTMLElement = document.querySelector(
       '.messenger__conversation-card__messages'
     );
-
+    const body = document.querySelector('.messenger__conversation-card__body');
     if (messagesHTMLElement) {
-      if (smooth) {
-        const body = document.querySelector(
-          '.messenger__conversation-card__body'
-        );
-        if (body) body.classList.add(smoothClass);
-      }
+      if (smooth && body) body.classList.add(smoothClass);
 
       messagesHTMLElement.scrollIntoView(false);
+      if (body) body.scrollTop += 15;
       setIsBottom(true);
     }
   };
@@ -153,6 +149,10 @@ const _ConversationCard = (props: ConversationCardProps): JSX.Element => {
     const loader = document.getElementById('typingLoader');
     if (loader && isBottom) scrollToBottom();
   }, [props.chatroom.typing]);
+
+  useEffect(() => {
+    if (props.chatroom.listing.sold && isBottom) scrollToBottom();
+  }, [props.chatroom.listing.sold]);
 
   const renderListingInfo = (): JSX.Element => {
     return (
