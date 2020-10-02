@@ -4,7 +4,11 @@ import axios from 'axios';
 
 import { replaceListing } from '../../actions';
 import { UserPageLayout, NavItem } from './UserPageLayout';
-import { calcDistanceBetweenTwoPoints, catchAsync } from '../../utilities';
+import {
+  calcDistanceBetweenTwoPoints,
+  catchAsync,
+  StoreState,
+} from '../../utilities';
 import { Loader } from '../Modal';
 import { ListingCardPublic, ListingCardPrivate } from '../ListingCard';
 import {
@@ -13,11 +17,13 @@ import {
   UserDoc,
   ApiRoutes,
   ListingDoc,
+  SocketIOEvents,
 } from '../../../common';
 
 interface UserListingsProps {
   user: UserDoc;
 
+  sockets: Record<string, SocketIOClient.Socket>;
   replaceListing(listing: ListingDoc): void;
 }
 
@@ -60,6 +66,8 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
         [MyListingsTypes.Selling]: selling.filter((l, i) => i !== index),
         [MyListingsTypes.Sold]: [data.data, ...listings[MyListingsTypes.Sold]],
       });
+
+      props.sockets[`/${selling[index].id}`].emit(SocketIOEvents.ListingSold);
     })({
       msg:
         'Having issue with marking this listing as sold. Please try again later.',
@@ -195,4 +203,10 @@ const _UserListings = (props: UserListingsProps): JSX.Element => {
   );
 };
 
-export const UserListings = connect(null, { replaceListing })(_UserListings);
+const mapStateToProps = (state: StoreState) => {
+  return { sockets: state.sockets };
+};
+
+export const UserListings = connect(mapStateToProps, { replaceListing })(
+  _UserListings
+);
