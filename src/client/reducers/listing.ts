@@ -32,6 +32,8 @@ export const listingsReducer = (
       return action.payload;
     case ActionTypes.clearListings:
       return [];
+    case ActionTypes.updateSoldStatus:
+      return state.filter(listing => listing.id != action.payload);
     default:
       return state;
   }

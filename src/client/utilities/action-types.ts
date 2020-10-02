@@ -28,6 +28,7 @@ export enum ActionTypes {
   unsaveListing,
   fetchSavedListingIds,
   clearSavedListingIds,
+  updateSoldStatus,
 
   // listings filters
   setDefaultFilters,

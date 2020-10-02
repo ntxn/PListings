@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Dispatch } from 'redux';
 
 import { history } from '../history';
 import {
@@ -19,7 +18,7 @@ import {
   processFormValuesToFormData,
   SaveListingAction,
   UnsaveListingAction,
-  catchAsync,
+  UpdateSoldStatusAction,
   catchAsyncAction,
 } from '../utilities';
 import { ApiRoutes, ListingAttrs, UserDoc, ListingDoc } from '../../common';
@@ -181,4 +180,11 @@ export const clearListings = (): ClearListingsAction => {
 
 export const clearSavedListingIds = (): ClearSavedListingIdsAction => {
   return { type: ActionTypes.clearSavedListingIds };
+};
+
+export const updateSoldStatus = (listingId: string): UpdateSoldStatusAction => {
+  return {
+    type: ActionTypes.updateSoldStatus,
+    payload: listingId,
+  };
 };

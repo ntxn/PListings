@@ -179,6 +179,11 @@ export interface StopTypingAction {
   payload: string;
 }
 
+export interface UpdateSoldStatusAction {
+  type: ActionTypes.updateSoldStatus;
+  payload: string;
+}
+
 export type Action =
   | FetchCurrentUserAction
   | SignUpAction
@@ -212,7 +217,8 @@ export type Action =
   | StopTypingAction
   | ClearUnreadMsgIdsByBuyerAction
   | ClearUnreadMsgIdsBySellerAction
-  | AddUnreadMsgIdAction;
+  | AddUnreadMsgIdAction
+  | UpdateSoldStatusAction;
 
 // Store State
 export interface StoreState {

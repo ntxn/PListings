@@ -72,6 +72,16 @@ export const chatroomReducer = (
       room = { ...state[action.payload] };
       room.typing = false;
       return { ...state, [action.payload]: room };
+    case ActionTypes.updateSoldStatus:
+      const result = Object.entries(state).filter(
+        entry => entry[1].listing.id == action.payload
+      );
+      let chatroom: ChatroomDocClient | undefined;
+      if (result.length === 1) {
+        chatroom = { ...result[0][1] };
+        chatroom.listing.sold = true;
+      }
+      return chatroom ? { ...state, [result[0][0]]: chatroom } : state;
     default:
       return state;
   }
