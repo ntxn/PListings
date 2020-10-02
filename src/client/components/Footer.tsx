@@ -10,7 +10,10 @@ export const Footer = (): JSX.Element => {
             <img src="/img/logo/logo-white.png" alt="plistings logo in white" />
           </Link>
         </div>
-        <div className="footer__navigation">Navigation</div>
+        <div className="footer__navigation">
+          <Link to="/about">About</Link>
+          <Link to="/contact-us">Contact Me</Link>
+        </div>
       </div>
     </footer>
   );

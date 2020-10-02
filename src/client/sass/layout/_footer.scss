@@ -17,6 +17,21 @@ footer {
     }
 
     &__navigation {
+      a:link,
+      a:visited,
+      a:active {
+        text-decoration: none;
+        color: var(--color-grey-light-2);
+        display: inline-block;
+        margin-left: 1rem;
+        padding-bottom: 0.3rem;
+        border-bottom: 2px solid transparent;
+
+        &:hover {
+          color: var(--color-grey-light-1);
+          border-color: var(--color-grey-light-1);
+        }
+      }
     }
   }
 }

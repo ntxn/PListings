@@ -1,7 +1,7 @@
 .messenger {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 10rem); // TODO: get footer actual height
+  height: calc(100vh - 10rem); // - footer height
 
   &__info-cards {
     min-width: 20rem;

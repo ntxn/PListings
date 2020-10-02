@@ -1128,6 +1128,20 @@ footer {
       footer .footer__logo img {
         max-width: 100%;
         max-height: 100%; }
+    footer .footer__navigation a:link,
+    footer .footer__navigation a:visited,
+    footer .footer__navigation a:active {
+      text-decoration: none;
+      color: var(--color-grey-light-2);
+      display: inline-block;
+      margin-left: 1rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 2px solid transparent; }
+      footer .footer__navigation a:link:hover,
+      footer .footer__navigation a:visited:hover,
+      footer .footer__navigation a:active:hover {
+        color: var(--color-grey-light-1);
+        border-color: var(--color-grey-light-1); }
 
 header {
   padding: var(--padding-body);
