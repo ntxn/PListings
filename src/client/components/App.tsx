@@ -7,6 +7,7 @@ import { fetchCurrentUser, getLocationByIP } from '../actions';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { NotFound } from './NotFound';
+import { About } from './About';
 import { withAuth, SignUp, LogIn } from './auth';
 import { AccountSettings, UserListings, Profile } from './user';
 import {
@@ -80,6 +81,7 @@ const _App = (props: AppProps): JSX.Element => {
                 exact
                 component={withLoadingListing(Listing)}
               />
+              <Route path="/about" exact component={About} />
               <Route component={NotFound} />
             </Switch>
           </div>

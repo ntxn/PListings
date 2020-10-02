@@ -1,0 +1,101 @@
+.about {
+  max-width: 80rem;
+  width: 80%;
+
+  margin: 2rem auto;
+  color: var(--color-grey-dark-3);
+  font-size: 1.4rem;
+
+  &__header {
+    text-align: center;
+
+    img {
+      width: 21rem;
+      height: auto;
+    }
+  }
+
+  &__subheader {
+    text-align: center;
+    font-size: var(--default-font-size);
+    font-weight: 500;
+    margin-bottom: 5rem;
+    margin-top: 0.5rem;
+    color: var(--color-grey-dark-1);
+  }
+
+  &__plistings {
+    &__intro {
+      margin-bottom: 0.7rem;
+    }
+
+    &__features {
+      margin-top: 1.5rem;
+      margin-bottom: 0.7rem;
+    }
+
+    &__features__details {
+      list-style-type: circle;
+      margin-left: 3rem;
+      font-size: 1.3rem;
+    }
+  }
+
+  &__me {
+    width: 100%;
+    margin-top: 6rem;
+    display: flex;
+
+    &__photo {
+      flex-grow: 0;
+      width: 10rem;
+      height: 10rem;
+      margin-right: 2rem;
+
+      img {
+        @include img-100-cover;
+        border-radius: 50%;
+      }
+    }
+
+    &__content {
+      flex: 1;
+    }
+
+    &__intro {
+      margin-bottom: 1rem;
+      text-align: justify;
+
+      a {
+        margin-left: 1rem;
+
+        svg {
+          transform: translateY(20%);
+        }
+      }
+    }
+
+    &__icons {
+      a > svg {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-right: 1rem;
+      }
+      &--linkedIn {
+        &:link,
+        &:visited,
+        &:active {
+          color: #0077b5;
+        }
+      }
+
+      &--github {
+        &:link,
+        &:visited,
+        &:active {
+          color: var(--color-black);
+        }
+      }
+    }
+  }
+}

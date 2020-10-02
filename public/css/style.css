@@ -1175,6 +1175,65 @@ main {
     width: 100%;
     max-width: var(--content-max-width); }
 
+.about {
+  max-width: 80rem;
+  width: 80%;
+  margin: 2rem auto;
+  color: var(--color-grey-dark-3);
+  font-size: 1.4rem; }
+  .about__header {
+    text-align: center; }
+    .about__header img {
+      width: 21rem;
+      height: auto; }
+  .about__subheader {
+    text-align: center;
+    font-size: var(--default-font-size);
+    font-weight: 500;
+    margin-bottom: 5rem;
+    margin-top: 0.5rem;
+    color: var(--color-grey-dark-1); }
+  .about__plistings__intro {
+    margin-bottom: 0.7rem; }
+  .about__plistings__features {
+    margin-top: 1.5rem;
+    margin-bottom: 0.7rem; }
+  .about__plistings__features__details {
+    list-style-type: circle;
+    margin-left: 3rem;
+    font-size: 1.3rem; }
+  .about__me {
+    width: 100%;
+    margin-top: 6rem;
+    display: flex; }
+    .about__me__photo {
+      flex-grow: 0;
+      width: 10rem;
+      height: 10rem;
+      margin-right: 2rem; }
+      .about__me__photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%; }
+    .about__me__content {
+      flex: 1; }
+    .about__me__intro {
+      margin-bottom: 1rem;
+      text-align: justify; }
+      .about__me__intro a {
+        margin-left: 1rem; }
+        .about__me__intro a svg {
+          transform: translateY(20%); }
+    .about__me__icons a > svg {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-right: 1rem; }
+    .about__me__icons--linkedIn:link, .about__me__icons--linkedIn:visited, .about__me__icons--linkedIn:active {
+      color: #0077b5; }
+    .about__me__icons--github:link, .about__me__icons--github:visited, .about__me__icons--github:active {
+      color: var(--color-black); }
+
 .settings {
   margin: 2rem auto;
   width: 100%;
