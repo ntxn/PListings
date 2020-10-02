@@ -99,6 +99,10 @@ io.on('connection', socket => {
             .to(roomId)
             .emit(SocketIOEvents.StopTyping, { userId, roomId });
         });
+
+        socket.on(SocketIOEvents.ListingSold, () => {
+          socket.broadcast.emit(SocketIOEvents.ListingSold);
+        });
       });
 
       namespaces[namespaceName] = namespace;

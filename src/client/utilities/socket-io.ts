@@ -16,6 +16,7 @@ import {
   typing,
   stopTyping,
   addUnreadMsgId,
+  updateSoldStatus,
 } from '../actions';
 import { StoreState, ChatroomDocClient } from './interfaces';
 
@@ -113,6 +114,10 @@ const initializeNamespaceSocket = (
       if (user.id !== userId) dispatch(stopTyping(roomId));
     }
   );
+
+  socket.on(SocketIOEvents.ListingSold, () => {
+    dispatch(updateSoldStatus(listing.id));
+  });
 
   return socket;
 };

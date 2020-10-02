@@ -10,4 +10,5 @@ export enum SocketIOEvents {
   MessageSent = 'Message sent',
   MessageReceived = 'Message received',
   MessageSeen = 'Message seen',
+  ListingSold = 'Listing sold',
 }
