@@ -280,8 +280,6 @@ body {
   text-decoration: none;
   display: inline-block;
   font-size: 1.4rem;
-  padding-bottom: 3px;
-  border-bottom: 2px solid transparent;
   cursor: pointer; }
 
 .btn-text--orange {
@@ -290,9 +288,19 @@ body {
 .btn-text--grey {
   color: var(--color-grey-dark-1); }
 
-.btn-text--orange:hover, .btn-text--grey:hover {
+.btn-text::after {
+  display: block;
+  content: '';
   border-bottom: 2px solid var(--color-secondary-dark);
+  transform: scaleX(0);
+  transition: all 0.2s ease-in-out;
+  transform-origin: 0 50%; }
+
+.btn-text:hover {
   color: var(--color-secondary-dark); }
+  .btn-text:hover::after {
+    transform: scaleX(1);
+    transform-origin: 0 50%; }
 
 .btn-text--underlined--green {
   border-bottom: 1px solid var(--color-secondary-dark);
@@ -1134,14 +1142,11 @@ footer {
       text-decoration: none;
       color: var(--color-grey-light-2);
       display: inline-block;
-      margin-left: 1rem;
-      padding-bottom: 0.3rem;
-      border-bottom: 2px solid transparent; }
-      footer .footer__navigation a:link:hover,
-      footer .footer__navigation a:visited:hover,
-      footer .footer__navigation a:active:hover {
-        color: var(--color-grey-light-1);
-        border-color: var(--color-grey-light-1); }
+      padding-bottom: 0.3rem; }
+    footer .footer__navigation::after {
+      border-color: var(--color-grey-light-1); }
+    footer .footer__navigation:hover a {
+      color: var(--color-grey-light-1); }
 
 header {
   padding: var(--padding-body);
